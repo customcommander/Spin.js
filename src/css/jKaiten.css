@@ -1,0 +1,127 @@
+body,
+#kaiten{
+    overflow: hidden;    
+}
+
+#kaiten {
+    position:   absolute;
+    top:        0em;
+    right:      0em;
+    bottom:     0em;
+    left:       0em;    
+}
+
+/*////////////////////////////////////////////////////////////////////////////*/
+/*// Navigation                                                             //*/
+/*////////////////////////////////////////////////////////////////////////////*/
+
+#k-nav-controls {
+    position:   absolute;
+    top:        0em;
+    left:       0em;
+    height:     2.5em;
+    width:      100%;
+    z-index:    100;
+}
+
+#k-nav-prev,
+#k-nav-next {
+    display:            none;    
+    position:           absolute;
+    top:                0em;
+    z-index:            100;    
+    cursor:             pointer;    
+    width:              2.5em;   
+    height:             2.5em;
+    background-repeat:  no-repeat;
+}
+
+#k-nav-prev {
+    left: 0.5em;
+    background-image: url('ctrl-prev.png');
+}
+
+#k-nav-next {
+    right: 0.5em;
+    background-image: url('ctrl-next.png');
+}
+
+
+
+
+#k-panels {        
+    position: absolute;
+    top:        0em;
+    right:      0em;
+    bottom:     0em;
+    left:       0em;    
+    width:      100%;    
+    margin:     0em;
+    padding:    0em;
+}
+
+
+
+.k-panel {
+    list-style-type: none;
+}
+
+.k-panel,
+.k-panel-hd,
+.k-panel-bd{
+    position:absolute;
+}            
+.k-panel{
+    top:0em;
+    bottom: 0em;
+    -moz-box-sizing:border-box;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    border-right:1px solid black;
+    z-index: 0;
+    background-color: white;
+
+}
+.k-panel-hd{    
+    top:0px;
+    width:100%;
+    height:2.5em;
+    background-color: whitesmoke;
+    text-align: center;
+    background: -moz-linear-gradient(center top , #B2B2B2, #838383) repeat scroll 0 0 #838383;    
+    background: -webkit-gradient(linear, left top, left bottom,from(#b2b2b2),to(#838383)) repeat scroll 0 0 #838383;
+}
+
+.k-panel-hd .k-title {
+    font-weight: bold;
+    color: white;
+    font-size: 1.3em;
+    text-shadow: 0 1px 0 black;
+    padding-top: 0.3em;
+    -moz-box-sizing:border-box;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    display: inline-block;
+}
+
+.k-panel-bd {
+    top:        2.5em;
+    right:      0em;                
+    bottom:     0em;
+    left:       0em;
+    overflow-y:auto;
+}
+
+/** Error Panel **/
+.k-panel.error h2 {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    margin-left: -45%;
+    text-align: center;
+    border: 1px solid red;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    width: 90%;    
+    padding: 10px 0px;
+}

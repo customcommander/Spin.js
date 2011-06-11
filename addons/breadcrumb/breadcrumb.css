@@ -1,0 +1,52 @@
+/*******************************************************************************
+ ** Menubar & Breadcrumb                                                       *
+ ******************************************************************************/
+
+/*We need to make room for the menubar so we push down #k-panels a little bit...*/
+#k-panels {
+    top: 2.5em!important;
+}
+
+#k-menubar {
+    position: absolute;
+    z-index: 100;
+    top: 0em;
+    left: 0em;
+    right: 0em;
+    width: 100%;
+    height: 2.5em;
+    background-color: red;      
+    background: -moz-linear-gradient(center top , #1a171b, #3d3c3f) repeat scroll 0 0 #3d3c3f;
+    background: -webkit-gradient(linear, left top, left bottom,from(#1a171b),to(#3d3c3f)) repeat scroll 0 0 #3d3c3f; 
+    -webkit-box-sizing: border-box;
+}
+
+#k-breadcrumb {
+    list-style-type: none outside none;
+    height: 2.5em;
+    margin: 0px;
+    padding: 0px;
+}
+
+.k-breadcrumb-item {
+    background-image: url('breadcrumb-item.png');
+    background-repeat: no-repeat;
+    background-position: center right;
+    display: block;
+    float: left;
+    height: 2.5em;
+    margin: 0px;
+    padding-top: 0.625em;
+    padding-right: 1.25em;
+    padding-bottom: 0em;
+    padding-left: 1em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;    
+    cursor: pointer;
+    color: white;
+}
+
+.k-breadcrumb-item.k-last {
+    background-image: url('breadcrumb-lastitem.png');    
+}
