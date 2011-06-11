@@ -35,94 +35,78 @@
  * Spin.js allows web developers to design applications as a logical and
  * continous flow of screens.
  *
- * @author      Julien Gonzalez <hello@spinjs.com>
+ * @author      customcommander <hello@spinjs.com>
  * @since       June 11, 2011
+ * @version     1.0
  */
 (function ($){    
     
-    /**
-     * Throws an Error object and display the Error message in a panel.
-     * Used internally by jKaiten.
-     */
-    function ErrorPanel(msg){
-        Kaiten('<h2>' + msg + '</h2>', 'Ooops!?').addClass('error');
-        throw new Error(msg);
-    }
-    
-    /**
-     * Overrides jQuery default error function in order to allow developers
-     * to access the internal ErrorPanel function.
-     * 
-     * Developers can re-override it if they need a more subtle design. The
-     * internal ErrorPanel will remain untouched.
-     */
-    $.error = ErrorPanel;
-
-
-/******************************************************************************
- * K (Private API)                                                            *
- *                                                                            *
- * Environment variables and internal functions.                              *
- *                                                                            *          
- * K has various responsabilities:                                            *
- *                                                                            *
- * 1) Configuration object validation                                         *
- * 2) Startup initialization                                                  *
- * 3) Loading of panels (see loader function)                                 *
- * 4) Resizing                                                                *
- ******************************************************************************/
+//------------------------------------------------------------------------------
+//-- Env (Private API) ---------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**     
-     * Validates the user configuration object and set/reset some environment
-     * variables with it.
-     * 
-     * The configuration object is a key/value pairs object:
-     * 
-     *      minWidth:     minimum width of a panel
-     *      loader:       custom loader function
+     * Validates the configuration object and set or reset some environment
+     * variables. 
+     *
+     * Configuration is a key/value pairs object literal.
+     *
+     * Current supported keys are:
+     *
+     * minWidth: a number that indicates the minimum width of a panel.
+     * loader: a function that will be used to load panels.
+     *
+     * @author      customcommander <hello@spinjs.com>
+     * @since       June 11, 2011
+     * @version     1.0
      */
-    function K(o){
+    function Env(o){
         
         //Browser window width in pixels
-        K.WINDOW_WIDTH = $(window).width();
+        Env.WINDOW_WIDTH = $(window).width();
         
         /**
-         * Calling K() without argument set the default environment.
+         * Calling Env() without argument set the default environment.
          * (e.g. minWidth is 320 and loader is the default loader)
          */
-        if (!$.isPlainObject(o)){
+        if (o===undefined || !$.isPlainObject(o)){
             o = {};
         }
         
         /**
          * If minWidth is given it must be a number.
-         * That number cannot be lower than 320 or greater than the
-         * current browser window.
+         *
+         * Spin.js imposes a soft limit for the panel width. The width cannot
+         * be greater than the browser width and cannot be lower than 320.
+         * 320 is the (former) width of an iPhone in vertical position.
+         *
+         * However Spin.js does not prevent a user from narrowing 
+         * his/her browser window below 320 if it's convenient to him/her.
          */
         if (o.hasOwnProperty('minWidth') && $.type(o.minWidth)=='number'){
             
-            //in the case o.minWidth is a float
+            //in the case minWidth is a float
             o.minWidth = Math.floor(o.minWidth);
             
             if (o.minWidth<320){
                 o.minWidth = 320;            
-            } else if (o.minWidth>K.WINDOW_WIDTH){
-                o.minWidth = K.WINDOW_WIDTH;
+            } else if (o.minWidth>Env.WINDOW_WIDTH){
+                o.minWidth = Env.WINDOW_WIDTH;
             }
-            
-        //If minWidth is not given or is not a number we fallback to 320
+                                
         } else {
+            //default value if minWidth is missing or invalid
             o.minWidth = 320;
         }
         
-        K.PANEL_MINWIDTH = o.minWidth;
-        K.MAX_COLUMNS    = Math.floor(K.WINDOW_WIDTH / K.PANEL_MINWIDTH);
+        Env.PANEL_MINWIDTH = o.minWidth;
+        Env.MAX_COLUMNS    = Math.floor(Env.WINDOW_WIDTH / Env.PANEL_MINWIDTH);
         
-        if (!K.MAX_COLUMNS){
-            K.MAX_COLUMNS = 1;
+        if (!Env.MAX_COLUMNS){
+            Env.MAX_COLUMNS = 1;
         }
         
-        K.PANEL_WIDTH = Math.round(K.WINDOW_WIDTH / K.MAX_COLUMNS);
+        Env.PANEL_WIDTH = Math.round(Env.WINDOW_WIDTH / Env.MAX_COLUMNS);
         
         /**
          * If loader is given it must be a function otherwise we trigger
@@ -130,11 +114,10 @@
          */
         if (o.hasOwnProperty('loader')){            
             if (!$.isFunction(o.loader)){                
-                ErrorPanel('Loader is not a function');                
-            }
-            
+                Env.error('Loader is not a function');                
+            }            
             //Overrides the default loader.
-            K.loader = o.loader;
+            Env.loader = o.loader;
         }    
         
         return o;                    
@@ -142,67 +125,87 @@
     
     //ENVIRONMENT VARIABLES
     //--------------------------------------------------------------------------    
-    K.WINDOW_WIDTH      = 0;        //Computed browser window width in pixels
-    K.PANEL_WIDTH       = 0;        //Computed panel width in pixels
-    K.PANEL_MINWIDTH    = 0;        //Minimum panel width in pixels
-    K.MAX_COLUMNS       = 0;        //Maximum number of panels that can be visible                                    
-    K.initialized       = false;    //Indicates if environment has been initialized
-    K.BASE_PATH         = null;
-    K.body              = null;     //$(document.body)    
-    K.panels            = null;
-    K.prevCtrl          = null;     //Previous panel control (jQuery object)
-    K.nextCtrl          = null;     //Next panel control (jQuery object)
+    Env.initialized       = false;    //Indicates if environment has been initialized
+
+    Env.BASE_PATH         = null;
+    Env.WINDOW_WIDTH      = 0;        //Computed browser window width in pixels
+    Env.PANEL_WIDTH       = 0;        //Computed panel width in pixels
+    Env.PANEL_MINWIDTH    = 0;        //Minimum panel width in pixels
+    Env.MAX_COLUMNS       = 0;        //Maximum number of panels that can be visible                                            
+    
+    Env.body              = null;     //$(document.body)    
+    Env.panels            = null;
+    Env.prevCtrl          = null;     //Previous panel control (jQuery object)
+    Env.nextCtrl          = null;     //Next panel control (jQuery object)    
+    
+    /**
+     * Throws an Error object and displays its message into a panel.
+     *
+     * This function is used internally when Spin.js needs to trigger 
+     * a failure.
+     *
+     * @author      customcommander <hello@spinjs.com>
+     * @since       June 11, 2011
+     * @version     1.0
+     */
+    Env.error = function (msg){
+        Kaiten('<h2>' + msg + '</h2>', 'Error!').addClass('error');
+        throw new Error(msg);
+    };
     
     /**
      * Environment Base Path
      *
-     * Locates the script tag that includes jKaiten and gets its src
-     * property to build the base path with it.
+     * Locates the script tag that includes Spin.js and gets its src
+     * property to build the base path with it. This function is executed as
+     * soon as Spin.js source file is included.
      *
-     * http://example.com/jKaiten/src/js/jKaiten.js     <-- full path from src
-     * http://example.com/jKaiten/                      <-- base path
+     * http://example.com/Spinjs/src/js/Spin.js     <-- full path from src
+     * http://example.com/Spinjs/                   <-- base path
      *
-     * @since           1.0
+     * @author      customcommander <hello@spinjs.com>
+     * @since       June 11, 2011
+     * @version     1.0
      */
-    K.initBasePath = function (){
-        var fullpath;
-        fullpath    = $('script[src*="src/js/jKaiten"]').prop('src'); 
-        K.BASE_PATH = fullpath.substring(0, fullpath.lastIndexOf('src'));
+    Env.initBasePath = function (){
+        var fullpath  = $('script[src*="src/js/Spin"]').prop('src'); 
+        Env.BASE_PATH = fullpath.substring(0, fullpath.lastIndexOf('src'));
     };
     
     /**
      * Environment Required Stylesheets
      * 
      * Loads required stylesheets by appending the corresponding link tags to
-     * the head. This function is executed as soon as jKaiten source file is
+     * the head. This function is executed as soon as Spin.js source file is
      * included.
      *
-     * Developers shouldn't have to worry about the extra required files 
-     * and of their inclusion order...
-     *
-     * @since           1.0
-     * @todo            put all stylesheets into one single minified file.
+     * @author      customcommander <hello@spinjs.com>
+     * @since       June 11, 2011
+     * @version     1.0
+     * @todo        put all stylesheets into one single minified file.
      */
-    K.loadCss = function (){        
+    Env.loadCss = function (){        
         $('head').append(
-            '<link rel="stylesheet" type="text/css" href="' + K.BASE_PATH + 'src/css/fonts-min.css" />',
-            '<link rel="stylesheet" type="text/css" href="' + K.BASE_PATH + 'src/css/reset-min.css" />',
-            '<link rel="stylesheet" type="text/css" href="' + K.BASE_PATH + 'src/css/base-min.css" />',
-            '<link rel="stylesheet" type="text/css" href="' + K.BASE_PATH + 'src/css/jKaiten.css" />'
+            '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/fonts-min.css" />',
+            '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/reset-min.css" />',
+            '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/base-min.css" />',
+            '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/jKaiten.css" />'
         );
     };
     
     /**
-     * Startup Initialization
+     * Environment Initialization
      * 
-     * The parameter is the user configuration object (if any).
+     * @param       key/value pairs object literal (Configuration)
+     *
+     * @author      customcommander <hello@spinjs.com>
+     * @since       June 11, 2011
+     * @version     1.0    
      */
-    K.initialize = function (o){
+    Env.initialize = function (o){
                 
         /**
-         * jKaiten takes care of its required HTML markup.
-         * The developer just has to put the required resources (css/js)
-         * in the <head/>. The body element must be empty.
+         * Spin.js takes care of its own HTML markup.
          */
         $(document.body).append([
             '<div id="kaiten">',         
@@ -217,33 +220,33 @@
         
         //Setting environment variables.
         //----------------------------------------------------------------------
-        K.body       = $(document.body);        //Body element
-        K.prevCtrl   = $('#k-nav-prev');        //Previous panel control
-        K.nextCtrl   = $('#k-nav-next');        //Next panel control
-        K.panels     = $('#k-panels');          //Panels list
+        Env.body       = $(document.body);        //Body element
+        Env.prevCtrl   = $('#k-nav-prev');        //Previous panel control
+        Env.nextCtrl   = $('#k-nav-next');        //Next panel control
+        Env.panels     = $('#k-panels');          //Panels list
         
         //Validates the configuration object
-        o = K(o);   
+        o = Env(o);   
         
         //Loads the first panel
-        K.loader(K.body);        
+        Env.loader(Env.body);        
         
         //Setting events handlers.
         //----------------------------------------------------------------------
         
         $(window).resize(function (){
-            var formerWidth = K.PANEL_WIDTH;
+            var formerWidth = Env.PANEL_WIDTH;
             
-            //This updates K.PANEL_WIDTH
-            K({minWidth: K.PANEL_MINWIDTH});
+            //This updates Env.PANEL_WIDTH
+            Env({minWidth: Env.PANEL_MINWIDTH});
             
             //If we perform a vertical resizing only, panel & window widths
             //remain the same. Then we don't have to resize the panels.            
-            if (K.PANEL_WIDTH===formerWidth){                
+            if (Env.PANEL_WIDTH===formerWidth){                
                 return;
             }
             
-            K.resize();
+            Env.resize();
         });
         
         /**
@@ -251,7 +254,7 @@
          * 
          * A click on a non navigable element will not propagate.
          */
-        K.body.delegate('.no-nav', 'click', function (e){
+        Env.body.delegate('.no-nav', 'click', function (e){
             e.stopPropagation();
         });
         
@@ -261,7 +264,7 @@
          * 
          * Note that any default behaviour is prevented.
          */
-        K.body.delegate('.nav', 'click', function (e){
+        Env.body.delegate('.nav', 'click', function (e){
             var elt     = $(this),
                 target  = $(e.target),
                 panel   = elt.closest('li.k-panel'),
@@ -281,7 +284,7 @@
                 
                 Kaiten.removeAfter(panel);
                 
-                K.loader(elt);                
+                Env.loader(elt);                
                 
             } else {                
                 Kaiten.moveTo(
@@ -291,21 +294,24 @@
             
         });                
         
-        K.prevCtrl.click(function (){
+        Env.prevCtrl.click(function (){
             var idx = Stack.previous(Stack.min);
             Kaiten.moveTo(Stack.panel(idx));            
         });
         
-        K.nextCtrl.click(function (){
+        Env.nextCtrl.click(function (){
             var idx = Stack.next(Stack.max);
             Kaiten.moveTo(Stack.panel(idx));
         });        
     };
     
     /**
-     * Loader - loads the next panel
+     * Loader
      *
-     * The loader is executed by jKaiten each time a click is made on
+     * The loader is the function that is in charge of loading the panels.
+     * i.e. This is probably the most interesting function ;-)
+     *
+     * The loader is executed by Spin.js each time a click is made on
      * an element with the class 'nav' and gives that element to the loader
      * as its first parameter.
      *
@@ -313,18 +319,22 @@
      * finished to load. Its parameter at that specific time is always the
      * body element.
      *
-     * jKaiten defines a default loader but you can override it by giving
-     * your own loader function to $.kaiten.configure():
+     * Spin.js defines a default loader but you can override it by giving
+     * your own loader function to $.spin.configure():
      * 
-     * $.kaiten.configure({
+     * $.spin.configure({
      *      loader: function (elt){
      *          //your loading logic
      *      }
      * });
      * 
      * The following comments describe the behaviour of the default loader.
+     *
+     * @author      customcommander <hello@spinjs.com>
+     * @since       June 11, 2011
+     * @version     1.0
      */
-    K.loader = function (elt){
+    Env.loader = function (elt){
         
         /**
          * The loader assumes that each clicked element (elt) has a data-url
@@ -342,36 +352,10 @@
         url = ($.type(url)!='string' || !$.trim(url)) ? '' : $.trim(url);        
         
         /**
-         * At the very first execution of the loader we use the url to define 
-         * a default url. The default url is used when the clicked element has 
-         * no data-url attribute.
-         *
-         * The first time that the loader executes, the url is mandatory. 
-         * If none is provided the loader triggers a failure.
-         *
-         * <!--Required data-url attribute!-->
-         * <body data-url="panel.php"/>
-         *
-         */
-        if (!K.loader.hasOwnProperty('defaultUrl')){
-            if (!url){
-                ErrorPanel('No url given');
-            }
-            K.loader.defaultUrl = url;
-        }
-        
-        /**
-         * If there is no url, we fallback to the default url.
-         *
-         * The default url is convenient when you have a unique script that 
-         * provides any panels. (Such as a front controller.)
-         *
-         * You set it once and you're done.
-         *
-         * <body data-url="panel-controller.php"/> 
+         * If url is empty we trigger a failure.
          */
         if (!url){
-            url = K.loader.defaultUrl;
+            Env.error('No url given');
         }
         
         $.ajax({
@@ -389,71 +373,77 @@
              * e.g. 404 Not Found
              */
             error: function (xhr, status, error){                
-                ErrorPanel(xhr.status + ' ' + error);
+                Env.error(xhr.status + ' ' + error);
             }
         });
     };   
     
     /**
-     * Browser Window Resize Handler     
+     * Environment Resize
+     * (When the user resizes his/her browser window)
+     *
+     * @author      customcommander <hello@spinjs.com>
+     * @since       June 11, 2011
+     * @version     1.0  
      */
-    K.resize = function (){
+    Env.resize = function (){
         var idx = 0,
             n   = Stack.size(),
             newMin,
             newMax,
             pos;
         
-        newMin = Stack.max - K.MAX_COLUMNS + 1;
+        newMin = Stack.max - Env.MAX_COLUMNS + 1;
         
         if (newMin<0){
             newMin = 0;
             // Stack.max is updated if there are not enough panels before the last
             // (and including the last) to occupy the browser window and if there
             // are panels available after the last.
-            newMax = (Stack.max+1===n) ? Stack.max : K.MAX_COLUMNS - 1;
+            newMax = (Stack.max+1===n) ? Stack.max : Env.MAX_COLUMNS - 1;
             pos    = 0;
         } else {
             newMax = Stack.max;
-            pos    = (newMin===0) ? 0 : newMin * -K.PANEL_WIDTH;
+            pos    = (newMin===0) ? 0 : newMin * -Env.PANEL_WIDTH;
         }
         
         for (; idx<n; idx++){            
             Stack.panel(idx).css({
                 left:   Math.ceil(pos),
-                width:  K.PANEL_WIDTH
+                width:  Env.PANEL_WIDTH
             });
-            pos += K.PANEL_WIDTH;
+            pos += Env.PANEL_WIDTH;
         }
         
         Stack.min = newMin;
         Stack.max = newMax;
         
-        K.togglePrevNextControls();
+        Env.togglePrevNextControls();
     };  
     
-    K.togglePrevNextControls = function (){        
+    /**
+     * Shows or hides previous/next controls
+     *
+     * @author      customcommander <hello@spinjs.com>
+     * @since       June 11, 2011
+     * @version     1.0
+     */
+    Env.togglePrevNextControls = function (){        
         if (Stack.previous(Stack.min)<0){
-            K.prevCtrl.hide('fast');
+            Env.prevCtrl.hide('fast');
         } else {            
-            K.prevCtrl.show('fast');
+            Env.prevCtrl.show('fast');
         }
         if (Stack.next(Stack.max)<0){
-            K.nextCtrl.hide('fast');
+            Env.nextCtrl.hide('fast');
         } else {
-            K.nextCtrl.show('fast');
+            Env.nextCtrl.show('fast');
         }
     };
         
-/******************************************************************************
- * Stack (Private API)                                                        * 
- *                                                                            *
- * Stack is responsible for :                                                 *
- *                                                                            *
- * 1) Identifying panels.                                                     *
- * 2) Adding and removing panels from the DOM.                                *
- * 3) Maintaining the visibility state of the panels.                         *
- ******************************************************************************/
+//------------------------------------------------------------------------------
+//-- Stack (Private API) -------------------------------------------------------
+//------------------------------------------------------------------------------
  
     /**
      * Stack - Adds a panel
@@ -495,8 +485,8 @@
      * Appends the panel to the DOM (panels/breadcrumb) and to the Stack.
      */
     Stack.push = function (panel){           
-        K.panels.append(panel);                
-        K.body.trigger('paneladd.k', [panel]);        
+        Env.panels.append(panel);                
+        Env.body.trigger('paneladd.k', [panel]);        
         return Stack.arr.push(panel.attr('id')) - 1;
     };
     
@@ -507,7 +497,7 @@
         var id    = Stack.arr.pop(),
             panel = $('#' + id).remove();
             
-        K.body.trigger('panelremove.k', [panel]);
+        Env.body.trigger('panelremove.k', [panel]);
     };
     
     /**
@@ -517,13 +507,13 @@
         var idx;      
             
         if (!(panel instanceof jQuery) || !panel.is('li.k-panel')){
-            ErrorPanel('No panel given');
+            Env.error('No panel given');
         }
         
         idx = $.inArray(panel.attr('id'), Stack.arr);
         
         if (idx<0){
-            ErrorPanel('Panel Not Found');
+            Env.error('Panel Not Found');
         }
         
         return idx;
@@ -543,7 +533,7 @@
         if (Stack.min<0){/*i.e. the first panel*/
             return 0;
         }        
-        return (Stack.max - Stack.min + 1) * K.PANEL_WIDTH;
+        return (Stack.max - Stack.min + 1) * Env.PANEL_WIDTH;
     };
     
     /**
@@ -571,7 +561,7 @@
      * Returns true if index is within visible range.
      */
     Stack.visible = function (idx){        
-        return (idx>=Stack.min) && (idx<=(Stack.min + K.MAX_COLUMNS - 1));
+        return (idx>=Stack.min) && (idx<=(Stack.min + Env.MAX_COLUMNS - 1));
     }; 
     
     /**
@@ -594,6 +584,10 @@
         
         Stack.max = Stack.previous(idx);   
     };   
+    
+//------------------------------------------------------------------------------
+//-- Spin (Public API) ---------------------------------------------------------
+//------------------------------------------------------------------------------
             
     /**
      * Kaiten - Public API
@@ -625,7 +619,7 @@
          * or a jQuery object.
          */
         if (html && $.type(html)!='string' &&  !(html instanceof jQuery)){
-            ErrorPanel('String or jQuery object expected');
+            Env.error('String or jQuery object expected');
         }
         
         /**
@@ -659,7 +653,7 @@
             .attr('id', panelId)
             .css({
                 left: Stack.position(),
-                width: K.PANEL_WIDTH
+                width: Env.PANEL_WIDTH
             });
         
         /**
@@ -706,7 +700,7 @@
              * what your code does ;-)
              * 
              */
-            K.body.append([
+            Env.body.append([
                 '<script type="text/javascript">',
                     js.join(''),
                 '</script>'
@@ -728,11 +722,11 @@
      * Parameter 'o' is a key/value pairs literal object.
      */
     Kaiten.configure = function (o){
-        if (!K.initialized){
+        if (!Env.initialized){
             $(function (){
-                K.initialize(o);
+                Env.initialize(o);
             });   
-            K.initialized = true;         
+            Env.initialized = true;         
         }
     };
     
@@ -776,8 +770,8 @@
             //          | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
             //          |   |   |   |   |   |   |min|   |max|
             //          +---+---+---+---+---+---+---+---+---+            
-            css.left = '-=' + Math.round(((destIdx - Stack.max) * K.PANEL_WIDTH));                            
-            newMin   = destIdx - K.MAX_COLUMNS + 1;  // 8 - 3 + 1 = 6
+            css.left = '-=' + Math.round(((destIdx - Stack.max) * Env.PANEL_WIDTH));                            
+            newMin   = destIdx - Env.MAX_COLUMNS + 1;  // 8 - 3 + 1 = 6
             newMax   = destIdx;                     // 8
             
             //from 2 to (and including) 8
@@ -793,15 +787,15 @@
                     
                     //panel 5 is positioned at : (5 - 2) * 100 = 300
                     //panel 6 is positioned at : (6 - 2) * 100 = 400 ...
-                    panel.css({left: Math.round((idx - Stack.min) * K.PANEL_WIDTH)});                    
+                    panel.css({left: Math.round((idx - Stack.min) * Env.PANEL_WIDTH)});                    
                 }                
             }            
             
         } else if (destIdx<Stack.min){
             
-            css.left = '+=' + Math.round(((Stack.min - destIdx) * K.PANEL_WIDTH));
+            css.left = '+=' + Math.round(((Stack.min - destIdx) * Env.PANEL_WIDTH));
             newMin   = destIdx;
-            newMax   = destIdx + K.MAX_COLUMNS - 1;
+            newMax   = destIdx + Env.MAX_COLUMNS - 1;
             
             for (idx=destIdx; idx<=Stack.max; idx++){                                  
                 
@@ -809,7 +803,7 @@
                 elts.push(panel.get(0));                                                       
                 
                 if (idx<Stack.min){                                                            
-                    panel.css({left: Math.round((idx - Stack.min) * K.PANEL_WIDTH)});                    
+                    panel.css({left: Math.round((idx - Stack.min) * Env.PANEL_WIDTH)});                    
                 }
             }                        
         }   
@@ -820,7 +814,7 @@
         
         $(elts).animate(css, 'fast');   
         
-        K.togglePrevNextControls();
+        Env.togglePrevNextControls();
         
         return destPanel;
     };        
@@ -913,17 +907,17 @@
         
         //Call without argument
         if (n===undefined){
-            return K.MAX_COLUMNS;
+            return Env.MAX_COLUMNS;
         }
         
         n = parseInt(n, 10);
         
         if (!n || n<0){
-            ErrorPanel('Invalid number of columns');
+            Env.error('Invalid number of columns');
         }
         
         //maximum number of columns if panel width is set to 320
-        max = Math.floor(K.WINDOW_WIDTH / 320);
+        max = Math.floor(Env.WINDOW_WIDTH / 320);
         
         if (!max){
             max = 1;
@@ -937,21 +931,21 @@
             n = max;
         }
         
-        K({minWidth: Math.floor(K.WINDOW_WIDTH / n)});
+        K({minWidth: Math.floor(Env.WINDOW_WIDTH / n)});
         
-        K.resize();
+        Env.resize();
         
         return n;
     };
     
-    K.initBasePath();
-    K.loadCss();
+    Env.initBasePath();
+    Env.loadCss();
     
     $(function (){
-        if (!K.initialized){
-            K.initialize();                    
+        if (!Env.initialized){
+            Env.initialize();                    
         }
-        K.initialized = true;
+        Env.initialized = true;
     });
     
     /**
@@ -970,7 +964,7 @@
         }
         
         if (!panel.length){
-            ErrorPanel("Can't find your panel");
+            Env.error("Can't find your panel");
         }
         
         return panel;
@@ -1046,6 +1040,14 @@
                         .text();
         }
     };
+    
+    /**
+     * This is a "gift" to developers if they want to use the internal 
+     * Env.error function and if they are happy with its design.
+     *
+     * Developers can re-override $.error later without affecting Env.error.
+     */
+    $.error = Env.error;
     
     /**
      * Extends jQuery with jKaiten public API

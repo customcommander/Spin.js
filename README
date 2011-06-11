@@ -1,6 +1,9 @@
 Spin.js 1.0
 http://spinjs.com
 
+Spin.js allows web developers to design applications 
+as a logical and continous flow of screens.
+
 Copyright 2011, Julien Gonzalez
 Code licensed under the GPLv3 License:
 http://www.gnu.org/licenses
