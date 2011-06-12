@@ -55,9 +55,9 @@
      * @since           1.0
      * @version         1.0
      * @param           {Object}    [o]             Configuration object key/value pairs object literal
-     * @param           {Number}    [o.minWidth]    The minimum width of a panel (in pixels)
-     * @param           {Function}  [o.loader]      The custom loader function (i.e. 
-     * @returns         {Object} Configuration object (can be different from the original)     
+     * @param           {Number}    [o.minWidth]    Minimum width of a panel in pixels
+     * @param           {Function}  [o.loader]      Custom loader function
+     * @returns         {Object} Configuration object (may differs from the original)     
      */
     function Env(o){
         
@@ -396,10 +396,9 @@
     };
     
     /**
-     * Loader
+     * The loader is in charge of loading the panels.
      *
-     * <p>The loader is the function that is in charge of loading the panels.
-     * i.e. This is probably the most interesting function ;-)</p>
+     * <p>It's probably the most interesting function!</p>
      *
      * <p>The loader is executed by Spin.js each time a click is made on
      * an element with the class 'nav' and gives that element to the loader
@@ -409,25 +408,26 @@
      * finished to load. Its parameter at that specific time is always the
      * body element.</p>
      *
-     * <p>Spin.js defines a default loader but you can override it by giving
-     * your own loader function to $.spin.configure():</p>
+     * <p>Spin.js defines a default loader (this one) but you can override it 
+     * by supplying your own to $.spin.configure().</p>
      * 
-     * @example
+     * <pre>
+     * //This is how you set you own loader
      * $.spin.configure({
      *      loader: function (elt){
      *          //your loading logic
      *      }
      * });
-     * 
-     * @author          customcommander <hello@spinjs.com>
+     * </pre>
+     *
+     * @author          customcommander
      * @since           1.0
      * @version         1.0
      * @param           {jQuery Object} elt The element which has been clicked or the body when the document loads
      */
-    Env.loader = function (elt){
-        //THE FOLLOWING COMMENTS DESCRIBES HOW THE DEFAULT LOADER WORKS
-        
-        /*
+    Env.loader = function (elt){              
+        /* This is how the default loader works:
+         *
          * The loader assumes that each clicked element (elt) has a data-url
          * attribute and loads that url with some ajax voodoo.
          *
@@ -439,8 +439,7 @@
         
         //Url must be an non empty string
         url = ($.type(url)!='string' || !$.trim(url)) ? '' : $.trim(url);        
-        
-        //Otherwise we trigger a failure
+
         if (!url){
             Env.error('No url given');
         }
@@ -457,9 +456,9 @@
     };   
     
     /**
-     * Environment Resize
+     * Environment Resize.
      *
-     * @author          customcommander <hello@spinjs.com>
+     * @author          customcommander
      * @since           1.0
      * @version         1.0  
      */
@@ -596,6 +595,8 @@
      * @type            Number
      */
     Stack.nextId = 1;
+    
+//-- Stack functions -----------------------------------------------------------
     
     /**
      * Returns the number of panels in the Stack
@@ -777,29 +778,35 @@
 //------------------------------------------------------------------------------
             
     /**
-     * Spin - Public API
+     * <p>Creates and appends a panel</p>
      *
-     * Spin is both a function and a namespace for the public API.
+     * @example
+     * //Creates and appends a panel with no content and no title
+     * $.spin();
+     *
+     * @example
+     * $.spin('&lt;p&gt;Hello World&lt;/p&gt;', 'Hello');
+     *
+     * @example
+     * var html = $('&lt;p&gt;Hello World&lt;/p&gt;');
+     * $.spin(html, 'Hello');
+     *
+     * @example
+     * //$.spin() returns the panel
+     * //we want to add content after the panel is created and appended
+     * var panel = $.spin();
+     * panel.panelBody('&lt;p&gt;Hello World&lt;/p&gt;');
      * 
-     * When used as a function, Spin appends a new panel to the list. 
-     * If the panel is positionned outside of visible range, Spin will move 
-     * until the panel gets visible.
-     *
-     * First parameter is either a string or a jQuery object that represents
-     * the content of the panel.
-     *
-     * The second parameter is a string and represents the title of the panel.
-     *
-     * Returns the new panel.
-     * 
-     * @namespace   Spin
-     * @name        $.spin
+     * @public
+     * @name            $.spin
+     * @namespace       
      * @function
-     * @param           {String|jQuery Object} [html]   Content of the panel. Can be either a HTML string or a jQuery object
-     * @param           {String}                [title] Title of the panel
      * @author          customcommander
      * @since           1.0
      * @version         1.0     
+     * @param           {String|jQuery Object}  [html]  Content of the panel. Either a HTML string or a jQuery object.
+     * @param           {String}                [title] Title of the panel
+     * @returns         {jQuery Object} The panel that has been created
      */
     function Spin(html, title){
         var panel, 
@@ -1218,6 +1225,24 @@
         }
         
         return panel;
+    };
+    
+    $.fn.panelBody = function (html){
+        var body;
+        
+        if (!this.is('li.k-panel') ||
+            (html && $.type(html)!='string' && !(html instanceof jQuery))){
+            return;
+        }
+        
+        body = this.find('div.k-panel-bd');
+        
+        if (html){
+            html = (html instanceof jQuery) ? html : $(html);
+            body.html(html);
+        }
+        
+        return body
     };
     
     /**
