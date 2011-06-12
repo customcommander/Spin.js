@@ -778,10 +778,10 @@
 //------------------------------------------------------------------------------
             
     /**
-     * <p>Creates and appends a panel</p>
+     * Creates and appends a panel.
      *
      * @example
-     * //Creates and appends a panel with no content and no title
+     * //Creates a panel with no content and no title
      * $.spin();
      *
      * @example
@@ -793,11 +793,6 @@
      * var html = $('&lt;p&gt;Hello World&lt;/p&gt;');
      * $.spin(html, 'Hello');
      *
-     * @example
-     * //Adds content after the panel is returned
-     * var panel = $.spin();
-     * panel.panelBody('&lt;p&gt;Hello World&lt;/p&gt;');
-     * 
      * @public
      * @name            $.spin
      * @namespace       
@@ -818,7 +813,7 @@
             n,      //control var
             js; 
             
-        /**
+        /*
          * If the html parameter is given it must be either a string
          * or a jQuery object.
          */
@@ -826,7 +821,7 @@
             Env.error('String or jQuery object expected');
         }
         
-        /**
+        /*
          * Converts the html parameter to a jQuery object if it was not
          * already.
          */
@@ -834,7 +829,7 @@
             html = $(html);
         }
         
-        /**
+        /*
          * If the title parameter was not given, we set it to an empty string.
          * Otherwise the string 'undefined' will be displayed.
          */
@@ -856,13 +851,13 @@
         panel
             .attr('id', panelId)
             .css({
-                left: Stack.position(),
-                width: Env.PANEL_WIDTH
+                left:   Stack.position(),
+                width:  Env.PANEL_WIDTH
             });
         
-        /**
+        /*
          * We append to the panel the html without any <script/> nodes.
-         * For reason explained below these nodes must added to the DOM
+         * For reason explained below these nodes must be added to the DOM
          * separately.
          */
         panel.find('div.k-panel-bd').append(html.filter(':not(script)'));                        
@@ -879,11 +874,10 @@
             
             for (i=0, n=script.length; i<n; i++){
                 
-                /**
+                /*
                  * We reinject the JavaScript defined between <script></script>
                  * into an anonymous function which "this" value is set to 
-                 * the panel that we just have created.
-                 * 
+                 * the panel that we just have created. 
                  */                
                 js.push([                    
                     '(function (){',                        //<-- anonymous function       
@@ -892,7 +886,7 @@
                 ].join(''));
             }
             
-            /**
+            /*
              * Adding JavaScript to the DOM after the addition of the panel
              * to the DOM.
              * 
@@ -901,8 +895,7 @@
              * 
              * If the JavaScript has no need to access such elements, it is
              * not necessary to do that but in the other hand we cannot predict
-             * what your code does ;-)
-             * 
+             * what your code does ;-) 
              */
             Env.body.append([
                 '<script type="text/javascript">',
@@ -918,19 +911,14 @@
     }    
     
     /**
-     * Allows to configure Spin.js before it runs.
-     * 
-     * The function is designed to be executed only once. Further calls will
-     * have no effect.
-     * 
-     * Parameter 'o' is a key/value pairs literal object.
+     * Configures Spin.js before its execution.
      *
-     * @function
      * @name        $.spin.configure     
      * @extends     $.spin
+     * @function
      * @param       {Object}    [o]             key/value pairs object literal
-     * @param       {Number}    [o.minWidth]    The minimum width of a panel (expressed in pixels)
-     * @param       {Function}  [o.loader]      Your own loader function
+     * @param       {Number}    [o.minWidth]    Minimum width of a panel in pixels
+     * @param       {Function}  [o.loader]      Custom loader function
      * @author      customcommander
      * @since       1.0
      * @version     1.0
@@ -945,15 +933,16 @@
     };
     
     /**
-     * Moves to given panel
+     * Moves to given panel.
      * 
-     * Performs a "horizontal scrolling" (left or right) 
-     * until given panel gets visible.     
+     * <p>Slides left or right until given panel gets visible.</p>
      *
-     * @function
+     * <p>If panel already is visible, the function does nothing.</p>
+     *     
      * @name        $.spin.moveTo
      * @extends     $.spin
-     * @param       {jQuery Object} destPanel   The panel to where you need to go.
+     * @function
+     * @param       {jQuery Object} destPanel Destination panel
      * @author      customcommander
      * @since       1.0
      * @version     1.0
@@ -1042,19 +1031,20 @@
     };        
     
     /**
-     * Removes all panels (visible or not) after given panel.
-     *
-     * @function
+     * Removes all panels after given panel.
+     *     
      * @name            $.spin.removeAfter
      * @extends         $.spin
+     * @function
+     * @author          customcommander
+     * @since           1.0
+     * @version         1.0
+     * @param           {jQuery Object} Panel
      */
     Spin.removeAfter = function (panel){
         var idx     = Stack.indexOf(panel), //panel index
-            nextIdx = Stack.next(idx);      //next panel index
-            
-        //nextIdx<0 means that current panel was the last panel
-        if (nextIdx>0){                        
-            //removes everything starting from nextIdx.
+            nextIdx = Stack.next(idx);      //next panel index, -1 if there isn't.            
+        if (nextIdx>0){
             Stack.remove(nextIdx);            
         }        
     };
@@ -1066,10 +1056,15 @@
      * Any other value will be disregarded.
      * 
      * If there is no such panel the function returns false.
-     *
-     * @function
+     *     
      * @name            $.spin.previous
      * @extends         $.spin
+     * @function
+     * @author          customcommander
+     * @since           1.0
+     * @version         1.0
+     * @param           {Boolean} [move] if set to false the function just returns the previous panel.
+     * @returns         {jQuery Object|Boolean}
      */
     Spin.previous = function (move){
         var idx = Stack.previous(Stack.min),
@@ -1095,10 +1090,14 @@
      * Any other value will be disregarded.
      * 
      * If there is no such panel the function returns false.
-     *
-     * @function
+     *     
      * @name            $.spin.next
      * @extends         $.spin
+     * @function
+     * @author          customcommander
+     * @since           1.0
+     * @version         1.0
+     * @param           {Boolean} [move] if set to false the function just returns the next panel.
      */
     Spin.next = function (move){
         var idx = Stack.next(Stack.max),
@@ -1119,10 +1118,14 @@
     
     /**
      * Returns the current number of columns on display.
-     *
-     * @function
+     *     
      * @name            $.spin.numColumns
      * @extends         $.spin
+     * @function
+     * @author          customcommander
+     * @since           1.0
+     * @version         1.0
+     * @returns         {Number}
      */
     Spin.numColumns = function (){
         return Stack.numVisible();
@@ -1139,10 +1142,13 @@
      * 320px wide each and by doing so, imposes a soft limit on that number.
      * 
      * Returns the maximum number of columns.
-     *
-     * @function
+     *     
      * @name            $.spin.maxColumns
      * @extends         $.spin
+     * @function
+     * @author          customcommander
+     * @since           1.0
+     * @version         1.0
      */
     Spin.maxColumns = function (n){
         var max;
@@ -1165,7 +1171,7 @@
             max = 1;
         }
         
-        /**
+        /*
          * if n is greater than max, it means that panel width is lower than 
          * 320. Spin.js doesn't like that.
          */
@@ -1181,30 +1187,22 @@
     };
     
     /**
-     * Returns Spin.js Installation Path
-     *
-     * @function
+     * Returns Spin.js installation path.
+     *     
      * @name            $.spin.basePath
      * @extends         $.spin
+     * @function
      * @author          customcommander
      * @since           1.0
      * @version         1.0
-     * @see             Env#initBasePath
+     * @see             Env.initBasePath
      * @returns         {String}
      */
     Spin.basePath = function (){
         return Env.BASE_PATH;
     };
     
-    Env.initBasePath();
-    Env.loadCss();
     
-    $(function (){
-        if (!Env.initialized){
-            Env.initialize();                    
-        }
-        Env.initialized = true;
-    });
     
     /**
      * Helper - Returns panel (jQuery Plugin)
@@ -1317,7 +1315,17 @@
         }
     };
     
-    /**
+    Env.initBasePath();
+    Env.loadCss();
+    
+    $(function (){
+        if (!Env.initialized){
+            Env.initialize();                    
+        }
+        Env.initialized = true;
+    });
+    
+    /*
      * This is a "gift" to developers if they want to use the internal 
      * Env.error function and if they are happy with its design.
      *
@@ -1325,18 +1333,8 @@
      */
     $.error = Env.error;
     
-    /**
+    /*
      * Extends jQuery with Spin.js public API
-     * 
-     * Usage:    
-     * 
-     * $.spin();
-     * $.spin.configure();     
-     * $.spin.next();
-     * $.spin.previous();
-     * $.spin.moveTo();     
-     * $.spin.removeAfter();
-     * $.spin.maxColumns();
      */
     $.extend({spin: Spin});
     
