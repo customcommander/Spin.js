@@ -785,15 +785,16 @@
      * $.spin();
      *
      * @example
+     * //Creates from HTML string
      * $.spin('&lt;p&gt;Hello World&lt;/p&gt;', 'Hello');
      *
      * @example
+     * //Creates from jQuery object
      * var html = $('&lt;p&gt;Hello World&lt;/p&gt;');
      * $.spin(html, 'Hello');
      *
      * @example
-     * //$.spin() returns the panel
-     * //we want to add content after the panel is created and appended
+     * //Adds content after the panel is returned
      * var panel = $.spin();
      * panel.panelBody('&lt;p&gt;Hello World&lt;/p&gt;');
      * 
