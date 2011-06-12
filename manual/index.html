@@ -10,7 +10,7 @@
 		<script type="text/javascript" src="../addons/items/items.js"></script>
         <script type="text/javascript">
         
-            $.kaiten.configure({
+            $.spin.configure({
                 minWidth: 400,
                 loader: function (elt){
                     var panel = elt.data('panel');
@@ -25,7 +25,7 @@
                         $.error('Panel Not Found');
                     }
                     
-                    $.kaiten(panel.clone().html(), elt.getPanelTitle());
+                    $.spin(panel.clone().html(), elt.getPanelTitle());
                 }
             });
         </script>
@@ -117,51 +117,51 @@
                         As you can see jKaiten API extends the jQuery object.
                     </p>
                     <p>
-                        <em class="em">$.kaiten()</em> is probably the most interesting function. It also defines the namespace for the public API.
+                        <em class="em">$.spin()</em> is probably the most interesting function. It also defines the namespace for the public API.
                     </p>
                 </div>
                 <ol class="k-items">
                     <li class="k-item nav" data-panel="jkaiten-kaiten">
-                        <span class="k-left k-title">$.kaiten()</span>                        
+                        <span class="k-left k-title">$.spin()</span>                        
                     </li>
                     <li class="k-item nav" data-panel="jkaiten-configure">
-                        <span class="k-left k-title">$.kaiten.configure()</span>
+                        <span class="k-left k-title">$.spin.configure()</span>
                     </li>
                     <li class="k-item nav" data-panel="jkaiten-moveto">
-                        <span class="k-left k-title">$.kaiten.moveTo()</span>
+                        <span class="k-left k-title">$.spin.moveTo()</span>
                     </li>
                     <li class="k-item nav" data-panel="jkaiten-previous">
-                        <span class="k-left k-title">$.kaiten.previous()</span>
+                        <span class="k-left k-title">$.spin.previous()</span>
                     </li>
                     <li class="k-item nav" data-panel="jkaiten-next">
-                        <span class="k-left k-title">$.kaiten.next()</span>
+                        <span class="k-left k-title">$.spin.next()</span>
                     </li>                    
                     <li class="k-item nav" data-panel="jkaiten-removeafter">
-                        <span class="k-left k-title">$.kaiten.removeAfter()</span>
+                        <span class="k-left k-title">$.spin.removeAfter()</span>
                     </li>
                     <li class="k-item nav" data-panel="jkaiten-numcolumns">
-                        <span class="k-left k-title">$.kaiten.numColumns</span>
+                        <span class="k-left k-title">$.spin.numColumns</span>
                     </li>
                     <li class="k-item nav" data-panel="jkaiten-maxcolumns">
-                        <span class="k-left k-title">$.kaiten.maxColumns()</span>
+                        <span class="k-left k-title">$.spin.maxColumns()</span>
                     </li>
                 </ol>
             </li>
             <li id="jkaiten-kaiten">                
                 <div class="block">
-                    <h2 class="title">$.kaiten()</h2>
+                    <h2 class="title">$.spin()</h2>
                     <p class="synopsys">
                         Creates a panel (jQuery object) and returns it. If
                         panel is positionned outside of visible range, it also 
                         moves.
                     </p>
                     <ul class="func_signatures">
-                        <li class="func_signature">$.kaiten()</li>
-                        <li class="func_signature">$.kaiten(html, [title])</li>                        
-                        <li class="func_signature">$.kaiten(jQuery object, [title])</li>                        
+                        <li class="func_signature">$.spin()</li>
+                        <li class="func_signature">$.spin(html, [title])</li>                        
+                        <li class="func_signature">$.spin(jQuery object, [title])</li>                        
                     </ul>     
                     <p>
-                        Calling <em class="em">$.kaiten</em> without argument simply creates
+                        Calling <em class="em">$.spin</em> without argument simply creates
                         and returns an empty panel.
                     </p>
                     <p>
@@ -176,27 +176,27 @@
                 <div class="block">                    
                     <code class="codeblock">
 //creates an empty panel
-$.kaiten();
+$.spin();
                     </code>
-                    <button onclick="$.kaiten()">Run</button>
+                    <button onclick="$.spin()">Run</button>
                     <code class="codeblock">
 //Hello World!
-$.kaiten('&lt;strong&gt;Hello World!&lt;/strong&gt;');
+$.spin('&lt;strong&gt;Hello World!&lt;/strong&gt;');
                     </code>
-                    <button onclick="$.kaiten('<strong>Hello World!</strong>', 'Hello World!')">Run</button>
+                    <button onclick="$.spin('<strong>Hello World!</strong>', 'Hello World!')">Run</button>
                 </div>                
-            </li><!--$.kaiten()-->
+            </li><!--$.spin()-->
             <li id="jkaiten-configure">
                 <div class="block">
-                    <h2 class="title">$.kaiten.configure()</h2>
+                    <h2 class="title">$.spin.configure()</h2>
                     <p class="synopsys">
                         Configure jKaiten before its execution.
                     </p>
                     <p>
-                        Note that <em class="em">$.kaiten.configure()</em> is designed to be executed only once. Any other calls to it will have no effect.
+                        Note that <em class="em">$.spin.configure()</em> is designed to be executed only once. Any other calls to it will have no effect.
                     </p>
                     <ul class="func_signatures">
-                        <li class="func_signature">$.kaiten.configure(conf)</li>
+                        <li class="func_signature">$.spin.configure(conf)</li>
                     </ul>
                     <p>
                         <em class="em">conf</em> is an object literal. Supported keys are <em class="em">minWidth</em> and <em class="em">loader</em>. Any other keys will be ignored.
@@ -205,7 +205,7 @@ $.kaiten('&lt;strong&gt;Hello World!&lt;/strong&gt;');
                         <em class="em">minWidth</em> must be a number. It represents the minimal width of a panel. If not given or invalid jKaiten defaults to 320.
                     </p>
                     <p class="codeblock">
-$.kaiten.configure({
+$.spin.configure({
     minWidth: 400
 });
                     </p>
@@ -213,23 +213,23 @@ $.kaiten.configure({
                         <em class="em">loader</em> must be a function. If not given or if <em class="em">loader</em> is not a function, jKaiten will use the default loader. (More info about the loader function below.)
                     </p>
                     <p class="codeblock">
-$.kaiten.configure({
+$.spin.configure({
     loader: function (){
-        $.kaiten('&lt;p&gt;Yet another panel&lt;/p&gt;');
+        $.spin('&lt;p&gt;Yet another panel&lt;/p&gt;');
     }
 });                    
                     </p>
                 </div>
-            </li><!--$.kaiten.configure()-->
+            </li><!--$.spin.configure()-->
             <li id="jkaiten-moveto">
                 <div class="block">
-                    <h2 class="title">$.kaiten.moveTo()</h2>
+                    <h2 class="title">$.spin.moveTo()</h2>
                     <p class="synopsys">
                         Moves to given panel. If panel already is visible the
                         function has no effect.
                     </p>                    
                     <ul class="func_signatures">
-                        <li class="func_signature">$.kaiten.moveTo(panel)</li>
+                        <li class="func_signature">$.spin.moveTo(panel)</li>
                     </ul>
                     <p>
                         <em class="em">panel</em> is a jQuery object that 
@@ -237,50 +237,50 @@ $.kaiten.configure({
                     </p>
                     <p class="codeblock">
 //Moves until panel is visible
-$.kaiten.moveTo($('#panel_37'));
+$.spin.moveTo($('#panel_37'));
                     </p>
                 </div>
-            </li><!--$.kaiten.moveTo()-->
+            </li><!--$.spin.moveTo()-->
             <li id="jkaiten-previous">
                 <div class="block">
-                    <h2 class="title">$.kaiten.previous()</h2>
+                    <h2 class="title">$.spin.previous()</h2>
                     <p class="synopsys">
                         Moves to the panel that is at the left of the first visible
                         panel and returns it. If there is no such panel, it returns false.
                     </p>
                     <ul class="func_signatures">
-                        <li class="func_signature">$.kaiten.previous()</li>
-                        <li class="func_signature">$.kaiten.previous(false)</li>
+                        <li class="func_signature">$.spin.previous()</li>
+                        <li class="func_signature">$.spin.previous(false)</li>
                     </ul>
                     <p>
                         In the second form, the function returns the panel but does not move.
                     </p>
                 </div>
-            </li> <!--$.kaiten.previous()-->
+            </li> <!--$.spin.previous()-->
             <li id="jkaiten-next">
                 <div class="block">
-                    <h2 class="title">$.kaiten.next()</h2>
+                    <h2 class="title">$.spin.next()</h2>
                     <p class="synopsys">
                         Moves to the panel that is at the right of the last visible
                         panel and returns it. If there is no such panel, it returns false.
                     </p>
                     <ul class="func_signatures">
-                        <li class="func_signature">$.kaiten.next()</li>
-                        <li class="func_signature">$.kaiten.next(false)</li>
+                        <li class="func_signature">$.spin.next()</li>
+                        <li class="func_signature">$.spin.next(false)</li>
                     </ul>
                     <p>
                         In the second form, the function returns the panel but does not move.
                     </p>
                 </div>
-            </li> <!--$.kaiten.next()-->
+            </li> <!--$.spin.next()-->
             <li id="jkaiten-removeafter">
                 <div class="block">
-                    <h2 class="title">$.kaiten.removeAfter()</h2>
+                    <h2 class="title">$.spin.removeAfter()</h2>
                     <p class="synopsys">
                         Removes all panels after given panel.
                     </p>                    
                     <ul class="func_signatures">
-                        <li class="func_signature">$.kaiten.removeAfter(panel)</li>
+                        <li class="func_signature">$.spin.removeAfter(panel)</li>
                     </ul>
                     <p>
                         <em class="em">panel</em> is a jQuery object.
@@ -289,25 +289,25 @@ $.kaiten.moveTo($('#panel_37'));
             </li>
             <li id="jkaiten-numcolumns">
                 <div class="block">
-                    <h2 class="title">$.kaiten.numColumns()</h2>
+                    <h2 class="title">$.spin.numColumns()</h2>
                     <p class="synopsys">
                         Returns the current number of columns on display.
                     </p>
                     <ul class="func_signatures">
-                        <li class="func_signature">$.kaiten.numColumns()</li>
+                        <li class="func_signature">$.spin.numColumns()</li>
                     </ul>
                 </div>
             </li>
             <li id="jkaiten-maxcolumns">
                 <div class="block">
-                    <h2 class="title">$.kaiten.maxColumns</h2>
+                    <h2 class="title">$.spin.maxColumns</h2>
                     <p class="synopsys">
                         Gets or sets the maximum number of columns on display. Number and size of the panels
                         will adapt automatically if necessary.
                     </p>
                     <ul class="func_signatures">
-                        <li class="func_signature">$.kaiten.maxColumns()</li>
-                        <li class="func_signature">$.kaiten.maxColumns(n)</li>
+                        <li class="func_signature">$.spin.maxColumns()</li>
+                        <li class="func_signature">$.spin.maxColumns(n)</li>
                     </ul>
                     <p>In both forms, the function returns the maximum number of columns.</p>
                     <p>
@@ -361,7 +361,7 @@ $.kaiten.moveTo($('#panel_37'));
                     </p>
                     <p class="codeblock">
 function FoobarLoader(elt){
-    $.kaiten([
+    $.spin([
         '&lt;a class="nav"&gt;',
             'Click to load a foobar',
         '&lt;/a&gt;'
@@ -374,21 +374,21 @@ function FoobarLoader(elt){
                     <p class="codeblock">
 function SubtleLoader(elt){
     if (elt.is('img')){
-        $.kaiten('&lt;p&gt;Image&lt;/p&gt;');
+        $.spin('&lt;p&gt;Image&lt;/p&gt;');
     } else if (elt.is('button')){
-        $.kaiten('&lt;p&gt;Button&lt;/p&gt;');
+        $.spin('&lt;p&gt;Button&lt;/p&gt;');
     } else {
-        $.kaiten('&lt;p&gt;Foobar!!&lt;/p&gt;');
+        $.spin('&lt;p&gt;Foobar!!&lt;/p&gt;');
     }
 }
                     </p>
                     <h3 class="subtitle">Setting up your own loader</h3>
                     <p class="synopsys">
                         Setting up your own loader is made by passing it to 
-                        $.kaiten.configure(). (see jKaiten API.)
+                        $.spin.configure(). (see jKaiten API.)
                     </p>
                     <p class="codeblock">
-$.kaiten.configure({
+$.spin.configure({
     loader: function (elt){
         //your loading logic here...
     }
@@ -411,7 +411,7 @@ $.kaiten.configure({
         //your loading logic here
     }
     
-    $.kaiten.configure({loader: MyOwnLoader});
+    $.spin.configure({loader: MyOwnLoader});
 })();
                     </p>                    
                 </div>                
@@ -445,7 +445,7 @@ $.kaiten.configure({
                         When the ajax call is done, the default loader then simply does :
                     </p>
                     <p class="codeblock">
-$.kaiten(response);
+$.spin(response);
                     </p>
                     <p>
                         Which means that whatever is executed on the server 

@@ -149,7 +149,7 @@
      * @version     1.0
      */
     Env.error = function (msg){
-        Kaiten('<h2>' + msg + '</h2>', 'Error!').addClass('error');
+        Spin('<h2>' + msg + '</h2>', 'Error!').addClass('error');
         throw new Error(msg);
     };
     
@@ -282,12 +282,12 @@
                     .removeClass('mouseover')
                     .addClass('loaded');
                 
-                Kaiten.removeAfter(panel);
+                Spin.removeAfter(panel);
                 
                 Env.loader(elt);                
                 
             } else {                
-                Kaiten.moveTo(
+                Spin.moveTo(
                     Stack.panel(
                         Stack.next(idx)));                
             }
@@ -296,12 +296,12 @@
         
         Env.prevCtrl.click(function (){
             var idx = Stack.previous(Stack.min);
-            Kaiten.moveTo(Stack.panel(idx));            
+            Spin.moveTo(Stack.panel(idx));            
         });
         
         Env.nextCtrl.click(function (){
             var idx = Stack.next(Stack.max);
-            Kaiten.moveTo(Stack.panel(idx));
+            Spin.moveTo(Stack.panel(idx));
         });        
     };
     
@@ -365,7 +365,7 @@
              * We have succeeded to load the url.
              */      
             success: function (html, status, xhr){            
-                Kaiten(html, elt.getPanelTitle());                    
+                Spin(html, elt.getPanelTitle());                    
             },
             
             /**
@@ -590,12 +590,12 @@
 //------------------------------------------------------------------------------
             
     /**
-     * Kaiten - Public API
+     * Spin - Public API
      *
-     * Kaiten is both a function and a namespace for the public API.
+     * Spin is both a function and a namespace for the public API.
      * 
-     * When used as a function, Kaiten appends a new panel to the list. 
-     * If the panel is positionned outside of visible range, Kaiten will move 
+     * When used as a function, Spin appends a new panel to the list. 
+     * If the panel is positionned outside of visible range, Spin will move 
      * until the panel gets visible.
      *
      * First parameter is either a string or a jQuery object that represents
@@ -605,7 +605,7 @@
      *
      * Returns the new panel.
      */
-    function Kaiten(html, title){
+    function Spin(html, title){
         var panel, 
             panelId       = Stack.id(),            
             panelSelector = '#' + panelId,                        
@@ -708,20 +708,20 @@
         }
         
         //Moves to the panel if not visible
-        Kaiten.moveTo(panel);
+        Spin.moveTo(panel);
         
         return panel;
     }    
     
     /**
-     * Allows to configure jKaiten before it runs.
+     * Allows to configure Spin.js before it runs.
      * 
      * The function is designed to be executed only once. Further calls will
      * have no effect.
      * 
      * Parameter 'o' is a key/value pairs literal object.
      */
-    Kaiten.configure = function (o){
+    Spin.configure = function (o){
         if (!Env.initialized){
             $(function (){
                 Env.initialize(o);
@@ -736,7 +736,7 @@
      * Performs a "horizontal scrolling" (left or right) 
      * until given panel gets visible.     
      */
-    Kaiten.moveTo = function (destPanel){        
+    Spin.moveTo = function (destPanel){        
         var destIdx = Stack.indexOf(destPanel), //destination index
             arr     = Stack.arr,            
             css     = {left: ''},
@@ -822,7 +822,7 @@
     /**
      * Removes all panels (visible or not) after given panel.
      */
-    Kaiten.removeAfter = function (panel){
+    Spin.removeAfter = function (panel){
         var idx     = Stack.indexOf(panel), //panel index
             nextIdx = Stack.next(idx);      //next panel index
             
@@ -841,7 +841,7 @@
      * 
      * If there is no such panel the function returns false.
      */
-    Kaiten.previous = function (move){
+    Spin.previous = function (move){
         var idx = Stack.previous(Stack.min),
             panel;                            
         
@@ -855,7 +855,7 @@
             return panel;
         }        
         
-        return Kaiten.moveTo(panel);        
+        return Spin.moveTo(panel);        
     };        
     
     /**
@@ -866,7 +866,7 @@
      * 
      * If there is no such panel the function returns false.
      */
-    Kaiten.next = function (move){
+    Spin.next = function (move){
         var idx = Stack.next(Stack.max),
             panel;
         
@@ -880,13 +880,13 @@
             return panel;
         }        
         
-        return Kaiten.moveTo(panel);        
+        return Spin.moveTo(panel);        
     };   
     
     /**
      * Returns the current number of columns on display.
      */
-    Kaiten.numColumns = function (){
+    Spin.numColumns = function (){
         return Stack.numVisible();
     };
     
@@ -897,12 +897,12 @@
      * If the parameter is set it redefines that number and the display will
      * be updated accordingly.
      * 
-     * Note that jKaiten tries to keep the panels to a minimum of 
+     * Note that Spin.js tries to keep the panels to a minimum of 
      * 320px wide each and by doing so, imposes a soft limit on that number.
      * 
      * Returns the maximum number of columns.
      */
-    Kaiten.maxColumns = function (n){
+    Spin.maxColumns = function (n){
         var max;
         
         //Call without argument
@@ -925,7 +925,7 @@
         
         /**
          * if n is greater than max, it means that panel width is lower than 
-         * 320. jKaiten doesn't like that.
+         * 320. Spin.js doesn't like that.
          */
         if (n>max){
             n = max;
@@ -936,6 +936,25 @@
         Env.resize();
         
         return n;
+    };
+    
+    /**
+     * Returns Spin.js Installation Path.
+     *
+     * Let's say that you have put Spin.js into the folder 'lib/js' 
+     * on your server and you include it like this:
+     *
+     * <script type="text/javascript" src="lib/js/Spinjs/src/js/Spin.js"></script>
+     *
+     * The functions returns 'http://example.com/lib/js/Spinjs/'
+     * or 'file:///home/julian/Public/lib/js/Spinjs/' (if you are working locally)
+     *
+     * @author      customcommander <hello@spinjs.com>
+     * @since       June 12, 2011
+     * @version     1.0
+     */
+    Spin.basePath = function (){
+        return Env.BASE_PATH;
     };
     
     Env.initBasePath();
@@ -1050,20 +1069,19 @@
     $.error = Env.error;
     
     /**
-     * Extends jQuery with jKaiten public API
+     * Extends jQuery with Spin.js public API
      * 
      * Usage:    
      * 
-     * $.kaiten();
-     * $.kaiten.configure();     
-     * $.kaiten.next();
-     * $.kaiten.previous();
-     * $.kaiten.moveTo();     
-     * $.kaiten.removeAfter();
-     * $.kaiten.numColumns();
-     * $.kaiten.maxColumns();
+     * $.spin();
+     * $.spin.configure();     
+     * $.spin.next();
+     * $.spin.previous();
+     * $.spin.moveTo();     
+     * $.spin.removeAfter();
+     * $.spin.maxColumns();
      */
-    $.extend({kaiten: Kaiten});
+    $.extend({spin: Spin});
     
     //jQuery is awesome!!!
 }(jQuery));
