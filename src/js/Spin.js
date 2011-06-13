@@ -1229,6 +1229,10 @@
     $.fn.panelBody = function (html){
         var body;
         
+        /*
+         * If it's not a panel or if html is given but is neither a string
+         * nor a jQuery object we simply return and do nothing.
+         */
         if (!this.is('li.k-panel') ||
             (html && $.type(html)!='string' && !(html instanceof jQuery))){
             return;
@@ -1236,12 +1240,16 @@
         
         body = this.find('div.k-panel-bd');
         
+        /*
+         * If html is given we update the panel body with it 
+         * before returning it.
+         */
         if (html){
             html = (html instanceof jQuery) ? html : $(html);
             body.html(html);
         }
         
-        return body
+        return body;
     };
     
     /**
