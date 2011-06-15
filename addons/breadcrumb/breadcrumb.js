@@ -4,20 +4,16 @@ $(function (){
         breadcrumb,
         lastItem;
 
-    /*$('#k-panels').css({
-        top: '2.5em'
-    });*/
-    
     $(document.body).append([
         '<div id="k-menubar">',
         '   <ol id="k-breadcrumb"/>',
         '</div'
-    ].join(''));    
+    ].join(''));            
     
     body       = $(document.body);
     breadcrumb = $('#k-breadcrumb');
     
-    body.bind('paneladd.k', function (e, panel){
+    body.bind('paneladd.spin', function (e, panel){
                 
         if (lastItem){
             lastItem.removeClass('k-last');
@@ -25,15 +21,19 @@ $(function (){
         
         lastItem = $([
             '<li class="k-breadcrumb-item k-last" id="' + panel.attr('id') + '_ref">',
-                panel.getPanelTitle(),
+                panel.panelTitle(),
             '</li>'
         ].join(''));
         
         breadcrumb.append(lastItem);
     });
     
-    body.bind('panelremove.k', function (e, panel){
+    body.bind('panelremove.spin', function (e, panel){
         $('#' + panel.attr('id') + '_ref').remove();
+    });
+    
+    body.bind('titlechange.spin', function (e, panel){
+        $('#' + panel.attr('id') + '_ref').text(panel.panelTitle());
     });
     
     breadcrumb.delegate('li.k-breadcrumb-item', 'click', function (e){

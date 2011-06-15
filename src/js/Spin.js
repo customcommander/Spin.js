@@ -35,8 +35,8 @@
  * Spin.js allows web developers to design applications as a logical
  * and continuous flow of screens.
  *
- * @author      customcommander
- * @since       1.0
+ * @author              customcommander
+ * @since               1.0
  */
 (function ($){    
     
@@ -256,9 +256,7 @@
      * @version         1.0
      */
     Env.initBasePath = function (){        
-        //e.g. http://example.com/Spinjs/src/js/Spin.js
         var fullpath  = $('script[src*="src/js/Spin"]').prop('src'); 
-        //e.g. http://example.com/Spinjs/
         Env.BASE_PATH = fullpath.substring(0, fullpath.lastIndexOf('src'));
     };
     
@@ -279,7 +277,7 @@
     };
     
     /**
-     * Initializes Environment
+     * Initializes Environment.
      *
      * <ul>
      *      <li>Adds required HTML markup to the DOM</li>
@@ -290,7 +288,7 @@
      * @author          customcommander
      * @since           1.0
      * @version         1.0
-     * @param           {Object} [o]    Configuration object
+     * @param           {Object} [o] Configuration object
      */
     Env.initialize = function (o){
                 
@@ -310,10 +308,10 @@
         
         //Setting environment variables.
         //----------------------------------------------------------------------
-        Env.body       = $(document.body);        //Body element
-        Env.prevCtrl   = $('#k-nav-prev');        //Previous panel control
-        Env.nextCtrl   = $('#k-nav-next');        //Next panel control
-        Env.panels     = $('#k-panels');          //Panels list
+        Env.body       = $(document.body);
+        Env.prevCtrl   = $('#k-nav-prev');
+        Env.nextCtrl   = $('#k-nav-next');
+        Env.panels     = $('#k-panels');
         
         //Validates the configuration object
         o = Env(o);   
@@ -426,7 +424,8 @@
      * @param           {jQuery Object} elt The element which has been clicked or the body when the document loads
      */
     Env.loader = function (elt){              
-        /* This is how the default loader works:
+        /* 
+         * This is how the default loader works:
          *
          * The loader assumes that each clicked element (elt) has a data-url
          * attribute and loads that url with some ajax voodoo.
@@ -437,7 +436,9 @@
          */
         var url = elt.data('url');
         
-        //Url must be an non empty string
+        /*
+         * Url must be a non empty string!
+         */
         url = ($.type(url)!='string' || !$.trim(url)) ? '' : $.trim(url);        
 
         if (!url){
@@ -447,7 +448,7 @@
         $.ajax({
             url: url,                              
             success: function (html, status, xhr){            
-                Spin(html, elt.getPanelTitle());                    
+                Spin(html, elt.panelTitle());                    
             },
             error: function (xhr, status, error){                
                 Env.error(xhr.status + ' ' + error);
@@ -565,8 +566,9 @@
     Stack.arr = [];
     
     /**
-     * Begin of visible range. (Panels with indexes lower than Stack.min are
-     * not visible.)
+     * Begin of visible range. 
+     *
+     * <p>Panels with indexes lower than Stack.min are not visible.</p>
      *
      * @author          customcommander
      * @since           1.0
@@ -576,8 +578,9 @@
     Stack.min = -1;
     
     /**
-     * End of visible range. (Panels with indexes greater than Stack.max are 
-     * not visible.)
+     * End of visible range.
+     *
+     * <p>Panels with indexes greater than Stack.max are not visible.</p>
      *
      * @author          customcommander
      * @since           1.0
@@ -593,6 +596,7 @@
      * @since           1.0
      * @version         1.0
      * @type            Number
+     * @default         1
      */
     Stack.nextId = 1;
     
@@ -616,11 +620,12 @@
      * @author          customcommander
      * @since           1.0
      * @version         1.0
+     * @param           {jQuery} panel
      * @returns         {Number} Panel Stack index
      */
     Stack.push = function (panel){           
         Env.panels.append(panel);                
-        Env.body.trigger('paneladd.k', [panel]);        
+        Env.body.trigger('paneladd.spin', [panel]);        
         return Stack.arr.push(panel.attr('id')) - 1;
     };
     
@@ -634,7 +639,7 @@
     Stack.pop = function (){
         var id    = Stack.arr.pop(),
             panel = $('#' + id).remove();            
-        Env.body.trigger('panelremove.k', [panel]);
+        Env.body.trigger('panelremove.spin', [panel]);
     };
     
     /**
@@ -643,7 +648,7 @@
      * @author          customcommander
      * @since           1.0
      * @version         1.0
-     * @param           {jQuery Object} panel
+     * @param           {jQuery} panel
      * @returns         {Number} Panel Stack index
      * @throws          {Error} An Error is thrown if panel is not valid or unknown
      */
@@ -697,7 +702,7 @@
      * @since           1.0
      * @version         1.0
      * @param           {Number} idx Stack index
-     * @returns         {jQuery Object} Panel
+     * @returns         {jQuery} Panel
      */
     Stack.panel = function (idx){
         return $('#' + Stack.arr[idx]);
@@ -1064,7 +1069,7 @@
      * @since           1.0
      * @version         1.0
      * @param           {Boolean} [move] if set to false the function just returns the previous panel.
-     * @returns         {jQuery Object|Boolean}
+     * @returns         {jQuery|Boolean}
      */
     Spin.previous = function (move){
         var idx = Stack.previous(Stack.min),
@@ -1202,28 +1207,90 @@
         return Env.BASE_PATH;
     };
     
-    
-    
-    /**
-     * Helper - Returns panel (jQuery Plugin)
-     *
-     * Returns the panel of the first matched element in the set.
-     * Triggers a failure if it can't find it.
-     */
-    $.fn.getPanel = function (){
+    $.fn.panel = function (){
         var panel;
         
-        if (this.hasClass('k-panel')){
+        if (this.is('li.k-panel')){
             panel = this;
         } else {
             panel = this.closest('li.k-panel');
         }
         
         if (!panel.length){
-            Env.error("Can't find your panel");
+            Env.error('Panel Not Found');
         }
         
         return panel;
+        
+    };
+    
+    $.fn.panelTitle = function (str){
+        var title;
+        
+        /*
+         * If called from a navigable element (or from the body when the 
+         * document loads) we return the title of the panel that will be
+         * loaded. 
+         *
+         * In this case, title can be set in several different ways...
+         */
+        if (this.hasClass('nav') || this.is('body')){
+            
+            /* 
+             * Title is set on a data-title attribute on the element
+             *
+             * <a class="nav" data-title="My Movies">
+             *      Click here to see my movies
+             * </a>
+             */
+            if (this.data('title')){
+                return this.data('title');
+                
+            /*
+             * If element also has class 'k-title' we take its text
+             *
+             * <a class="nav k-title">
+             *      My movies
+             * </a>
+             */
+            } else if (this.hasClass('k-title')){            
+                return this.text();
+                
+            /*
+             * Looking for a child with class 'k-title'. We take the text of
+             * the first child.
+             *
+             * <div class="nav">
+             *      <h2 class="k-title">My Movies</h2>
+             *      <p>
+             *          In the next panel you'll see the list of the best
+             *          movies of all time!
+             *      </p>
+             * </div>
+             */
+            } else if (this.find('.k-title').length){
+                return this.find('.k-title').eq(0).text();
+                
+            /*
+             * Finally we take the text of the element.
+             *
+             * <a class="nav">My movies</a>
+             */
+            } else {
+                return this.text();
+            }
+            
+        /*
+         * Returning the title of the current panel.
+         */
+        } else if (this.is('li.k-panel')) {
+            title = this.find('div.k-panel-hd').find('span.k-title');
+            if (str!==undefined){                
+                title.text(str);
+                Env.body.trigger('titlechange.spin', [this]);
+            }
+            return title.text();
+        }
     };
     
     $.fn.panelBody = function (html){
@@ -1250,78 +1317,7 @@
         }
         
         return body;
-    };
-    
-    /**
-     * Helper - Returns panel title (jQuery Plugin)
-     */
-    $.fn.getPanelTitle = function (){        
-        /**
-         * If called from a navigable element the plugin returns the title
-         * of the panel that will be loaded. 
-         *
-         * There are different ways to find it.
-         */
-        if (this.hasClass('nav') || this.is('body')){
-            /**
-             * 1) Looking for a data-title attribute:
-             *
-             * <a class="nav" data-title="Sci-fi movies">
-             *      See my Sci-fi movies
-             * </a>
-             *
-             * Returns 'Sci-fi movies'
-             */
-            if (this.data('title')){
-                return this.data('title');
-            /**
-             * 2) If the navigable element also has the class 'k-title' it
-             * returns its text:
-             *
-             * <a class="nav k-title">
-             *      My Sci-fi movies
-             * </a>
-             *
-             * Returns 'My Sci-fi movies'
-             */
-            } else if (this.hasClass('k-title')){
-                return this.text();
-            /**
-             * 3) Looking for a child of the navigable element that has the 
-             * class 'k-title':
-             *
-             * <div class="nav">
-             *      <span class="k-title">Blade Runner</span>
-             *      <img src="bladerunner.jpg" alt="Blade Runner"/>
-             * </div>
-             *
-             * Returns 'Blade Runner'
-             */
-            } else if (this.find('.k-title').length){
-                return this.find('.k-title').eq(0).text();
-            /**
-             * 4) Finally it returns the text of the navigable element
-             *
-             * <a class="nav">
-             *      Sci-fi movies
-             * </a>
-             *
-             * Returns 'Sci-fi movies'
-             */
-            } else {
-                return this.text();
-            }
-        /**
-         * Otherwise it just returns the title of the panel that contains the
-         * element.
-         */
-        } else {
-            return this.getPanel()
-                .find('div.k-panel-hd')
-                    .find('span.k-title')
-                        .text();
-        }
-    };
+    };    
     
     Env.initBasePath();
     Env.loadCss();
@@ -1333,11 +1329,21 @@
         Env.initialized = true;
     });
     
-    /*
-     * This is a "gift" to developers if they want to use the internal 
-     * Env.error function and if they are happy with its design.
+    /**
+     * Throws an Error and displays its message into a panel.
      *
-     * Developers can re-override $.error later without affecting Env.error.
+     * <p>Spin.js overrides <a href="http://api.jquery.com/jQuery.error/">jQuery.error</a>
+     * with Env.error</p>
+     *
+     * <p>Developers can re-override it without affecting Spin.js's internal
+     * error function.</p>
+     *
+     * @name            $.error
+     * @function
+     * @author          customcommander
+     * @since           1.0
+     * @version         1.0
+     * @see             Env.error
      */
     $.error = Env.error;
     
