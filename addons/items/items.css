@@ -2,13 +2,13 @@
 /*/// Panel Items                                                         ///*/
 /*///////////////////////////////////////////////////////////////////////////*/
 
-.k-items {
+.spin-items {
     margin: 0em;
     padding: 0em;
     border-top: 1px solid gainsboro;
 }
 
-.k-item {
+.spin-item {
     position:           relative;
     height:             2.5em;
     padding:            0em;
@@ -20,22 +20,22 @@
     list-style-type: none;
 }
 
-.k-left,
-.k-right {
+.spin-left,
+.spin-right {
     position: absolute; 
     top: 0.625em;
 }
 
-.k-left {
+.spin-left {
     left:   2.5em;
 }
 
-.k-right {
+.spin-right {
     right:   2.5em;
 }
 
 
-.k-item.nav {
+.spin-item.nav {
     background-image: url('item-arrow-black.png');
     background-repeat: no-repeat;
     background-position: right center;               
@@ -47,7 +47,7 @@
     cursor: pointer;
 }
 
-.k-item.nav.mouseover {  
+.spin-item.nav.mouseover {  
 /** webkit ********************************************************************/
     background-image: url('item-arrow-black.png'), -webkit-gradient(linear, left top, left bottom,from(#efefef),to(#d6d6d6));
     -webkit-background-origin: content, border;
@@ -63,7 +63,7 @@
     background-position: right center, 0 0;
 }
 
-.k-item.mouseover {  
+.spin-item.mouseover {  
 /** webkit ********************************************************************/
     background-image: -webkit-gradient(linear, left top, left bottom,from(#efefef),to(#d6d6d6));
     -webkit-background-origin: border;
@@ -79,7 +79,7 @@
     background-position: 0 0;
 }
 
-.k-item.loaded {    
+.spin-item.loaded {    
     background-image: url('item-arrow-black.png'), -moz-linear-gradient(center top , #186AB9, #6AA4DC);
     background-image: url('item-arrow-black.png'), -webkit-gradient(linear, left top, left bottom,from(#186ab9),to(#6aa4dc));
     background-repeat: no-repeat, repeat;

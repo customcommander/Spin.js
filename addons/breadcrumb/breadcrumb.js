@@ -5,22 +5,22 @@ $(function (){
         lastItem;
 
     $(document.body).append([
-        '<div id="k-menubar">',
-        '   <ol id="k-breadcrumb"/>',
-        '</div'
+        '<div id="spin-menubar">',
+        '   <ol id="spin-breadcrumb"/>',
+        '</div>'
     ].join(''));            
     
     body       = $(document.body);
-    breadcrumb = $('#k-breadcrumb');
+    breadcrumb = $('#spin-breadcrumb');
     
     body.bind('paneladd.spin', function (e, panel){
                 
         if (lastItem){
-            lastItem.removeClass('k-last');
+            lastItem.removeClass('spin-last');
         }
         
         lastItem = $([
-            '<li class="k-breadcrumb-item k-last" id="' + panel.attr('id') + '_ref">',
+            '<li class="spin-breadcrumb-item spin-last" id="' + panel.attr('id') + '_ref">',
                 panel.panelTitle(),
             '</li>'
         ].join(''));
@@ -36,7 +36,7 @@ $(function (){
         $('#' + panel.attr('id') + '_ref').text(panel.panelTitle());
     });
     
-    breadcrumb.delegate('li.k-breadcrumb-item', 'click', function (e){
+    breadcrumb.delegate('li.spin-breadcrumb-item', 'click', function (e){
         var id = $(this).attr('id').slice(0, -4); //removes "_ref" at end of string
         $.spin.moveTo($('#' + id));
     });

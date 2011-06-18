@@ -251,6 +251,8 @@
      * <p>Finds the script tag that includes Spin.js and computes the 
      * absolute path to its base directory.</p>
      *
+     * <p>The function is executed when Spin.js source file is included.</p>
+     *
      * @author          customcommander
      * @since           1.0
      * @version         1.0
@@ -261,7 +263,9 @@
     };
     
     /**
-     * Loads Environment CSS
+     * Loads Environment CSS.
+     *
+     * <p>The function is executed when Spin.js source file is included.</p>
      * 
      * @author          customcommander
      * @since           1.0
@@ -272,7 +276,7 @@
             '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/fonts-min.css" />',
             '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/reset-min.css" />',
             '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/base-min.css" />',
-            '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/jKaiten.css" />'
+            '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/spin.css" />'
         );
     };
     
@@ -282,6 +286,7 @@
      * <ul>
      *      <li>Adds required HTML markup to the DOM</li>
      *      <li>Sets environment variables</li>
+     *      <li>Loads the first panel</li>
      *      <li>Defines events handlers</li>
      * </ul>
      *
@@ -292,36 +297,34 @@
      */
     Env.initialize = function (o){
                 
-        /*
-         * Spin.js takes care of its own HTML markup.
-         */
+        //Spin.js takes care of its own markup
         $(document.body).append([
-            '<div id="kaiten">',         
-            '   <ol id="k-panels">',
-            '       <li class="k-nav-controls">',
-            '           <div id="k-nav-prev"/>',
-            '           <div id="k-nav-next"/>',
-            '       </li>',
-            '   </ol>',
+            '<div id="spin">',   
+            '   <div id="spin-nav-controls">',
+            '       <div id="spin-nav-prev"/>',
+            '       <div id="spin-nav-next"/>',      
+            '   </div>',
+            '   <ol id="spin-panels"/>',
             '</div>'
         ].join(''));
         
-        //Setting environment variables.
-        //----------------------------------------------------------------------
+        //Sets environment variables
         Env.body       = $(document.body);
-        Env.prevCtrl   = $('#k-nav-prev');
-        Env.nextCtrl   = $('#k-nav-next');
-        Env.panels     = $('#k-panels');
+        Env.prevCtrl   = $('#spin-nav-prev');
+        Env.nextCtrl   = $('#spin-nav-next');
+        Env.panels     = $('#spin-panels');
         
         //Validates the configuration object
-        o = Env(o);   
+        o = Env(o);
         
         //Loads the first panel
-        Env.loader(Env.body);        
+        Env.loader(Env.body);
         
-        //Setting events handlers.
-        //----------------------------------------------------------------------
+        //From here until the end, we defines global events handlers
         
+        /*
+         *
+         */        
         $(window).resize(function (){
             var formerWidth = Env.PANEL_WIDTH;
             
@@ -355,7 +358,7 @@
         Env.body.delegate('.nav', 'click', function (e){
             var elt     = $(this),
                 target  = $(e.target),
-                panel   = elt.closest('li.k-panel'),
+                panel   = elt.panel(),
                 idx     = Stack.indexOf(panel);
                 
             e.preventDefault();                   
@@ -655,7 +658,7 @@
     Stack.indexOf = function (panel){
         var idx;      
             
-        if (!(panel instanceof jQuery) || !panel.is('li.k-panel')){
+        if (!(panel instanceof jQuery) || !panel.is('li.spin-panel')){
             Env.error('No panel given');
         }
         
@@ -844,11 +847,11 @@
             
         //Base markup of a panel
         panel = $([
-            '<li class="k-panel">',
-            '   <div class="k-panel-hd">',
-            '       <span class="k-title">' + title + '</span>',
+            '<li class="spin-panel">',
+            '   <div class="spin-panel-hd">',
+            '       <span class="spin-title">' + title + '</span>',
             '   </div>',
-            '   <div class="k-panel-bd"/>',
+            '   <div class="spin-panel-bd"/>',
             '</li>'
         ].join(''));
         
@@ -865,7 +868,7 @@
          * For reason explained below these nodes must be added to the DOM
          * separately.
          */
-        panel.find('div.k-panel-bd').append(html.filter(':not(script)'));                        
+        panel.find('div.spin-panel-bd').append(html.filter(':not(script)'));                        
        
         //Adds the panel to the DOM
         Stack(panel);
@@ -1210,18 +1213,17 @@
     $.fn.panel = function (){
         var panel;
         
-        if (this.is('li.k-panel')){
+        if (this.is('li.spin-panel')){
             panel = this;
         } else {
-            panel = this.closest('li.k-panel');
+            panel = this.closest('li.spin-panel');
         }
         
         if (!panel.length){
             Env.error('Panel Not Found');
         }
         
-        return panel;
-        
+        return panel;        
     };
     
     $.fn.panelTitle = function (str){
@@ -1253,7 +1255,7 @@
              *      My movies
              * </a>
              */
-            } else if (this.hasClass('k-title')){            
+            } else if (this.hasClass('spin-title')){            
                 return this.text();
                 
             /*
@@ -1268,8 +1270,8 @@
              *      </p>
              * </div>
              */
-            } else if (this.find('.k-title').length){
-                return this.find('.k-title').eq(0).text();
+            } else if (this.find('.spin-title').length){
+                return this.find('.spin-title').eq(0).text();
                 
             /*
              * Finally we take the text of the element.
@@ -1283,8 +1285,8 @@
         /*
          * Returning the title of the current panel.
          */
-        } else if (this.is('li.k-panel')) {
-            title = this.find('div.k-panel-hd').find('span.k-title');
+        } else if (this.is('li.spin-panel')) {
+            title = this.find('div.spin-panel-hd').find('span.spin-title');
             if (str!==undefined){                
                 title.text(str);
                 Env.body.trigger('titlechange.spin', [this]);
@@ -1300,12 +1302,12 @@
          * If it's not a panel or if html is given but is neither a string
          * nor a jQuery object we simply return and do nothing.
          */
-        if (!this.is('li.k-panel') ||
+        if (!this.is('li.spin-panel') ||
             (html && $.type(html)!='string' && !(html instanceof jQuery))){
             return;
         }
         
-        body = this.find('div.k-panel-bd');
+        body = this.find('div.spin-panel-bd');
         
         /*
          * If html is given we update the panel body with it 

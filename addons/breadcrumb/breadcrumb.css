@@ -2,12 +2,12 @@
  ** Menubar & Breadcrumb                                                       *
  ******************************************************************************/
 
-/*We need to make room for the menubar so we push down #k-panels a little bit...*/
-#k-panels {
+/*We need to make room for the menubar so we push down #spin-panels a little bit...*/
+#spin {
     top: 2.5em!important;
 }
 
-#k-menubar {
+#spin-menubar {
     position: absolute;
     z-index: 100;
     top: 0em;
@@ -21,14 +21,14 @@
     -webkit-box-sizing: border-box;
 }
 
-#k-breadcrumb {
+#spin-breadcrumb {
     list-style-type: none outside none;
     height: 2.5em;
     margin: 0px;
     padding: 0px;
 }
 
-.k-breadcrumb-item {
+.spin-breadcrumb-item {
     background-image: url('breadcrumb-item.png');
     background-repeat: no-repeat;
     background-position: center right;
@@ -47,6 +47,6 @@
     color: white;
 }
 
-.k-breadcrumb-item.k-last {
+.spin-breadcrumb-item.spin-last {
     background-image: url('breadcrumb-lastitem.png');    
 }

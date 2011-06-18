@@ -29,7 +29,7 @@
                 }
             });
         </script>
-        <title>jKaiten Demo</title>
+        <title>Spin.js Manual</title>
     </head>
     <body data-panel="index" data-title="Spin.js Manual">
         <ol id="manual" style="display:none">
@@ -40,55 +40,55 @@
                         as a logical and continuous flow of screens.
                     </p>
                 </div>
-                <ol class="k-items">
-                    <li class="k-item nav" data-panel="browsersupport">
-                        <span class="k-left k-title">Supported Browsers</span>
+                <ol class="spin-items">
+                    <li class="spin-item nav" data-panel="browsersupport">
+                        <span class="spin-left spin-title">Supported Browsers</span>
                     </li>
-                    <li class="k-item nav" data-panel="setup">
-                        <span class="k-left k-title">Setup</span>
+                    <li class="spin-item nav" data-panel="setup">
+                        <span class="spin-left spin-title">Setup</span>
                     </li>
-                    <li class="k-item nav" data-panel="jkaiten-loader">
-                        <span class="k-left k-title">The Loader function</span>                
-                        <span class="k-right">
+                    <li class="spin-item nav" data-panel="spin-loader">
+                        <span class="spin-left spin-title">The Loader function</span>                
+                        <span class="spin-right">
                             <strong>important</strong>
                         </span>
                     </li>
-                    <li class="k-item nav" data-panel="defaultloader">
-                        <span class="k-left k-title">The default Loader</span>                
-                        <span class="k-right">
+                    <li class="spin-item nav" data-panel="defaultloader">
+                        <span class="spin-left spin-title">The default Loader</span>                
+                        <span class="spin-right">
                             <strong>important</strong>
                         </span>
                     </li>
-                    <li class="k-item nav" data-panel="jkaiten">
-                        <span class="k-left k-title">Spin Programming</span>                
-                        <span class="k-right">API</span>
+                    <li class="spin-item nav" data-panel="spin">
+                        <span class="spin-left spin-title">Spin Programming</span>                
+                        <span class="spin-right">API</span>
                     </li>
-                    <li class="k-item nav" data-panel="addons">
-                        <span class="k-left k-title">Addons</span>                
+                    <li class="spin-item nav" data-panel="addons">
+                        <span class="spin-left spin-title">Addons</span>                
                     </li>
-                    <li class="k-item nav" data-panel="jkaiten-loader">
-                        <span class="k-left k-title">Terms and definitions</span>                
+                    <li class="spin-item nav" data-panel="spin-loader">
+                        <span class="spin-left spin-title">Terms and definitions</span>                
                     </li>                                        
                 </ol>                
             </li>
             <li id="browsersupport">
                 <div class="block">
                     <p>                        
-                        I have developed jKaiten on browsers available on my machines.
+                        I have developed Spin.js on browsers available on my machines.
                     </p>
                 </div>
-                <ol class="k-items">
-                    <li class="k-item">
-                        <span class="k-left">Firefox 3.6</span>
+                <ol class="spin-items">
+                    <li class="spin-item">
+                        <span class="spin-left">Firefox 3.6</span>
                     </li>
-                    <li class="k-item">
-                        <span class="k-left">Firefox 4</span>
+                    <li class="spin-item">
+                        <span class="spin-left">Firefox 4</span>
                     </li>
-                    <li class="k-item">
-                        <span class="k-left">Chrome 11</span>
+                    <li class="spin-item">
+                        <span class="spin-left">Chrome 11</span>
                     </li>
-                    <li class="k-item">
-                        <span class="k-left">Safari 4</span>
+                    <li class="spin-item">
+                        <span class="spin-left">Safari 4</span>
                     </li>
                 </ol>
             </li>
@@ -98,56 +98,56 @@
                         Here is the basic HTML that you need to make jKaiten runs.
                     </p>
                     <p>
-                        With such markup, jKaiten runs with default settings and without any addons.
+                        With such markup, Spin.js runs with default settings and without any addons.
                     </p>
                     <code class="codeblock">
 &lt;html&gt;
     &lt;head&gt;
-        &lt;script type="text/javascript" src="jKaiten/src/js/jquery-1.6.1.min.js"&gt;&lt;/script&gt;
-        &lt;script type="text/javascript" src="jKaiten/src/js/jKaiten.js"&gt;&lt;/script&gt;
+        &lt;script type="text/javascript" src="Spinjs/src/js/jquery-1.6.1.min.js"&gt;&lt;/script&gt;
+        &lt;script type="text/javascript" src="Spinjs/src/js/Spin.js"&gt;&lt;/script&gt;
     &lt;/head&gt;
     &lt;body data-url="your_script.php">&lt;/body&gt;
 &lt;/html&gt;
                     </code>
                 </div>
             </li>
-            <li id="jkaiten">
+            <li id="spin">
                 <div class="block">
                     <p>
-                        As you can see jKaiten API extends the jQuery object.
+                        Spin.js API extends the jQuery object.
                     </p>
                     <p>
                         <em class="em">$.spin()</em> is probably the most interesting function. It also defines the namespace for the public API.
                     </p>
                 </div>
-                <ol class="k-items">
-                    <li class="k-item nav" data-panel="jkaiten-kaiten">
-                        <span class="k-left k-title">$.spin()</span>                        
+                <ol class="spin-items">
+                    <li class="spin-item nav" data-panel="spin-kaiten">
+                        <span class="spin-left spin-title">$.spin()</span>                        
                     </li>
-                    <li class="k-item nav" data-panel="jkaiten-configure">
-                        <span class="k-left k-title">$.spin.configure()</span>
+                    <li class="spin-item nav" data-panel="spin-configure">
+                        <span class="spin-left spin-title">$.spin.configure()</span>
                     </li>
-                    <li class="k-item nav" data-panel="jkaiten-moveto">
-                        <span class="k-left k-title">$.spin.moveTo()</span>
+                    <li class="spin-item nav" data-panel="spin-moveto">
+                        <span class="spin-left spin-title">$.spin.moveTo()</span>
                     </li>
-                    <li class="k-item nav" data-panel="jkaiten-previous">
-                        <span class="k-left k-title">$.spin.previous()</span>
+                    <li class="spin-item nav" data-panel="spin-previous">
+                        <span class="spin-left spin-title">$.spin.previous()</span>
                     </li>
-                    <li class="k-item nav" data-panel="jkaiten-next">
-                        <span class="k-left k-title">$.spin.next()</span>
+                    <li class="spin-item nav" data-panel="spin-next">
+                        <span class="spin-left spin-title">$.spin.next()</span>
                     </li>                    
-                    <li class="k-item nav" data-panel="jkaiten-removeafter">
-                        <span class="k-left k-title">$.spin.removeAfter()</span>
+                    <li class="spin-item nav" data-panel="spin-removeafter">
+                        <span class="spin-left spin-title">$.spin.removeAfter()</span>
                     </li>
-                    <li class="k-item nav" data-panel="jkaiten-numcolumns">
-                        <span class="k-left k-title">$.spin.numColumns</span>
+                    <li class="spin-item nav" data-panel="spin-numcolumns">
+                        <span class="spin-left spin-title">$.spin.numColumns</span>
                     </li>
-                    <li class="k-item nav" data-panel="jkaiten-maxcolumns">
-                        <span class="k-left k-title">$.spin.maxColumns()</span>
+                    <li class="spin-item nav" data-panel="spin-maxcolumns">
+                        <span class="spin-left spin-title">$.spin.maxColumns()</span>
                     </li>
                 </ol>
             </li>
-            <li id="jkaiten-kaiten">                
+            <li id="spin-kaiten">                
                 <div class="block">
                     <h2 class="title">$.spin()</h2>
                     <p class="synopsys">
@@ -186,14 +186,14 @@ $.spin('&lt;strong&gt;Hello World!&lt;/strong&gt;');
                     <button onclick="$.spin('<strong>Hello World!</strong>', 'Hello World!')">Run</button>
                 </div>                
             </li><!--$.spin()-->
-            <li id="jkaiten-configure">
+            <li id="spin-configure">
                 <div class="block">
                     <h2 class="title">$.spin.configure()</h2>
                     <p class="synopsys">
-                        Configure jKaiten before its execution.
+                        Configures Spin.js before its execution.
                     </p>
                     <p>
-                        Note that <em class="em">$.spin.configure()</em> is designed to be executed only once. Any other calls to it will have no effect.
+                        Note that <em class="em">$.spin.configure()</em> is designed to be executed only once. Any other calls have no effect.
                     </p>
                     <ul class="func_signatures">
                         <li class="func_signature">$.spin.configure(conf)</li>
@@ -221,7 +221,7 @@ $.spin.configure({
                     </p>
                 </div>
             </li><!--$.spin.configure()-->
-            <li id="jkaiten-moveto">
+            <li id="spin-moveto">
                 <div class="block">
                     <h2 class="title">$.spin.moveTo()</h2>
                     <p class="synopsys">
@@ -241,7 +241,7 @@ $.spin.moveTo($('#panel_37'));
                     </p>
                 </div>
             </li><!--$.spin.moveTo()-->
-            <li id="jkaiten-previous">
+            <li id="spin-previous">
                 <div class="block">
                     <h2 class="title">$.spin.previous()</h2>
                     <p class="synopsys">
@@ -257,7 +257,7 @@ $.spin.moveTo($('#panel_37'));
                     </p>
                 </div>
             </li> <!--$.spin.previous()-->
-            <li id="jkaiten-next">
+            <li id="spin-next">
                 <div class="block">
                     <h2 class="title">$.spin.next()</h2>
                     <p class="synopsys">
@@ -273,7 +273,7 @@ $.spin.moveTo($('#panel_37'));
                     </p>
                 </div>
             </li> <!--$.spin.next()-->
-            <li id="jkaiten-removeafter">
+            <li id="spin-removeafter">
                 <div class="block">
                     <h2 class="title">$.spin.removeAfter()</h2>
                     <p class="synopsys">
@@ -287,7 +287,7 @@ $.spin.moveTo($('#panel_37'));
                     </p>
                 </div>
             </li>
-            <li id="jkaiten-numcolumns">
+            <li id="spin-numcolumns">
                 <div class="block">
                     <h2 class="title">$.spin.numColumns()</h2>
                     <p class="synopsys">
@@ -298,7 +298,7 @@ $.spin.moveTo($('#panel_37'));
                     </ul>
                 </div>
             </li>
-            <li id="jkaiten-maxcolumns">
+            <li id="spin-maxcolumns">
                 <div class="block">
                     <h2 class="title">$.spin.maxColumns</h2>
                     <p class="synopsys">
@@ -319,7 +319,7 @@ $.spin.moveTo($('#panel_37'));
                     </p>
                 </div>
             </li>
-            <li id="jkaiten-loader">
+            <li id="spin-loader">
                 <div class="block">
                     <h2 class="title">The loader function</h2>
                     <p class="synopsys">
@@ -415,12 +415,12 @@ $.spin.configure({
 })();
                     </p>                    
                 </div>                
-            </li><!--#jkaiten-loader-->   
+            </li><!--#spin-loader-->   
             <li id="defaultloader">
                 <div class="block">
                     <h2 class="title">Default Loader</h2>
                     <p class="synopsys">
-                        jKaiten comes with an embedded default loader that performs an ajax call (GET). 
+                        Spin.js comes with an embedded default loader that performs an ajax call (GET). 
                         The call is made to an url that has been defined on the element.                        
                     </p>
                     <p>
@@ -485,7 +485,7 @@ $.spin(response);
                     </p>
                     <p>
                         The key idea behind addons is that I wanted to keep 
-                        jKaiten core to its simplest form. It's a panels manager and that's all.
+                        Spin.js core to its simplest form. It's a panels manager and that's all.
                     </p>
                     <p>
                         Addons can be seen as Firefox extensions. Developers can develop additional features without having to modify jKaiten source code.
@@ -497,12 +497,12 @@ $.spin(response);
                         At this time there are two "official" addons. You can put your own into the "addons" folder if you like.
                     </p>                    
                 </div>
-                <ol class="k-items">
-                    <li class="k-item nav">
-                        <span class="k-left k-title">Breadcrumb</span>
+                <ol class="spin-items">
+                    <li class="spin-item nav">
+                        <span class="spin-left spin-title">Breadcrumb</span>
                     </li>
-                    <li class="k-item nav">
-                        <span class="k-left k-title">Navigation Items</span>
+                    <li class="spin-item nav">
+                        <span class="spin-left spin-title">Navigation Items</span>
                     </li>                        
                 </ol>
             </li> 
