@@ -1053,7 +1053,10 @@
         var idx     = Stack.indexOf(panel), //panel index
             nextIdx = Stack.next(idx);      //next panel index, -1 if there isn't.            
         if (nextIdx>0){
+            Spin.moveTo(panel);
             Stack.remove(nextIdx);            
+            Env.togglePrevNextControls();
+            panel.find('.loaded').removeClass('loaded');
         }        
     };
     
