@@ -47,6 +47,9 @@
                     <li class="spin-item nav" data-panel="setup">
                         <span class="spin-left spin-title">Setup</span>
                     </li>
+                    <li class="spin-item nav" data-panel="navelements">
+                        <span class="spin-left spin-title">Navigable Elements</span>
+                    </li>
                     <li class="spin-item nav" data-panel="spin-loader">
                         <span class="spin-left spin-title">The Loader function</span>                
                         <span class="spin-right">
@@ -95,7 +98,7 @@
             <li id="setup">
                 <div class="block">
                     <p>
-                        Here is the basic HTML that you need to make jKaiten runs.
+                        Here is the basic HTML that you need to make Spin.js runs.
                     </p>
                     <p>
                         With such markup, Spin.js runs with default settings and without any addons.
@@ -110,6 +113,9 @@
 &lt;/html&gt;
                     </code>
                 </div>
+            </li>
+            <li id="navelements">
+                
             </li>
             <li id="spin">
                 <div class="block">
@@ -202,7 +208,7 @@ $.spin('&lt;strong&gt;Hello World!&lt;/strong&gt;');
                         <em class="em">conf</em> is an object literal. Supported keys are <em class="em">minWidth</em> and <em class="em">loader</em>. Any other keys will be ignored.
                     </p>
                     <p>
-                        <em class="em">minWidth</em> must be a number. It represents the minimal width of a panel. If not given or invalid jKaiten defaults to 320.
+                        <em class="em">minWidth</em> must be a number. It represents the minimal width of a panel. If not given or invalid Spin.js defaults to 320.
                     </p>
                     <p class="codeblock">
 $.spin.configure({
@@ -210,7 +216,7 @@ $.spin.configure({
 });
                     </p>
                     <p>
-                        <em class="em">loader</em> must be a function. If not given or if <em class="em">loader</em> is not a function, jKaiten will use the default loader. (More info about the loader function below.)
+                        <em class="em">loader</em> must be a function. If not given or if <em class="em">loader</em> is not a function, Spin.js will use the default loader. (More info about the loader function below.)
                     </p>
                     <p class="codeblock">
 $.spin.configure({
@@ -323,7 +329,7 @@ $.spin.moveTo($('#panel_37'));
                 <div class="block">
                     <h2 class="title">The loader function</h2>
                     <p class="synopsys">
-                        jKaiten executes the loader function each time a click is made on an element having the class <em class="em">nav</em>.                        
+                        Spin.js executes the loader function each time a click is made on an element having the class <em class="em">nav</em>.                        
                     </p>                    
                     <p>
                         Examples of <em class="em">navigable elements</em>:
@@ -345,7 +351,7 @@ $.spin.moveTo($('#panel_37'));
                         The first parameter of the loader function is the element that has been clicked on (wrapped in a jQuery object).
                     </p>
                     <p>
-                        jKaiten <strong>prevents any default action</strong> of a "navigable" element.
+                        Spin.js <strong>prevents any default action</strong> of a "navigable" element.
                     </p>
                     <p class="codeblock">
 &lt;a class="nav" href="http://www.example.com"&gt;
@@ -385,7 +391,7 @@ function SubtleLoader(elt){
                     <h3 class="subtitle">Setting up your own loader</h3>
                     <p class="synopsys">
                         Setting up your own loader is made by passing it to 
-                        $.spin.configure(). (see jKaiten API.)
+                        $.spin.configure(). (see Spin.js API.)
                     </p>
                     <p class="codeblock">
 $.spin.configure({
@@ -488,7 +494,7 @@ $.spin(response);
                         Spin.js core to its simplest form. It's a panels manager and that's all.
                     </p>
                     <p>
-                        Addons can be seen as Firefox extensions. Developers can develop additional features without having to modify jKaiten source code.
+                        Addons can be seen as Firefox extensions. Developers can develop additional features without having to modify Spin.js source code.
                     </p>
                     <p>
                         <strong>Relax...</strong> An addon is simply a directory that contains your javascript and/or css files or anything else that you need. If you want to use an addon, simply includes the necessary files to your HTML document.
