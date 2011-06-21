@@ -1153,10 +1153,11 @@
      * 320px wide each and by doing so, imposes a soft limit on that number.
      * 
      * Returns the maximum number of columns.
-     *     
-     * @name            $.spin.maxColumns
-     * @extends         $.spin
+     *          
      * @function
+     * @extends         $.spin
+     * @name            $.spin.maxColumns
+     * @param           {Number} [n] Number of columns
      * @author          customcommander
      * @since           1.0
      * @version         1.0
