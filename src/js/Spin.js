@@ -1191,8 +1191,7 @@
             n = max;
         }
         
-        K({minWidth: Math.floor(Env.WINDOW_WIDTH / n)});
-        
+        Env({minWidth: Math.floor(Env.WINDOW_WIDTH / n)});        
         Env.resize();
         
         return n;
