@@ -1065,8 +1065,7 @@
      */
     Spin.maximize = function (panel){
         Stack.max = Stack.indexOf(panel);
-        Env.PANEL_FORMER_MINWIDTH = Env.PANEL_MINWIDTH;
-        Env.maximized = true;
+        Env.PANEL_FORMER_MINWIDTH = Env.PANEL_MINWIDTH;        
         Spin.maxColumns(1);
     };    
     
@@ -1229,6 +1228,8 @@
             n = max;
         }
         
+        
+        Env.maximized = (n===1);
         Env({minWidth: Math.floor(Env.WINDOW_WIDTH / n)});        
         Env.resize();
         
