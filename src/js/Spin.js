@@ -373,7 +373,9 @@
                     .removeClass('mouseover')
                     .addClass('loaded');
                 
-                Spin.removeAfter(panel);
+                if (Stack.next(idx)>0){
+                    Stack.remove(Stack.next(idx));
+                }
                 
                 Env.loader(elt);                
                 
