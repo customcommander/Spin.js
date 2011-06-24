@@ -137,6 +137,11 @@
     Env.initialized = false;
     
     /**
+     * True if the panel width is set to take all the place available.
+     */
+    Env.maximized = false;
+    
+    /**
      * Absolute path to base directory that contains Spin.js
      *
      * @author      customcommander
@@ -165,17 +170,17 @@
      * @version     1.0
      * @type        Number
      */
-    Env.PANEL_WIDTH = 0;
+    Env.PANEL_WIDTH = 0;        
     
     /**
-     * Minimum panel width in pixels
-     *
-     * @author      customcommander
-     * @since       1.0
-     * @version     1.0
-     * @type        Number
+     * Minimum panel width.
      */
     Env.PANEL_MINWIDTH = 0;
+    
+    /**
+     * Minimum panel width before maximization.
+     */
+    Env.PANEL_FORMER_MINWIDTH = 0;
     
     /**
      * Maximum number of columns that can be visible
@@ -329,7 +334,13 @@
             var formerWidth = Env.PANEL_WIDTH;
             
             //This updates Env.PANEL_WIDTH
-            Env({minWidth: Env.PANEL_MINWIDTH});
+            
+            if (!Env.maximized){
+                Env({minWidth: Env.PANEL_MINWIDTH});
+            } else {
+                Env({minWidth: $(this).width()});
+            }
+            
             
             //If we perform a vertical resizing only, panel & window widths
             //remain the same. Then we don't have to resize the panels.            
@@ -375,6 +386,7 @@
                 
                 if (Stack.next(idx)>0){
                     Stack.remove(Stack.next(idx));
+                    Env.togglePrevNextControls();
                 }
                 
                 Env.loader(elt);                
@@ -1038,7 +1050,31 @@
         Env.togglePrevNextControls();
         
         return destPanel;
-    };        
+    };   
+    
+    /**
+     * Maximizes given panel.
+     *
+     * @name            $.spin.maximize
+     * @extends         $.spin
+     * @function
+     * @author          customcommander
+     * @since           1.0
+     * @version         1.0
+     * @param           {jQuery} panel
+     */
+    Spin.maximize = function (panel){
+        Stack.max = Stack.indexOf(panel);
+        Env.PANEL_FORMER_MINWIDTH = Env.PANEL_MINWIDTH;
+        Env.maximized = true;
+        Spin.maxColumns(1);
+    };    
+    
+    Spin.restore = function (){
+        Env({minWidth: Env.PANEL_FORMER_MINWIDTH});
+        Env.resize();
+        Env.maximized = false;
+    }; 
     
     /**
      * Removes all panels after given panel.
