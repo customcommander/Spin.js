@@ -84,9 +84,10 @@
          * However Spin.js does not prevent a user from narrowing 
          * his/her browser window below 320 if he/she wants or needs to do so.
          */
+        /*
         if (o.hasOwnProperty('minWidth') && $.type(o.minWidth)=='number'){
                         
-            o.minWidth = Math.floor(o.minWidth); //if it's a float
+            o.minWidth = Math.floor(o.minWidth);
             
             if (o.minWidth<320){
                 o.minWidth = 320;            
@@ -94,10 +95,15 @@
                 o.minWidth = Env.WINDOW_WIDTH;
             }                                
         } else {            
-            o.minWidth = 320; //default value if minWidth is missing or invalid
+            o.minWidth = 320;
         }
+        */
         
-        Env.PANEL_MINWIDTH = o.minWidth;
+        //Set only once!
+        if (!Env.PANEL_MINWIDTH){
+            Env.PANEL_MINWIDTH = Env.computeMinWidth(o);
+        }
+        //Env.PANEL_MINWIDTH = Env.computeMinWidth(o);
         Env.MAX_COLUMNS    = Math.floor(Env.WINDOW_WIDTH / Env.PANEL_MINWIDTH);
         
         if (!Env.MAX_COLUMNS){
@@ -178,9 +184,14 @@
     Env.PANEL_MINWIDTH = 0;
     
     /**
+     * Spin.js defines a soft limit to the minimum width of a panel. (pixels.)
+     */
+    Env.SPIN_MINWIDTH = 320;
+    
+    /**
      * Minimum panel width before maximization.
      */
-    Env.PANEL_FORMER_MINWIDTH = 0;
+    Env.PANEL_FORMER_MINWIDTH = 0;    
     
     /**
      * Maximum number of columns that can be visible
@@ -234,7 +245,45 @@
 
     
 //-- Env functions -------------------------------------------------------------
-
+    
+    /**
+     * Returns the computed minimum width of a panel.
+     *
+     * @param           {Object} o Configuration object
+     * @returns         {Number}
+     */
+    Env.computeMinWidth = function (o){
+        var width;
+        
+        /*
+         * If o.minWidth is not set or is neither a number nor a string
+         * we return the default value.
+         */
+        if (!o.hasOwnProperty('minWidth') || 
+            ($.type(o.minWidth)!='string' && $.type(o.minWidth)!='number')){
+            return Env.SPIN_MINWIDTH;
+            
+        /*
+         * String
+         * We allow o.minWidth to be written like this '30%'
+         * @todo implement the feature
+         */
+        } else if ($.type(o.minWidth)=='string'){            
+            return Env.SPIN_MINWIDTH;
+            
+        /*
+         * Number
+         * If it's a float we round it down. The width cannot be lower than
+         * Spin.js soft limit and not greater than the browser window.
+         */
+        } else {
+            width = Math.floor(o.minWidth);
+            return ((width<Env.SPIN_MINWIDTH) && Env.SPIN_MINWIDTH)
+                || ((width>Env.WINDOW_WIDTH) && Env.WINDOW_WIDTH)
+                || width;
+        }
+    };
+    
     
     /**
      * Throws an Error object and displays its message into a panel.
@@ -332,23 +381,14 @@
          */        
         $(window).resize(function (){
             var formerWidth = Env.PANEL_WIDTH;
+                        
+            Env();
             
-            //This updates Env.PANEL_WIDTH
-            
-            if (!Env.maximized){
-                Env({minWidth: Env.PANEL_MINWIDTH});
-            } else {
-                Env({minWidth: $(this).width()});
-            }
-            
-            
-            //If we perform a vertical resizing only, panel & window widths
-            //remain the same. Then we don't have to resize the panels.            
-            if (Env.PANEL_WIDTH===formerWidth){                
-                return;
-            }
-            
-            Env.resize();
+            //doing this because the window resize event can be fired
+            //several times in a row.
+            if (Env.PANEL_WIDTH!==formerWidth){                  
+                Env.resize();
+            }            
         });
         
         /*
@@ -486,6 +526,8 @@
             newMin,
             newMax,
             pos;
+            
+        console.log('Env.resize(): MAX_COLUMNS=%d', Env.MAX_COLUMNS);
         
         newMin = Stack.max - Env.MAX_COLUMNS + 1;
         
@@ -1229,8 +1271,11 @@
         }
         
         
-        Env.maximized = (n===1);
-        Env({minWidth: Math.floor(Env.WINDOW_WIDTH / n)});        
+        //Env.maximized = (n===1);
+        //Env({minWidth: Math.floor(Env.WINDOW_WIDTH / n)});        
+        Env.PANEL_MINWIDTH = Math.floor(Env.WINDOW_WIDTH / n);
+        Env();
+        console.log('Spin.maxColumns(): %d', Env.PANEL_MINWIDTH);
         Env.resize();
         
         return n;
