@@ -525,9 +525,7 @@
             n   = Stack.size(),
             newMin,
             newMax,
-            pos;
-            
-        console.log('Env.resize(): MAX_COLUMNS=%d', Env.MAX_COLUMNS);
+            pos;                    
         
         newMin = Stack.max - Env.MAX_COLUMNS + 1;
         
@@ -864,7 +862,7 @@
      * @author          customcommander
      * @since           1.0
      * @version         1.0     
-     * @param           {String|jQuery Object}  [html]  Content of the panel. Either a HTML string or a jQuery object.
+     * @param           {String|jQuery Object}  [html]  Body of the panel. Either a HTML string or a jQuery object.
      * @param           {String}                [title] Title of the panel
      * @returns         {jQuery Object} The panel that has been created
      */
@@ -875,7 +873,7 @@
             script,
             i,      //control var 
             n,      //control var
-            js; 
+            js;                    
             
         /*
          * If the html parameter is given it must be either a string
@@ -1234,9 +1232,9 @@
      * Returns the maximum number of columns.
      *          
      * @function
-     * @extends         $.spin
      * @name            $.spin.maxColumns
-     * @param           {Number} [n] Number of columns
+     * @extends         $.spin     
+     * @param           {Number} [n] Maximum number of columns
      * @author          customcommander
      * @since           1.0
      * @version         1.0
@@ -1244,7 +1242,7 @@
     Spin.maxColumns = function (n){
         var max;
         
-        //Call without argument
+        //call without argument
         if (n===undefined){
             return Env.MAX_COLUMNS;
         }
@@ -1256,11 +1254,7 @@
         }
         
         //maximum number of columns if panel width is set to 320
-        max = Math.floor(Env.WINDOW_WIDTH / 320);
-        
-        if (!max){
-            max = 1;
-        }
+        max = Math.floor(Env.WINDOW_WIDTH / Env.SPIN_MINWIDTH) || 1;                
         
         /*
          * if n is greater than max, it means that panel width is lower than 
@@ -1269,13 +1263,9 @@
         if (n>max){
             n = max;
         }
-        
-        
-        //Env.maximized = (n===1);
-        //Env({minWidth: Math.floor(Env.WINDOW_WIDTH / n)});        
-        Env.PANEL_MINWIDTH = Math.floor(Env.WINDOW_WIDTH / n);
-        Env();
-        console.log('Spin.maxColumns(): %d', Env.PANEL_MINWIDTH);
+                    
+        Env.PANEL_MINWIDTH = Math.floor(Env.WINDOW_WIDTH / n);        
+        Env();        
         Env.resize();
         
         return n;
