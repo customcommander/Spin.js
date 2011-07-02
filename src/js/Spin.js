@@ -1109,6 +1109,9 @@
         Spin.maxColumns(1);
     };    
     
+    /**
+     *
+     */
     Spin.restore = function (){
         Env({minWidth: Env.PANEL_FORMER_MINWIDTH});
         Env.resize();
