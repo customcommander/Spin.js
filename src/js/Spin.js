@@ -1081,7 +1081,14 @@
     };    
     
     /**
+     * Restores the environment to its state before maximization.
      *
+     * @name            $.spin.restore
+     * @extends         $.spin
+     * @function
+     * @author          customcommander
+     * @since           1.0
+     * @version         1.0     
      */
     Spin.restore = function (){
         if (Env.maximized){
