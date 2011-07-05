@@ -72,44 +72,14 @@
          */
         if (o===undefined || !$.isPlainObject(o)){
             o = {};
-        }
-        
-        /*
-         * If minWidth is given it must be a number.
-         *
-         * Spin.js imposes a soft limit for the panel width. The width cannot
-         * be greater than the browser width and cannot be lower than 320.
-         * 320 is the (former) width of an iPhone in vertical position.
-         *
-         * However Spin.js does not prevent a user from narrowing 
-         * his/her browser window below 320 if he/she wants or needs to do so.
-         */
-        /*
-        if (o.hasOwnProperty('minWidth') && $.type(o.minWidth)=='number'){
-                        
-            o.minWidth = Math.floor(o.minWidth);
-            
-            if (o.minWidth<320){
-                o.minWidth = 320;            
-            } else if (o.minWidth>Env.WINDOW_WIDTH){
-                o.minWidth = Env.WINDOW_WIDTH;
-            }                                
-        } else {            
-            o.minWidth = 320;
-        }
-        */
+        }        
         
         //Set only once!
         if (!Env.PANEL_MINWIDTH){
             Env.PANEL_MINWIDTH = Env.computeMinWidth(o);
         }
-        //Env.PANEL_MINWIDTH = Env.computeMinWidth(o);
-        Env.MAX_COLUMNS    = Math.floor(Env.WINDOW_WIDTH / Env.PANEL_MINWIDTH);
-        
-        if (!Env.MAX_COLUMNS){
-            Env.MAX_COLUMNS = 1;
-        }
-        
+                
+        Env.MAX_COLUMNS = Math.floor(Env.WINDOW_WIDTH / Env.PANEL_MINWIDTH) || 1;        
         Env.PANEL_WIDTH = Math.round(Env.WINDOW_WIDTH / Env.MAX_COLUMNS);
         
         /*
@@ -1107,15 +1077,19 @@
         Stack.max = Stack.indexOf(panel);
         Env.PANEL_FORMER_MINWIDTH = Env.PANEL_MINWIDTH;        
         Spin.maxColumns(1);
+        Env.maximized = true;
     };    
     
     /**
      *
      */
     Spin.restore = function (){
-        Env({minWidth: Env.PANEL_FORMER_MINWIDTH});
-        Env.resize();
-        Env.maximized = false;
+        if (Env.maximized){
+            Env.PANEL_MINWIDTH = Env.PANEL_FORMER_MINWIDTH;
+            Env();
+            Env.resize();
+            Env.maximized = false;            
+        }
     }; 
     
     /**
