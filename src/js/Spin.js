@@ -36,7 +36,7 @@
  * and continuous flow of screens.
  *
  * @author              customcommander
- * @since               1.0
+ * @since               1.0.0
  */
 (function ($){    
     
