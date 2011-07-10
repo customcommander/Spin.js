@@ -550,260 +550,148 @@
 //------------------------------------------------------------------------------
  
     /**
-     * Adds a panel to the Stack.
-     * 
-     * <p>Adds a panel and updates visible range boundaries.</p>
+     * Stack adds and removes panels but also allows to get information about panels.
      *
      * @private
-     * @name            Stack
-     * @namespace     
-     * @function
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {jQuery Object} panel The panel to add to the Stack
      */
-    function Stack(panel){
-        var idx = Stack.push(panel);
-        
-        //first panel
-        if (idx===0){
-            Stack.min = 0;
-            Stack.max = 0;
-            
-        //if index is still visible it becomes the new max boundary
-        //(we don't need to care if it isn't.)
-        } else if (Stack.visible(idx)) {
-            Stack.max = idx;                        
-        }
-        
-        return idx;
-    }
-    
-//-- Stack variables -----------------------------------------------------------
+    var Stack = {
 
-    /**
-     * Array of panels IDs
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @type            String[]
-     */
-    Stack.arr = [];
-    
-    /**
-     * Begin of visible range. 
-     *
-     * <p>Panels with indexes lower than Stack.min are not visible.</p>
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @type            Number
-     */
-    Stack.min = -1;
-    
-    /**
-     * End of visible range.
-     *
-     * <p>Panels with indexes greater than Stack.max are not visible.</p>
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @type            Number
-     */
-    Stack.max = -1;
-    
-    /**
-     * Autoincremented ID
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @type            Number
-     * @default         1
-     */
-    Stack.nextId = 1;
-    
-//-- Stack functions -----------------------------------------------------------
-    
-    /**
-     * Returns the number of panels in the Stack
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @returns         {Number}
-     */
-    Stack.size = function (){
-        return Stack.arr.length;
-    };
-    
-    /**
-     * Appends the panel to the DOM and to the Stack.
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {jQuery} panel
-     * @returns         {Number} Panel Stack index
-     */
-    Stack.push = function (panel){           
-        Env.panels.append(panel);                
-        Env.body.trigger('paneladd.spin', [panel]);        
-        return Stack.arr.push(panel.attr('id')) - 1;
-    };
-    
-    /**
-     * Removes the last panel from the DOM and from the Stack.
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     */
-    Stack.pop = function (){
-        var id    = Stack.arr.pop(),
-            panel = $('#' + id).remove();            
-        Env.body.trigger('panelremove.spin', [panel]);
-    };
-    
-    /**
-     * Returns the panel Stack index.
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {jQuery} panel
-     * @returns         {Number} Panel Stack index
-     * @throws          {Error} An Error is thrown if panel is not valid or unknown
-     */
-    Stack.indexOf = function (panel){
-        var idx;      
+        /**
+         * Panels properties.
+         * @type        Object[]
+         */
+        arr: [],
+        
+        /**
+         * Start of visible range.
+         * @type        Number
+         */
+        min: 0,
+        
+        /**
+         * End of visible range.
+         * @type        Number
+         */
+        max: 0,   
+        
+        /**
+         * Panel id (autoincremented).
+         * @type        Number
+         */
+        next_id: 1,         
+        
+        /**
+         * Adds a panel both into the Stack and the DOM.
+         * @param       {jQuery} panel
+         * @param       {Object} properties
+         */
+        push: function (panel, properties){
+            $.extend(properties, {
+                selector: '#' + panel.attr('id')
+            });
+            this.arr.push(properties);        
+            Env.panels.append(panel);
+            Env.body.trigger('paneladd.spin', [panel]);        
+            return this.arr.length - 1;
+        },
+        
+        /**
+         * Removes a panel both from the Stack and the DOM.
+         */
+        pop: function (){
+            var properties = this.arr.pop(),//removes from the Stack       
+                panel = $(properties.selector).remove();//removes from the DOM
+            Env.body.trigger('panelremove.spin', [panel]);
+        },
+        
+        /**
+         * Returns next index.
+         * @param       {Number} idx Stack index
+         * @returns     {Number} -1 if idx is the last index
+         */
+        next: function (idx){
+            return ((idx===this.arr.length-1) && -1) || idx+1;
+        },
+        
+        /**
+         * Returns previous index.
+         * @param       {Number} idx Stack index
+         * @returns     {Number} -1 if idx is the first index
+         */
+        previous: function (idx){
+            return ((idx===0) && -1) || idx-1;
+        },    
+        
+        /**
+         * Returns the Stack index of given panel
+         * @param       {jQuery} panel
+         * @returns     {Number}
+         */
+        indexOf: function (panel){
+            var i, selector;
             
-        if (!(panel instanceof jQuery) || !panel.is('li.spin-panel')){
-            Env.error('No panel given');
+            if (!(panel instanceof jQuery) || !panel.is('li.spin-panel')){
+                Env.error('no panel given');
+            }
+            
+            selector = '#' + panel.attr('id');
+            
+            for (i=0; i<this.arr.length; i++){
+                if (this.arr[i].selector==selector){
+                    return i;
+                }
+            }
+            
+            Env.error('panel not found');
+        },
+        
+        /**
+         * Returns the panel at given index.
+         * @param       {Number} Stack index
+         * @returns     {jQuery} Panel DOM element wrapped inside a jQuery object.
+         */
+        panelAt: function (idx){
+            return $(this.arr[idx].selector);
+        },            
+        
+        /**
+         * Returns true if index is within visible range.
+         * @param       {Number} idx Stack index
+         * @returns     {Boolean}
+         * @see         Stack#min
+         * @see         Stack#max
+         */
+        visible: function (idx){
+            return (this.min<=idx) && (idx<=this.max);
+        },
+        
+        /**
+         * Returns the id for a new panel.
+         * @returns     {String}
+         * @see         Stack#next_id
+         */
+        newId: function (){
+            return 'panel_' + this.next_id++;
+        },
+        
+        /**
+         * Returns the position for new panel.
+         * @returns     {Number}
+         */
+        newPosition: function (){
+            var i, n, pos = 0;
+                        
+            if (this.arr.length){                     
+                //new position is the sum of visible panels widths
+                for (i=this.min, n=this.max; i<=n; i++){
+                    pos+= this.arr[i].col * this.PANEL_WIDTH;
+                }
+            }
+            
+            return pos;
         }
         
-        idx = $.inArray(panel.attr('id'), Stack.arr);
-        
-        if (idx<0){
-            Env.error('Panel Not Found');
-        }
-        
-        return idx;
     };
-    
-    /**
-     * Returns the next panel ID
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @returns         {String} Panel ID
-     */
-    Stack.id = function (){        
-        return 'panel_' + Stack.nextId++;        
-    };
-    
-    /**
-     * Returns the next panel position
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @returns         {Number}
-     */
-    Stack.position = function (){
-        if (Stack.min<0){/*i.e. the first panel*/
-            return 0;
-        }        
-        return (Stack.max - Stack.min + 1) * Env.PANEL_WIDTH;
-    };
-    
-    /**
-     * Returns panel at given Stack index
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {Number} idx Stack index
-     * @returns         {jQuery} Panel
-     */
-    Stack.panel = function (idx){
-        return $('#' + Stack.arr[idx]);
-    };            
-    
-    /**
-     * Returns previous Stack index 
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {Number} idx Stack index
-     * @returns         {Number} previous Stack index or -1
-     */
-    Stack.previous = function (idx){        
-        return (--idx<0) ? -1 : idx;
-    };
-    
-    /**
-     * Returns next Stack index
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {Number} idx Stack index
-     * @returns         {Number} next Stack index or -1
-     */
-    Stack.next = function (idx){        
-        return (++idx>=Stack.size()) ? -1 : idx;
-    };
-    
-    /**
-     * Returns true if Stack index is within visible range
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {Number} idx Stack index
-     * @returns         {Boolean} false if not within visible range
-     */
-    Stack.visible = function (idx){        
-        return (idx>=Stack.min) && (idx<=(Stack.min + Env.MAX_COLUMNS - 1));
-    }; 
-    
-    /**
-     * Returns the number of visible panels.
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @returns         {Number}
-     */
-    Stack.numVisible = function (){
-        return Stack.max - Stack.min + 1;
-    };
-    
-    /**
-     * Removes all panels after and including given Stack index
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {Number} idx Stack index
-     */
-    Stack.remove = function (idx){
-        var i = 0, 
-            n = Stack.size() - idx; 
-            
-        for (; i<n; i++){        
-            Stack.pop();                        
-        }   
-        
-        Stack.max = Stack.previous(idx);   
-    };   
     
 //------------------------------------------------------------------------------
 //-- Spin (Public API) ---------------------------------------------------------
