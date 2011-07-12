@@ -403,7 +403,7 @@
                 
             } else {                
                 Spin.moveTo(
-                    Stack.panel(
+                    Stack.panelAt(
                         Stack.next(idx)));                
             }
             
@@ -411,12 +411,12 @@
         
         Env.prevCtrl.click(function (){
             var idx = Stack.previous(Stack.min);
-            Spin.moveTo(Stack.panel(idx));            
+            Spin.moveTo(Stack.panelAt(idx));            
         });
         
         Env.nextCtrl.click(function (){
             var idx = Stack.next(Stack.max);
-            Spin.moveTo(Stack.panel(idx));
+            Spin.moveTo(Stack.panelAt(idx));
         });        
     };
     
@@ -512,7 +512,7 @@
         }
         
         for (; idx<n; idx++){            
-            Stack.panel(idx).css({
+            Stack.panelAt(idx).css({
                 left:   Math.ceil(pos),
                 width:  Env.PANEL_WIDTH
             });
@@ -584,15 +584,29 @@
          * Adds a panel both into the Stack and the DOM.
          * @param       {jQuery} panel
          * @param       {Object} properties
+         * @returns     {Number} panel index
          */
-        push: function (panel, properties){
-            $.extend(properties, {
-                selector: '#' + panel.attr('id')
-            });
-            this.arr.push(properties);        
+        push: function (panel, properties){  
+            var idx;
+                
+            properties.selector = '#' + panel.attr('id');
+                
+            if ('full'==properties.expand){
+                properties.columns = Env.MAX_COLUMNS;
+            } else if ('double'==properties.expand){
+                properties.columns = 2;
+            } else if ('auto'==properties.expand){
+                properties.columns = 2;
+            } else {
+                properties.columns = 1;
+            }
+            
+            idx = this.arr.push(properties) - 1;    
+                        
             Env.panels.append(panel);
-            Env.body.trigger('paneladd.spin', [panel]);        
-            return this.arr.length - 1;
+            Env.body.trigger('paneladd.spin', [panel]);  
+            
+            return idx;
         },
         
         /**
@@ -637,7 +651,7 @@
             selector = '#' + panel.attr('id');
             
             for (i=0; i<this.arr.length; i++){
-                if (this.arr[i].selector==selector){
+                if (this.arr[i].selector===selector){
                     return i;
                 }
             }
@@ -662,8 +676,20 @@
          * @see         Stack#max
          */
         visible: function (idx){
-            return (this.min<=idx) && (idx<=this.max);
-        },
+            var i       = this.min, 
+                col_sum = 0;
+                             
+            if (idx<this.min){
+                return false;
+            }
+            
+            do {
+                col_sum+= this.arr[i].columns;
+                i++;    
+            } while (i<idx && col_sum<=Env.MAX_COLUMNS);            
+            
+            return col_sum<=Env.MAX_COLUMNS;
+        },        
         
         /**
          * Returns the id for a new panel.
@@ -679,12 +705,13 @@
          * @returns     {Number}
          */
         newPosition: function (){
-            var i, n, pos = 0;
-                        
-            if (this.arr.length){                     
-                //new position is the sum of visible panels widths
-                for (i=this.min, n=this.max; i<=n; i++){
-                    pos+= this.arr[i].col * this.PANEL_WIDTH;
+            var i   = Stack.min, 
+                n   = Stack.max, 
+                pos = 0;
+                
+            if (this.arr.length){
+                for (; i<=n; i++){
+                    pos+= this.arr[i].columns * Env.PANEL_WIDTH;
                 }
             }
             
@@ -726,8 +753,10 @@
      */
     function Spin(html, title){
         var panel, 
-            panelId       = Stack.id(),            
-            panelSelector = '#' + panelId,                        
+            panelId       = Stack.newId(),            
+            panelSelector = '#' + panelId,   
+            panel_idx, 
+            panel_pos,                    
             script,
             i,      //control var 
             n,      //control var
@@ -767,11 +796,13 @@
             '</li>'
         ].join(''));
         
+        panel_pos = Stack.newPosition();
+        
         //Identifying, sizing and positioning
         panel
             .attr('id', panelId)
             .css({
-                left:   Stack.position(),
+                left:   panel_pos,
                 width:  Env.PANEL_WIDTH
             });
         
@@ -783,7 +814,14 @@
         panel.find('div.spin-panel-bd').append(html.filter(':not(script)'));                        
        
         //Adds the panel to the DOM
-        Stack(panel);
+        panel_idx = Stack.push(panel, {expand:'none'});
+        
+        if (Stack.visible(panel_idx)){
+            Stack.max = panel_idx;
+            console.log('max updated %d', panel_idx);
+        } else {
+            console.log('max not updated');
+        }
         
         //Gets all <script/> nodes from the original html.
         script = html.filter('script');
@@ -854,100 +892,87 @@
     
     /**
      * Moves to given panel.
-     * 
-     * <p>Slides left or right until given panel gets visible.</p>
-     *
-     * <p>If panel already is visible, the function does nothing.</p>
      *     
      * @name        $.spin.moveTo
      * @extends     $.spin
      * @function
-     * @param       {jQuery Object} destPanel Destination panel
+     * @param       {jQuery} target_panel
      * @author      customcommander
      * @since       1.0
      * @version     1.0
      */
-    Spin.moveTo = function (destPanel){        
-        var destIdx = Stack.indexOf(destPanel), //destination index
-            arr     = Stack.arr,            
-            css     = {left: ''},
-            elts    = [],
-            panel,
-            idx,            
-            newMin,
-            newMax;
-        
-        if (Stack.visible(destIdx)){            
-            //if panel already is visible we dont need to move there...
-            return destPanel;
-        }        
-        
-        if (destIdx>Stack.max){            
-            
-            // SITUATION
-            // *********
-            // 1) Panels 2 to 4 are visible but we need to move to panel 8.
-            // 2) Panels width is set to 100 (PANEL_WIDTH).
-            // 3) Only three panels can be visible (MAX_PANELS).                    
-            //
-            // current: -200-100 0   100 200 300 400 500 600
-            //          +---+---+---+---+---+---+---+---+---+
-            //          | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
-            //          |   |   |min|   |max|   |   |   |   |            
-            //          +---+---+---+---+---+---+---+---+---+
-            //
-            // new:     -600-500-400-300-200-100 0   100 200
-            //          +---+---+---+---+---+---+---+---+---+
-            //          | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
-            //          |   |   |   |   |   |   |min|   |max|
-            //          +---+---+---+---+---+---+---+---+---+            
-            css.left = '-=' + Math.round(((destIdx - Stack.max) * Env.PANEL_WIDTH));                            
-            newMin   = destIdx - Env.MAX_COLUMNS + 1;  // 8 - 3 + 1 = 6
-            newMax   = destIdx;                     // 8
-            
-            //from 2 to (and including) 8
-            for (idx=Stack.min; idx<=newMax; idx++){              
-                
-                panel = Stack.panel(idx); 
-                elts.push(panel.get(0));
-                
-                //before we animate panels 2 to 8, we have to be sure that they
-                //are all correctly positioned. since they already are visible
-                //panels 2 to 4 dont need this.
-                if (idx>Stack.max){                        
+    Spin.moveTo = function (target_panel){        
+        var target_idx = Stack.indexOf(target_panel),
                     
-                    //panel 5 is positioned at : (5 - 2) * 100 = 300
-                    //panel 6 is positioned at : (6 - 2) * 100 = 400 ...
-                    panel.css({left: Math.round((idx - Stack.min) * Env.PANEL_WIDTH)});                    
-                }                
-            }            
+            min_idx = Stack.min,
+            max_idx = Stack.max,
             
-        } else if (destIdx<Stack.min){
+            cur_idx,
+            cur_props,          
+            cur_pos,
             
-            css.left = '+=' + Math.round(((Stack.min - destIdx) * Env.PANEL_WIDTH));
-            newMin   = destIdx;
-            newMax   = destIdx + Env.MAX_COLUMNS - 1;
+            cols,
+            cols_sum,
             
-            for (idx=destIdx; idx<=Stack.max; idx++){                                  
+            tomove_selectors = [],
+            tomove_px        = 0,
+            
+            pos,
+            
+            i;
+        
+        //we dont move to a panel that is already visible
+        if (Stack.visible(target_idx)){
+            return;
+        }
+        
+        console.time('Spin.moveTo');
+        
+        //current visible panels will all move
+        for (i=min_idx; i<=max_idx; i++){
+            tomove_selectors.push(Stack.arr[i].selector);
+        }
+        
+        if (target_idx>min_idx){  
+        
+            pos = Env.MAX_COLUMNS * Env.PANEL_WIDTH;
+            
+            do {
+                cur_idx   = Stack.next(max_idx);
+                cur_props = Stack.arr[cur_idx];
+                cur_pos   = pos;                        
+                cols_sum  = 0;                
                 
-                panel = Stack.panel(idx);
-                elts.push(panel.get(0));                                                       
+                do {
+                    cols       = Stack.arr[min_idx].columns;
+                    cols_sum  += cols;                                                            
+                    tomove_px += cols * Env.PANEL_WIDTH;
+                    min_idx    = Stack.next(min_idx);
+                    
+                } while (cols_sum<cur_props.columns);
                 
-                if (idx<Stack.min){                                                            
-                    panel.css({left: Math.round((idx - Stack.min) * Env.PANEL_WIDTH)});                    
-                }
-            }                        
-        }   
+                //we need to make sure that this hidden panel is correctly
+                //positioned before we move it.
+                $(cur_props.selector).css({left: cur_pos});
+                
+                //adding this hidden panel to the list
+                tomove_selectors.push(cur_props.selector);
+                
+                max_idx = cur_idx;
+                pos    += Env.PANEL_WIDTH * cur_props.columns;
+                                
+            } while (cur_idx<target_idx);
+            
+            $(tomove_selectors.join()).animate({left: '-=' + tomove_px});            
+            
+        }
         
-        //updating boundaries
-        Stack.min = newMin;
-        Stack.max = newMax;                          
+        Stack.min = min_idx;
+        Stack.max = max_idx;
         
-        $(elts).animate(css, 'fast');   
+        console.log(Stack.min, Stack.max);
         
-        Env.togglePrevNextControls();
-        
-        return destPanel;
+        console.timeEnd('Spin.moveTo');
     };   
     
     /**
@@ -1034,7 +1059,7 @@
             return false;
         }        
         
-        panel = Stack.panel(idx);        
+        panel = Stack.panelAt(idx);        
         
         if ($.type(move)=='boolean' && !move){
             return panel;
@@ -1067,7 +1092,7 @@
             return false;
         }
         
-        panel = Stack.panel(idx);
+        panel = Stack.panelAt(idx);
         
         if ($.type(move)=='boolean' && !move){
             return panel;
