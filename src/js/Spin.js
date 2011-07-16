@@ -94,11 +94,11 @@
             Env.loader = o.loader;
         }    
         
-        return o;                    
-    }   
-
+        return o;
+    }
     
-//-- Env variables -------------------------------------------------------------     
+    
+//-- Env variables -------------------------------------------------------------
 
     
     /**
@@ -523,7 +523,11 @@
         Stack.max = newMax;
         
         Env.togglePrevNextControls();
-    };  
+    }; 
+    
+    Env.pack = function (){
+        
+    }; 
     
     /**
      * Shows or hides previous/next controls
@@ -582,12 +586,14 @@
         
         /**
          * Adds a panel both into the Stack and the DOM.
+         *
          * @param       {jQuery} panel
          * @param       {Object} properties
          * @returns     {Number} panel index
          */
         push: function (panel, properties){  
-            var idx;
+            var i,
+                idx;
                 
             properties.selector = '#' + panel.attr('id');
                 
@@ -601,7 +607,7 @@
                 properties.columns = 1;
             }
             
-            idx = this.arr.push(properties) - 1;    
+            idx = this.arr.push(properties) - 1;            
                         
             Env.panels.append(panel);
             Env.body.trigger('paneladd.spin', [panel]);  
@@ -613,13 +619,14 @@
          * Removes a panel both from the Stack and the DOM.
          */
         pop: function (){
-            var properties = this.arr.pop(),//removes from the Stack       
+            var properties = this.arr.pop(),            //removes from the Stack       
                 panel = $(properties.selector).remove();//removes from the DOM
             Env.body.trigger('panelremove.spin', [panel]);
         },
         
         /**
          * Returns next index.
+         *
          * @param       {Number} idx Stack index
          * @returns     {Number} -1 if idx is the last index
          */
@@ -629,6 +636,7 @@
         
         /**
          * Returns previous index.
+         *
          * @param       {Number} idx Stack index
          * @returns     {Number} -1 if idx is the first index
          */
@@ -637,7 +645,8 @@
         },    
         
         /**
-         * Returns the Stack index of given panel
+         * Returns the Stack index of given panel.
+         *
          * @param       {jQuery} panel
          * @returns     {Number}
          */
@@ -660,9 +669,10 @@
         },
         
         /**
-         * Returns the panel at given index.
+         * Returns panel at given index.
+         *
          * @param       {Number} Stack index
-         * @returns     {jQuery} Panel DOM element wrapped inside a jQuery object.
+         * @returns     {jQuery}
          */
         panelAt: function (idx){
             return $(this.arr[idx].selector);
@@ -670,29 +680,19 @@
         
         /**
          * Returns true if index is within visible range.
+         *
          * @param       {Number} idx Stack index
          * @returns     {Boolean}
          * @see         Stack#min
          * @see         Stack#max
          */
         visible: function (idx){
-            var i       = this.min, 
-                col_sum = 0;
-                             
-            if (idx<this.min){
-                return false;
-            }
-            
-            do {
-                col_sum+= this.arr[i].columns;
-                i++;    
-            } while (i<idx && col_sum<=Env.MAX_COLUMNS);            
-            
-            return col_sum<=Env.MAX_COLUMNS;
+            return (this.min<=idx) && (idx<=this.max);
         },        
         
         /**
-         * Returns the id for a new panel.
+         * Returns id for a new panel.
+         *
          * @returns     {String}
          * @see         Stack#next_id
          */
@@ -701,7 +701,8 @@
         },
         
         /**
-         * Returns the position for new panel.
+         * Returns position for new panel.
+         *
          * @returns     {Number}
          */
         newPosition: function (){
@@ -760,6 +761,7 @@
             script,
             i,      //control var 
             n,      //control var
+            cols_sum,
             js;                    
             
         /*
@@ -816,13 +818,6 @@
         //Adds the panel to the DOM
         panel_idx = Stack.push(panel, {expand:'none'});
         
-        if (Stack.visible(panel_idx)){
-            Stack.max = panel_idx;
-            console.log('max updated %d', panel_idx);
-        } else {
-            console.log('max not updated');
-        }
-        
         //Gets all <script/> nodes from the original html.
         script = html.filter('script');
         
@@ -860,10 +855,28 @@
                     js.join(''),
                 '</script>'
             ].join(''));
+        }        
+
+        /* 
+         * We need to compute how much columns are used starting from the 
+         * first visible panel. 
+         */
+        for (i=Stack.min, cols_sum=0; i<=panel_idx; i++){
+            cols_sum += Stack.arr[i].columns;
         }
         
-        //Moves to the panel if not visible
-        Spin.moveTo(panel);
+        /*
+         * If too much columns are used we need to move some panels until 
+         * the new panel gets fully visible.
+         */
+        if (cols_sum>Env.MAX_COLUMNS){
+            Spin.moveTo(panel);
+        /*
+         * The new panel is already fully visible. Updating visible range.
+         */
+        } else {
+            Stack.max = panel_idx;
+        }        
         
         return panel;
     }    
@@ -907,6 +920,9 @@
             min_idx = Stack.min,
             max_idx = Stack.max,
             
+            min,
+            max,
+            
             cur_idx,
             cur_props,          
             cur_pos,
@@ -917,7 +933,15 @@
             tomove_selectors = [],
             tomove_px        = 0,
             
-            pos,
+            
+            idx,    //panel index
+            props,  //panel properties
+            pos,    //panel position
+            
+            
+            
+            selectors = [],
+            shift = 0,
             
             i;
         
@@ -933,6 +957,7 @@
             tomove_selectors.push(Stack.arr[i].selector);
         }
         
+        //target index is on the right
         if (target_idx>min_idx){  
         
             pos = Env.MAX_COLUMNS * Env.PANEL_WIDTH;
@@ -965,12 +990,72 @@
             
             $(tomove_selectors.join()).animate({left: '-=' + tomove_px});            
             
+            Stack.min = min_idx;
+            Stack.max = max_idx;
+            
+        //target index is on the left
+        } else {
+            
+            //panels selectors that will be animated
+            for (i=target_idx; i<=Stack.max; i++){
+                selectors.push(Stack.arr[i].selector);                
+            }
+            
+            pos = 0;
+            
+            do {
+                Stack.min--;
+                cols = 0;
+                
+                /*
+                 * when we move a panel we need to make sure that there are 
+                 * enough columns available to it.
+                 * 
+                 *        min         max    min         max
+                 * +-------+---+---+---+      +-------+---+---+---+
+                 * |1>>....|2  |3>>|4>>|      |1      |2  |3..|4..|
+                 * |.......|   |   |   |      |       |   |...|...|
+                 * +-------+---+---+---+      +-------+---+---+---+
+                 *
+                 * the current width of the window allows a maximum of 
+                 * three visible columns.
+                 *
+                 * panel 1 is hidden and extends over two columns. panels 2, 3, 
+                 * and 4 are visible and extend over one column each.
+                 * 
+                 * so in order to make enough room for panel 1 we need to
+                 * move panels 3 and 4.
+                 */
+                do {
+                    cols      = Stack.arr[Stack.max].columns;
+                    shift    += cols * -Env.PANEL_WIDTH;                    
+                    cols_sum += cols;
+                    Stack.max--;
+                //we exit the loop when enough columns will
+                } while (cols_sum<Stack.arr[idx].columns);
+                ff
+                pos += Stack.arr[idx].columns * -Env.PANEL_WIDTH;
+                
+                Stack.panelAt(idx).css({left: pos});
+                
+            } while (idx>target_idx);
+                        
+            //reverse loop: hidden panels at left
+            for (pos=0, Stack.min--; Stack.min>=target_idx; Stack.min--){
+                
+                //repositioning before animation
+                pos += Stack.arr[idx].columns * -Env.PANEL_WIDTH;                
+                Stack.panelAt(i).css({left: pos});
+                
+                
+                
+                
+                
+            }
+            
         }
         
-        Stack.min = min_idx;
-        Stack.max = max_idx;
         
-        console.log(Stack.min, Stack.max);
         
         console.timeEnd('Spin.moveTo');
     };   
