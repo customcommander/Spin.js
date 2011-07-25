@@ -38,7 +38,8 @@ $(function (){
     
     breadcrumb.delegate('li.spin-breadcrumb-item', 'click', function (e){
         var id = $(this).attr('id').slice(0, -4); //removes "_ref" at end of string
-        $.spin.moveTo($('#' + id));
+//        $.spin.moveTo($('#' + id));
+        $.spin.expand($('#' + id));
     });
 
 });
