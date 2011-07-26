@@ -2,7 +2,7 @@
  * Spin.js 1.0
  * http://spinjs.com
  * 
- * Copyright 2011, Julien Gonzalez
+ * Copyright 2011, Julien Gonzalez.
  *
  * Includes jQuery JavaScript Library v1.6.1
  * http://jquery.com/
