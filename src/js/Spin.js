@@ -44,547 +44,246 @@
 //-- Env (Private API) ---------------------------------------------------------
 //------------------------------------------------------------------------------
 
-    /**     
-     * Env - Private API
-     *
-     * @name            Env
-     * @namespace
-     * @function
-     * @private
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {Object}    [o]             Configuration object key/value pairs object literal
-     * @param           {Number}    [o.minWidth]    Minimum width of a panel in pixels
-     * @param           {Function}  [o.loader]      Custom loader function
-     * @returns         {Object} Configuration object (may differs from the original)     
-     */
-    function Env(o){
+    var Env = {
         
-        /*
-         * Browser window width in pixels
-         */
-        Env.WINDOW_WIDTH = $(window).width();
+        basePath:           null,
         
-        /*
-         * Calling Env() without argument set the default environment.
-         * (e.g. minWidth is 320 and loader is the default loader)
-         */
-        if (o===undefined || !$.isPlainObject(o)){
-            o = {};
-        }        
+        initialized:        null,
+        body:               null,
+        panels:             null,
         
-        //Set only once!
-        if (!Env.PANEL_MINWIDTH){
-            Env.PANEL_MINWIDTH = Env.computeMinWidth(o);
-        }
+        packCss:            null,
+        unpackCss:          null,
+        shiftLeftCss:       null,
+        shiftRightCss:      null,
+        
+        configure: function (){
+            var win = $(window).width(), //window width
+                packed,                  //packed width
+                unpacked;                //unpacked width
+            
+            //one panel environment
+            if (win<640){
+                this.packCss       = { left: 0,        width: win      };    
+                this.unpackCss     = { left: 0,        width: win      };                
+                this.shiftLeftCss  = { left:-win,      width: win      };
+                this.shiftRightCss = { left: win,      width: win      };
+            
+            //two panels environment; same widths
+            } else if (win<960){
+                unpacked = Math.floor(win/2);
                 
-        Env.MAX_COLUMNS = Math.floor(Env.WINDOW_WIDTH / Env.PANEL_MINWIDTH) || 1;        
-        Env.PANEL_WIDTH = Math.round(Env.WINDOW_WIDTH / Env.MAX_COLUMNS);       
-        
-        if (Env.MAX_COLUMNS>1){
-            Env.panelBlur = {
-                left:   0,
-                width:  Env.PANEL_WIDTH
-            };
-            
-            Env.panelFocus = {
-                left:   Env.panelBlur.width,
-                width:  Env.panelBlur.width * (Env.MAX_COLUMNS-1)
-            };                        
-            
-            Env.panelHideLeft = {
-                left:  -Env.panelFocus.width,
-                width:  Env.panelFocus.width
-            };
-            
-        } else {
-            Env.panelFocus = {
-                left:   0,
-                width:  Env.WINDOW_WIDTH
-            };
-            
-            Env.panelHideLeft = {
-                left:  -Env.panelFocus.width,
-                width:  Env.panelFocus.width
-            };
-            
-            Env.panelBlur = Env.panelHideLeft;
-        }
-        
-        Env.panelHideRight = {
-            left:   Env.panelFocus.width,
-            width:  Env.panelFocus.width
-        };
-        
-        /*
-         * If loader is given it must be a function otherwise we trigger
-         * a failure... Come on dude, loader is very important!
-         */
-        if (o.hasOwnProperty('loader')){            
-            if (!$.isFunction(o.loader)){                
-                Env.error('Loader is not a function');                
+                this.packCss       = { left: 0,        width: unpacked };    
+                this.unpackCss     = { left: unpacked, width: unpacked };                
+                this.shiftLeftCss  = { left:-unpacked, width: unpacked };
+                this.shiftRightCss = { left: win,      width: unpacked };
+                
+            //two panels environment; optimized widths            
+            } else {
+                packed   = Math.floor(win/3);
+                unpacked = Math.floor(win-packed);
+                
+                this.packCss       = { left: 0,        width: packed   };    
+                this.unpackCss     = { left: packed,   width: unpacked };                
+                this.shiftLeftCss  = { left:-unpacked, width: unpacked };
+                this.shiftRightCss = { left: win,      width: unpacked };
             }            
-            //Overrides the default loader.
-            Env.loader = o.loader;
-        }    
+        },
         
-        return o;
-    }
-    
-    
-//-- Env variables -------------------------------------------------------------
-
-    
-    /**
-     * Indicates if the environment has been initialized     
-     *
-     * @default     false
-     * @author      customcommander
-     * @since       1.0
-     * @version     1.0
-     * @type        Boolean
-     */
-    Env.initialized = false;
-    
-    /**
-     * True if the panel width is set to take all the place available.
-     */
-    Env.maximized = false;
-    
-    /**
-     * Absolute path to base directory that contains Spin.js
-     *
-     * @author      customcommander
-     * @since       1.0
-     * @version     1.0
-     * @see         Env.initBasePath
-     * @type        String
-     */
-    Env.BASE_PATH = null;
-    
-    /**
-     * Browser window width in pixels     
-     *
-     * @author      customcommander
-     * @since       1.0
-     * @version     1.0
-     * @type        Number
-     */
-    Env.WINDOW_WIDTH = 0;        
-    
-    /**
-     * Computed panel width in pixels
-     *
-     * @author      customcommander
-     * @since       1.0
-     * @version     1.0
-     * @type        Number
-     */
-    Env.PANEL_WIDTH = 0;        
-    
-    /**
-     * Minimum panel width.
-     */
-    Env.PANEL_MINWIDTH = 0;    
-    
-    Env.panelBlur      = {};
-    Env.panelFocus     = {};    
-    Env.panelHideLeft  = {};
-    Env.panelHideRight = {};
-    
-    /**
-     * Spin.js defines a soft limit to the minimum width of a panel. (pixels.)
-     */
-    Env.SPIN_MINWIDTH = 320;
-    
-    /**
-     * Minimum panel width before maximization.
-     */
-    Env.PANEL_FORMER_MINWIDTH = 0;    
-    
-    /**
-     * Maximum number of columns that can be visible
-     *
-     * @author      customcommander
-     * @since       1.0
-     * @version     1.0
-     * @type        Number
-     */
-    Env.MAX_COLUMNS = 0;
-    
-    /**
-     * Reference to document body
-     *
-     * @author      customcommander
-     * @since       1.0
-     * @version     1.0
-     * @type        jQuery Object
-     */
-    Env.body = null;
-    
-    /**
-     * Reference to stack
-     *
-     * @author      customcommander
-     * @since       1.0
-     * @version     1.0
-     * @type        jQuery Object
-     */
-    Env.panels = null;
-    
-    /**
-     * Reference to previous panel control
-     *
-     * @author      customcommander
-     * @since       1.0
-     * @version     1.0
-     * @type        jQuery Object
-     */
-    Env.prevCtrl = null;
-    
-    /**
-     * Reference to next panel control
-     *
-     * @author      customcommander
-     * @since       1.0
-     * @version     1.0
-     * @type        jQuery Object
-     */
-    Env.nextCtrl = null;
-
-    
-//-- Env functions -------------------------------------------------------------
-    
-    /**
-     * Returns the computed minimum width of a panel.
-     *
-     * @param           {Object} o Configuration object
-     * @returns         {Number}
-     */
-    Env.computeMinWidth = function (o){
-        var width;
-        
-        /*
-         * If o.minWidth is not set or is neither a number nor a string
-         * we return the default value.
-         */
-        if (!o.hasOwnProperty('minWidth') || 
-            ($.type(o.minWidth)!='string' && $.type(o.minWidth)!='number')){
-            return Env.SPIN_MINWIDTH;
-            
-        /*
-         * String
-         * We allow o.minWidth to be written like this '30%'
-         * @todo implement the feature
-         */
-        } else if ($.type(o.minWidth)=='string'){            
-            return Env.SPIN_MINWIDTH;
-            
-        /*
-         * Number
-         * If it's a float we round it down. The width cannot be lower than
-         * Spin.js soft limit and not greater than the browser window.
-         */
-        } else {
-            width = Math.floor(o.minWidth);
-            return ((width<Env.SPIN_MINWIDTH) && Env.SPIN_MINWIDTH)
-                || ((width>Env.WINDOW_WIDTH) && Env.WINDOW_WIDTH)
-                || width;
-        }
-    };
-    
-    
-    /**
-     * Throws an Error object and displays its message into a panel.
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {String} [msg]  Error message
-     * @throws          {Error}
-     */
-    Env.error = function (msg){
-        Spin('<h2>' + msg + '</h2>', 'Error!').addClass('error');
-        throw new Error(msg);
-    };
-    
-    /**
-     * Initializes Env.BASE_PATH
-     *
-     * <p>Finds the script tag that includes Spin.js and computes the 
-     * absolute path to its base directory.</p>
-     *
-     * <p>The function is executed when Spin.js source file is included.</p>
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     */
-    Env.initBasePath = function (){        
-        var fullpath  = $('script[src*="src/js/Spin"]').prop('src'); 
-        Env.BASE_PATH = fullpath.substring(0, fullpath.lastIndexOf('src'));
-    };
-    
-    /**
-     * Loads Environment CSS.
-     *
-     * <p>The function is executed when Spin.js source file is included.</p>
-     * 
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     */
-    Env.loadCss = function (){        
-        $('head').append(
-            '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/fonts-min.css" />',
-            '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/reset-min.css" />',
-            '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/base-min.css" />',
-            '<link rel="stylesheet" type="text/css" href="' + Env.BASE_PATH + 'src/css/spin.css" />'
-        );
-    };
-    
-    /**
-     * Initializes Environment.
-     *
-     * <ul>
-     *      <li>Adds required HTML markup to the DOM</li>
-     *      <li>Sets environment variables</li>
-     *      <li>Loads the first panel</li>
-     *      <li>Defines events handlers</li>
-     * </ul>
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {Object} [o] Configuration object
-     */
-    Env.initialize = function (o){
-                
-        //Spin.js takes care of its own markup
-        $(document.body).append([
-            '<div id="spin">',   
-            '   <div id="spin-nav-controls">',
-            '       <div id="spin-nav-prev"/>',
-            '       <div id="spin-nav-next"/>',      
-            '   </div>',
-            '   <ol id="spin-panels"/>',
-            '</div>'
-        ].join(''));
-        
-        //Sets environment variables
-        Env.body       = $(document.body);
-        Env.prevCtrl   = $('#spin-nav-prev');
-        Env.nextCtrl   = $('#spin-nav-next');
-        Env.panels     = $('#spin-panels');
-        
-        //Validates the configuration object
-        o = Env(o);
-        
-        //Loads the first panel
-        Env.loader(Env.body);
-        
-        //From here until the end, we defines global events handlers
-        
-        /*
+        /**
+         * Throws an Error object and displays its message into a panel.
          *
-         */        
-        $(window).resize(function (){
-            var formerWidth = Env.PANEL_WIDTH;
-                        
-            Env();
-            
-            //doing this because the window resize event can be fired
-            //several times in a row.
-            if (Env.PANEL_WIDTH!==formerWidth){                  
-                Env.resize();
-            }            
-        });
-        
-        /*
-         * This allows to define non navigable zone(s) inside a navigable zone.
-         * 
-         * A click on a non navigable element will not propagate.
+         * @author          customcommander
+         * @since           1.0
+         * @version         1.0
+         * @param           {String} [msg]  Error message
+         * @throws          {Error}
          */
-        Env.body.delegate('.no-nav', 'click', function (e){
-            e.stopPropagation();
-        });
+        error: function (msg){
+            Spin('<h2>' + msg + '</h2>', 'Error!').addClass('error');
+            throw new Error(msg);
+        },
         
-        /*
-         * A click on any element with the class "nav" or that is contained by 
-         * an element with such class executes the loader. 
-         * 
-         * Note that any default behaviour is prevented.
+        /**
+         * Initializes Env.BASE_PATH
+         *
+         * <p>Finds the script tag that includes Spin.js and computes the 
+         * absolute path to its base directory.</p>
+         *
+         * <p>The function is executed when Spin.js source file is included.</p>
+         *
+         * @author          customcommander
+         * @since           1.0
+         * @version         1.0
          */
-        Env.body.delegate('.nav', 'click', function (e){
-            var elt     = $(this),
-                target  = $(e.target),
-                panel   = elt.panel(),
-                idx     = Stack.indexOf(panel);
-                
-            e.preventDefault();                   
-                
-            if (!elt.hasClass('loaded')){
-                
-                panel
-                    .find('.loaded')
-                    .removeClass('loaded');
+        initBasePath: function (){        
+            var fullpath  = $('script[src*="src/js/Spin"]').prop('src'); 
+            this.basePath = fullpath.substring(0, fullpath.lastIndexOf('src'));
+        },
+        
+        /**
+         * Loads Environment CSS.
+         *
+         * <p>The function is executed when Spin.js source file is included.</p>
+         * 
+         * @author          customcommander
+         * @since           1.0
+         * @version         1.0
+         */
+        loadCss: function (){        
+            $('head').append(
+                '<link rel="stylesheet" type="text/css" href="' + this.basePath + 'src/css/fonts-min.css" />',
+                '<link rel="stylesheet" type="text/css" href="' + this.basePath + 'src/css/reset-min.css" />',
+                '<link rel="stylesheet" type="text/css" href="' + this.basePath + 'src/css/base-min.css" />',
+                '<link rel="stylesheet" type="text/css" href="' + this.basePath + 'src/css/spin.css" />'
+            );
+        },
+        
+        initialize: function (){                    
+            Env.configure();
                     
-                elt
-                    .removeClass('mouseover')
-                    .addClass('loaded');
-                
-                if (Stack.next(idx)>0){
-                    Stack.remove(Stack.next(idx));
-                    Env.togglePrevNextControls();
+            //Spin.js takes care of its own markup
+            $(document.body).append([
+                '<div id="spin">',   
+                '   <div id="spin-nav-controls">',
+                '       <div id="spin-nav-prev"/>',
+                '       <div id="spin-nav-next"/>',      
+                '   </div>',
+                '   <ol id="spin-panels"/>',
+                '</div>'
+            ].join(''));
+            
+            //Sets environment variables
+            Env.body       = $(document.body);
+            Env.panels     = $('#spin-panels');
+            
+            
+            //Loads the first panel
+            Env.loader(Env.body);
+            
+            //From here until the end, we defines global events handlers
+            
+            /*
+             *
+             */        
+            $(window).resize(function (){
+                console.log('to implement');
+            });
+            
+            /*
+             * This allows to define non navigable zone(s) inside a navigable zone.
+             * 
+             * A click on a non navigable element will not propagate.
+             */
+            Env.body.delegate('.no-nav', 'click', function (e){
+                e.stopPropagation();
+            });
+            
+            /*
+             * A click on any element with the class "nav" or that is contained by 
+             * an element with such class executes the loader. 
+             * 
+             * Note that any default behaviour is prevented.
+             */
+            Env.body.delegate('.nav', 'click', function (e){
+                var elt     = $(this),
+                    target  = $(e.target),
+                    panel   = elt.panel(),
+                    idx     = Stack.indexOf(panel);
+                    
+                e.preventDefault();                   
+                    
+                if (!elt.hasClass('loaded')){
+                    
+                    panel.find('.loaded').removeClass('loaded');
+                        
+                    elt.removeClass('mouseover').addClass('loaded');
+                    
+                    if (Stack.next(idx)>0){
+                        Stack.remove(Stack.next(idx));
+                    }
+                    
+                    Env.loader(elt);                
+                    
+                } else {                
+                    Spin.expand(
+                        Stack.panelAt(
+                            Stack.next(idx)));                
                 }
                 
-                Env.loader(elt);                
-                
-            } else {                
-                Spin.expand(
-                    Stack.panelAt(
-                        Stack.next(idx)));                
+            });                        
+            
+            Env.initialized = true;
+        },
+        
+        /**
+         * The loader is in charge of loading the panels.
+         *
+         * <p>It's probably the most interesting function!</p>
+         *
+         * <p>The loader is executed by Spin.js each time a click is made on
+         * an element with the class 'nav' and gives that element to the loader
+         * as its first parameter.</p>
+         *
+         * <p>The very first execution of the loader occurs after the document has
+         * finished to load. Its parameter at that specific time is always the
+         * body element.</p>
+         *
+         * <p>Spin.js defines a default loader (this one) but you can override it 
+         * by supplying your own to $.spin.configure().</p>
+         * 
+         * <pre>
+         * //This is how you set you own loader
+         * $.spin.configure({
+         *      loader: function (elt){
+         *          //your loading logic
+         *      }
+         * });
+         * </pre>
+         *
+         * @author          customcommander
+         * @since           1.0
+         * @version         1.0
+         * @param           {jQuery Object} elt The element which has been clicked or the body when the document loads
+         */
+        loader: function (elt){              
+            /* 
+             * This is how the default loader works:
+             *
+             * The loader assumes that each clicked element (elt) has a data-url
+             * attribute and loads that url with some ajax voodoo.
+             *
+             * <a class="nav" data-url="mymovies.php?genre=scifi">
+             *      Click here to see my sci-fi movies
+             * </a>
+             */
+            var url = elt.data('url');
+            
+            /*
+             * Url must be a non empty string!
+             */
+            url = ($.type(url)!='string' || !$.trim(url)) ? '' : $.trim(url);        
+
+            if (!url){
+                Env.error('No url given');
             }
             
-        });                
-        
-        Env.prevCtrl.click(function (){
-            var idx = Stack.previous(Stack.min);
-            Spin.moveTo(Stack.panelAt(idx));            
-        });
-        
-        Env.nextCtrl.click(function (){
-            var idx = Stack.next(Stack.max);
-            Spin.moveTo(Stack.panelAt(idx));
-        });        
-    };
-    
-    /**
-     * The loader is in charge of loading the panels.
-     *
-     * <p>It's probably the most interesting function!</p>
-     *
-     * <p>The loader is executed by Spin.js each time a click is made on
-     * an element with the class 'nav' and gives that element to the loader
-     * as its first parameter.</p>
-     *
-     * <p>The very first execution of the loader occurs after the document has
-     * finished to load. Its parameter at that specific time is always the
-     * body element.</p>
-     *
-     * <p>Spin.js defines a default loader (this one) but you can override it 
-     * by supplying your own to $.spin.configure().</p>
-     * 
-     * <pre>
-     * //This is how you set you own loader
-     * $.spin.configure({
-     *      loader: function (elt){
-     *          //your loading logic
-     *      }
-     * });
-     * </pre>
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {jQuery Object} elt The element which has been clicked or the body when the document loads
-     */
-    Env.loader = function (elt){              
-        /* 
-         * This is how the default loader works:
-         *
-         * The loader assumes that each clicked element (elt) has a data-url
-         * attribute and loads that url with some ajax voodoo.
-         *
-         * <a class="nav" data-url="mymovies.php?genre=scifi">
-         *      Click here to see my sci-fi movies
-         * </a>
-         */
-        var url = elt.data('url');
-        
-        /*
-         * Url must be a non empty string!
-         */
-        url = ($.type(url)!='string' || !$.trim(url)) ? '' : $.trim(url);        
-
-        if (!url){
-            Env.error('No url given');
-        }
-        
-        $.ajax({
-            url: url,                              
-            success: function (html, status, xhr){            
-                Spin(html, elt.panelTitle());                    
-            },
-            error: function (xhr, status, error){                
-                Env.error(xhr.status + ' ' + error);
-            }
-        });
-    };   
-    
-    /**
-     * Environment Resize.
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0  
-     */
-    Env.resize = function (){
-        var idx = 0,
-            n   = Stack.size(),
-            newMin,
-            newMax,
-            pos;                    
-        
-        newMin = Stack.max - Env.MAX_COLUMNS + 1;
-        
-        if (newMin<0){
-            newMin = 0;
-            // Stack.max is updated if there are not enough panels before the last
-            // (and including the last) to occupy the browser window and if there
-            // are panels available after the last.
-            newMax = (Stack.max+1===n) ? Stack.max : Env.MAX_COLUMNS - 1;
-            pos    = 0;
-        } else {
-            newMax = Stack.max;
-            pos    = (newMin===0) ? 0 : newMin * -Env.PANEL_WIDTH;
-        }
-        
-        for (; idx<n; idx++){            
-            Stack.panelAt(idx).css({
-                left:   Math.ceil(pos),
-                width:  Env.PANEL_WIDTH
+            $.ajax({
+                url: url,                              
+                success: function (html, status, xhr){            
+                    Spin(html, elt.panelTitle());                    
+                },
+                error: function (xhr, status, error){                
+                    Env.error(xhr.status + ' ' + error);
+                }
             });
-            pos += Env.PANEL_WIDTH;
         }
         
-        Stack.min = newMin;
-        Stack.max = newMax;
-        
-        Env.togglePrevNextControls();
-    };         
+    };//Env
     
-    /**
-     * Shows or hides previous/next controls
-     *
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     */
-    Env.togglePrevNextControls = function (){        
-        if (Stack.previous(Stack.min)<0){
-            Env.prevCtrl.hide('fast');
-        } else {            
-            Env.prevCtrl.show('fast');
-        }
-        if (Stack.next(Stack.max)<0){
-            Env.nextCtrl.hide('fast');
-        } else {
-            Env.nextCtrl.show('fast');
-        }
-    };
-        
+    
+    
+            
 //------------------------------------------------------------------------------
 //-- Stack (Private API) -------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -596,10 +295,6 @@
      */
     var Stack = {
 
-        /**
-         * Panels properties.
-         * @type        Object[]
-         */
         arr: [],
         
         /**
@@ -797,10 +492,14 @@
             '</li>'
         ].join(''));
         
-        panel.attr('id', panelId).css({
-            left:   !Stack.arr.length? 0 : Env.WINDOW_WIDTH,
-            width:  Env.WINDOW_WIDTH
-        });
+        if (!Stack.arr.length){//i.e. first panel        
+            panel.attr('id', panelId).css({
+                left:   0,
+                width:  $(window).width()
+            });
+        } else {
+            panel.attr('id', panelId).css(Env.shiftRightCss);
+        }
         
         /*
          * We append to the panel the html without any <script/> nodes.
@@ -857,29 +556,24 @@
         }
         
         return panel;
-    }    
+    }
     
     /**
-     * Configures Spin.js before its execution.
-     *
-     * @name        $.spin.configure     
+     * 
+     * @name        $.spin.loader
      * @extends     $.spin
-     * @function
-     * @param       {Object}    [o]             key/value pairs object literal
-     * @param       {Number}    [o.minWidth]    Minimum width of a panel in pixels
-     * @param       {Function}  [o.loader]      Custom loader function
-     * @author      customcommander
      * @since       1.0
      * @version     1.0
+     * @param   {Function} fn function in charge of loading your panels     
      */
-    Spin.configure = function (o){
+    Spin.loader = function (fn){
         if (!Env.initialized){
-            $(function (){
-                Env.initialize(o);
-            });   
-            Env.initialized = true;         
+            if (!$.isFunction(fn)){
+                Env.error('missing or invalid loader');
+            }
+            Env.loader = fn;
         }
-    };
+    };      
         
     /**
      * Expands a panel.
@@ -939,52 +633,15 @@
                 Stack.max = idx;
             }                                                  
         } else if (max<idx){            
-            $(Stack.arr.slice(min, idx-1).join()).animate(Env.panelHideLeft);            
-            $(Stack.arr[idx-1]).animate(Env.panelBlur);
-            $(Stack.arr[idx]).animate(Env.panelFocus);            
+            $(Stack.arr.slice(min, idx-1).join()).animate(Env.shiftLeftCss);            
+            $(Stack.arr[idx-1]).animate(Env.packCss);
+            $(Stack.arr[idx]).animate(Env.unpackCss);            
             Stack.min = min<max || idx>0? idx-1 : idx;
             Stack.max = idx;            
         }        
         
         return panel;
-    };
-    
-    /**
-     * Maximizes given panel.
-     *
-     * @name            $.spin.maximize
-     * @extends         $.spin
-     * @function
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @param           {jQuery} panel
-     */
-    Spin.maximize = function (panel){
-        Stack.max = Stack.indexOf(panel);
-        Env.PANEL_FORMER_MINWIDTH = Env.PANEL_MINWIDTH;        
-        Spin.maxColumns(1);
-        Env.maximized = true;
     };    
-    
-    /**
-     * Restores the environment to its state before maximization.
-     *
-     * @name            $.spin.restore
-     * @extends         $.spin
-     * @function
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0     
-     */
-    Spin.restore = function (){
-        if (Env.maximized){
-            Env.PANEL_MINWIDTH = Env.PANEL_FORMER_MINWIDTH;
-            Env();
-            Env.resize();
-            Env.maximized = false;            
-        }
-    }; 
     
     /**
      * Removes all panels after given panel.
@@ -1003,7 +660,6 @@
         if (nextIdx>0){
             Spin.moveTo(panel);
             Stack.remove(nextIdx);            
-            Env.togglePrevNextControls();
             panel.find('.loaded').removeClass('loaded');
         }        
     };
@@ -1039,7 +695,7 @@
             return panel;
         }        
         
-        return Spin.moveTo(panel);        
+        return Spin.expand(panel);        
     };        
     
     /**
@@ -1072,91 +728,8 @@
             return panel;
         }        
         
-        return Spin.moveTo(panel);        
+        return Spin.expand(panel);        
     };   
-    
-    /**
-     * Returns the current number of columns on display.
-     *     
-     * @name            $.spin.numColumns
-     * @extends         $.spin
-     * @function
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @returns         {Number}
-     */
-    Spin.numColumns = function (){
-        return Stack.numVisible();
-    };
-    
-    /**
-     * If called without parameter, it returns the current maximum number of
-     * columns that can be displayed at the same time.
-     * 
-     * If the parameter is set it redefines that number and the display will
-     * be updated accordingly.
-     * 
-     * Note that Spin.js tries to keep the panels to a minimum of 
-     * 320px wide each and by doing so, imposes a soft limit on that number.
-     * 
-     * Returns the maximum number of columns.
-     *          
-     * @function
-     * @name            $.spin.maxColumns
-     * @extends         $.spin     
-     * @param           {Number} [n] Maximum number of columns
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     */
-    Spin.maxColumns = function (n){
-        var max;
-        
-        //call without argument
-        if (n===undefined){
-            return Env.MAX_COLUMNS;
-        }
-        
-        n = parseInt(n, 10);
-        
-        if (!n || n<0){
-            Env.error('Invalid number of columns');
-        }
-        
-        //maximum number of columns if panel width is set to 320
-        max = Math.floor(Env.WINDOW_WIDTH / Env.SPIN_MINWIDTH) || 1;                
-        
-        /*
-         * if n is greater than max, it means that panel width is lower than 
-         * 320. Spin.js doesn't like that.
-         */
-        if (n>max){
-            n = max;
-        }
-                    
-        Env.PANEL_MINWIDTH = Math.floor(Env.WINDOW_WIDTH / n);        
-        Env();        
-        Env.resize();
-        
-        return n;
-    };
-    
-    /**
-     * Returns Spin.js installation path.
-     *     
-     * @name            $.spin.basePath
-     * @extends         $.spin
-     * @function
-     * @author          customcommander
-     * @since           1.0
-     * @version         1.0
-     * @see             Env.initBasePath
-     * @returns         {String}
-     */
-    Spin.basePath = function (){
-        return Env.BASE_PATH;
-    };
     
     $.fn.panel = function (){
         var panel;
@@ -1272,12 +845,7 @@
     Env.initBasePath();
     Env.loadCss();
     
-    $(function (){
-        if (!Env.initialized){
-            Env.initialize();                    
-        }
-        Env.initialized = true;
-    });
+    $(Env.initialize);
     
     /**
      * Throws an Error and displays its message into a panel.
@@ -1301,6 +869,8 @@
      * Extends jQuery with Spin.js public API
      */
     $.extend({spin: Spin});
+    
+    
     
     //jQuery is awesome!!!
 }(jQuery));

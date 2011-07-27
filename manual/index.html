@@ -10,24 +10,22 @@
 		<script type="text/javascript" src="../addons/items/items.js"></script>
         <script type="text/javascript">
         
-            $.spin.configure({
-                minWidth: 400,
-                loader: function (elt){
-                    var panel = elt.data('panel');
-                
-                    if (!panel || $.type(panel)!='string'){
-                        $.error('Panel attribute missing or invalid');                        
-                    }
-                    
-                    panel = $('#' + panel);
-                    
-                    if (!panel.length){
-                        $.error('Panel Not Found');
-                    }
-                    
-                    $.spin(panel.clone().html(), elt.panelTitle());
+            $.spin.loader(function (elt){
+                var panel = elt.data('panel');
+            
+                if (!panel || $.type(panel)!='string'){
+                    $.error('Panel attribute missing or invalid');                        
                 }
+                
+                panel = $('#' + panel);
+                
+                if (!panel.length){
+                    $.error('Panel Not Found');
+                }
+                
+                $.spin(panel.clone().html(), elt.panelTitle());
             });
+            
         </script>
         <title>Spin.js Manual</title>
     </head>
