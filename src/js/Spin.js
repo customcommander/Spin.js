@@ -80,7 +80,42 @@
         }
                 
         Env.MAX_COLUMNS = Math.floor(Env.WINDOW_WIDTH / Env.PANEL_MINWIDTH) || 1;        
-        Env.PANEL_WIDTH = Math.round(Env.WINDOW_WIDTH / Env.MAX_COLUMNS);
+        Env.PANEL_WIDTH = Math.round(Env.WINDOW_WIDTH / Env.MAX_COLUMNS);       
+        
+        if (Env.MAX_COLUMNS>1){
+            Env.panelBlur = {
+                left:   0,
+                width:  Env.PANEL_WIDTH
+            };
+            
+            Env.panelFocus = {
+                left:   Env.panelBlur.width,
+                width:  Env.panelBlur.width * (Env.MAX_COLUMNS-1)
+            };                        
+            
+            Env.panelHideLeft = {
+                left:  -Env.panelFocus.width,
+                width:  Env.panelFocus.width
+            };
+            
+        } else {
+            Env.panelFocus = {
+                left:   0,
+                width:  Env.WINDOW_WIDTH
+            };
+            
+            Env.panelHideLeft = {
+                left:  -Env.panelFocus.width,
+                width:  Env.panelFocus.width
+            };
+            
+            Env.panelBlur = Env.panelHideLeft;
+        }
+        
+        Env.panelHideRight = {
+            left:   Env.panelFocus.width,
+            width:  Env.panelFocus.width
+        };
         
         /*
          * If loader is given it must be a function otherwise we trigger
@@ -151,7 +186,12 @@
     /**
      * Minimum panel width.
      */
-    Env.PANEL_MINWIDTH = 0;
+    Env.PANEL_MINWIDTH = 0;    
+    
+    Env.panelBlur      = {};
+    Env.panelFocus     = {};    
+    Env.panelHideLeft  = {};
+    Env.panelHideRight = {};
     
     /**
      * Spin.js defines a soft limit to the minimum width of a panel. (pixels.)
@@ -402,7 +442,7 @@
                 Env.loader(elt);                
                 
             } else {                
-                Spin.moveTo(
+                Spin.expand(
                     Stack.panelAt(
                         Stack.next(idx)));                
             }
@@ -588,19 +628,10 @@
          * @returns     {Number} panel index
          */
         push: function (panel){  
-            var selector = '#' + panel.attr('id');
-            
-            idx = this.arr.push(selector) - 1;
-            
-//            if (idx){
-//                this.min = idx-1;
-//                this.max = idx;
-//            }
-            
+            var selector = '#' + panel.attr('id');            
             Env.panels.append(panel);
-            Env.body.trigger('paneladd.spin', [panel]);  
-                        
-            return idx;
+            Env.body.trigger('paneladd.spin', [panel]);                          
+            return this.arr.push(selector) - 1;
         },
         
         /**
@@ -686,28 +717,7 @@
          */
         newId: function (){
             return 'panel_' + this.next_id++;
-        },
-        
-        /**
-         * Returns position for new panel.
-         *
-         * @returns     {Number}
-         */
-        newPosition: function (){
-            return (this.arr.length && Env.WINDOW_WIDTH) || 0;
-        },
-        
-        /**
-         * Returns width for a new panel.
-         * 
-         * @returns     {Number}
-         */
-        newWidth: function (){
-            return (!this.arr.length && (Env.PANEL_WIDTH * Env.MAX_COLUMNS))
-                || (Env.MAX_COLUMNS>1 && (Env.PANEL_WIDTH * (Env.MAX_COLUMNS-1)))
-                || Env.PANEL_WIDTH;
-        }
-        
+        },        
     };
     
 //------------------------------------------------------------------------------
@@ -746,7 +756,7 @@
             panelId       = Stack.newId(),            
             panelSelector = '#' + panelId,   
             panel_idx, 
-            panel_pos,                    
+            panel_pos,   
             script,
             i,      //control var 
             n,      //control var
@@ -787,15 +797,10 @@
             '</li>'
         ].join(''));
         
-//        panel_pos = Stack.newPosition();
-        
-        //Identifying, sizing and positioning
-        panel
-            .attr('id', panelId)
-            .css({
-                left:   Stack.newPosition(),
-                width:  Stack.newWidth()
-            });
+        panel.attr('id', panelId).css({
+            left:   !Stack.arr.length? 0 : Env.WINDOW_WIDTH,
+            width:  Env.WINDOW_WIDTH
+        });
         
         /*
          * We append to the panel the html without any <script/> nodes.
@@ -845,9 +850,11 @@
                     js.join(''),
                 '</script>'
             ].join(''));
-        }
+        }        
         
-        Spin.moveTo(panel);       
+        if (panel_idx){//i.e. not the first panel
+            Spin.expand(panel);       
+        }
         
         return panel;
     }    
@@ -873,175 +880,73 @@
             Env.initialized = true;         
         }
     };
-    
+        
     /**
-     * Moves to given panel.
-     *     
-     * @name        $.spin.moveTo
-     * @extends     $.spin
+     * Expands a panel.
+     *
+     * @name            $.spin.expand
+     * @extends         $.spin
      * @function
-     * @param       {jQuery} target_panel
-     * @author      customcommander
-     * @since       1.0
-     * @version     1.0
+     * @author          customcommander
+     * @since           1.0
+     * @version         1.0
+     * @param           {jQuery} panel
      */
-    Spin.moveTo = function (panel){
+    Spin.expand = function (panel){
         var idx = Stack.indexOf(panel),
             min = Stack.min,
             max = Stack.max,
-            i,
-            n,
-            selectors  = [],
-            spinanim_q = []; //spin animation queue            
+            selectors;
             
-        if (idx>max){
-            if (Env.MAX_COLUMNS===1){
-                for (i=min; i<=idx-1; i++){
-                    $(Stack.arr[i]).animate({ left: -Env.WINDOW_WIDTH });
-                }
-                panel.animate({ left: 0 });
+        
+        if (idx<=min){     
+            $(Stack.arr.slice(idx+1, min).join()).css({
+                left:   Env.WINDOW_WIDTH,
+                width:  Env.PANEL_WIDTH
+            });
+            
+            if (idx<min){
+                $(Stack.arr[min]).animate({ left: Env.WINDOW_WIDTH }, function (){
+                    $(this).css({ width: Env.PANEL_WIDTH });
+                });                
+            }
+            
+            $(Stack.arr[max]).animate({ left: Env.WINDOW_WIDTH }, function (){
+                $(this).css({ width: Env.PANEL_WIDTH });
+            });
+            
+            if (idx===0 || Env.MAX_COLUMNS===1){                
+                $(Stack.arr[idx]).animate({
+                    left:   0,
+                    width:  Env.WINDOW_WIDTH
+                });   
+                
                 Stack.min = idx;
-                Stack.max = idx;
+                Stack.max = idx;             
+                                
             } else {
-                for (i=min; i<idx-1; i++){
-                    $(Stack.arr[i]).animate({ left: -Env.PANEL_WIDTH,
-                                              width: Env.PANEL_WIDTH });
-                }
-                $(Stack.arr[idx-1]).animate({ left:  0, 
-                                              width: Env.PANEL_WIDTH });                
-                                              
-                panel.animate({ left:  Env.PANEL_WIDTH, 
-                                width: Env.PANEL_WIDTH * (Env.MAX_COLUMNS-1) });
-                                            
+                $(Stack.arr[idx]).animate({
+                    left:   Env.PANEL_WIDTH,
+                    width:  Env.PANEL_WIDTH * (Env.MAX_COLUMNS-1)
+                });
+
+                $(Stack.arr[idx-1]).animate({
+                    left:   0,
+                    width:  Env.PANEL_WIDTH
+                });                
+                
                 Stack.min = idx-1;
                 Stack.max = idx;
-            }
-        } else if (idx<min){                        
-            if (Env.MAX_COLUMNS===1 || idx===0){
-                for (i=idx+1; i<=max; i++){
-                    selectors.push(Stack.arr[i]);
-                }
-                                
-                spinanim_q.push(function (next){
-                    $(selectors.join()).animate({ left: Env.WINDOW_WIDTH });
-                    next();
-                });
-                
-                spinanim_q.push(function (next){
-                    $(Stack.arr[idx]).animate({ left:  0, 
-                                                width: Env.WINDOW_WIDTH });
-                    next();
-                });                                
-                
-                Stack.min = idx;
-                Stack.max = idx;
-                
-            } else {
-                for (i=min+1; i<=max; i++){
-                    selectors.push(Stack.arr[i]);
-                }
-                
-                spinanim_q.push(function (next){
-                    $(selectors.join()).animate({ left: Env.WINDOW_WIDTH });
-                    next();
-                });
-                
-                spinanim_q.push(function (next){
-                    $(Stack.arr[idx]).animate({ left:  0,
-                                                width: Env.PANEL_WIDTH });
-                    next();
-                });
-                
-                spinanim_q.push(function (next){
-                    $(Stack.arr[idx+1]).animate({ left:  Env.PANEL_WIDTH,
-                                                  width: Env.PANEL_WIDTH * (Env.MAX_COLUMNS-1) });
-                    next();
-                });
-                
-                Stack.min = idx;
-                Stack.max = idx+1;                                                
-            }            
-            
-            Env.body.queue('spin', spinanim_q).dequeue('spin');
-                        
-        }
-        
-                
-    };   
-    
-    Spin.expand = function (panel){
-        var i,
-            idx        = Stack.indexOf(panel),
-            min        = Stack.min,
-            max        = Stack.max,
-            selectors  = [], 
-            anim_queue = [];
-        
-        if (min<=idx && idx<max){
-            for (i=idx+1; i<=max; i++){
-                selectors.push(Stack.arr[i]);
-            }
-            
-            anim_queue.push(function (next){
-                $(selectors.join()).animate({ left: Env.WINDOW_WIDTH });
-                next();
-            });    
-            
-            if (idx!==0){//i.e. is not the first panel
-                anim_queue.push(function (next){
-                    $(Stack.arr[idx]).animate({ left:  Env.PANEL_WIDTH,
-                                                width: Env.PANEL_WIDTH * (Env.MAX_COLUMNS-1) });
-                    next();
-                });
-                
-                anim_queue.push(function (next){
-                    $(Stack.arr[idx-1]).animate({ left:  0,
-                                                  width: Env.PANEL_WIDTH });
-                    next();
-                });
-                
-            } else {
-                anim_queue.push(function (next){
-                    $(Stack.arr[idx]).animate({ left:  0,
-                                                width: Env.WINDOW_WIDTH });
-                    next();
-                });
-            }
-            
-            Stack.min = (idx===0) ? idx : idx-1;
+            }                                                  
+        } else if (max<idx){            
+            $(Stack.arr.slice(min, idx-1).join()).animate(Env.panelHideLeft);            
+            $(Stack.arr[idx-1]).animate(Env.panelBlur);
+            $(Stack.arr[idx]).animate(Env.panelFocus);            
+            Stack.min = min<max || idx>0? idx-1 : idx;
             Stack.max = idx;            
-            
-        } else if (idx>max && Env.MAX_COLUMNS>1){
-            for (i=min; i<idx-1; i++){
-                selectors.push(Stack.arr[i]);
-            }
-            
-            anim_queue = [
-                function (next){
-                    $(selectors.join()).animate({ left: -Env.PANEL_WIDTH,
-                                                  width: Env.PANEL_WIDTH });
-                    next();
-                },
-                function (next){
-                    $(Stack.arr[idx-1]).animate({ left:  0, 
-                                                  width: Env.PANEL_WIDTH });
-                    next();
-                },
-                function (next){
-                    $(Stack.arr[idx]).animate({ left:  Env.PANEL_WIDTH, 
-                                                width: Env.PANEL_WIDTH * (Env.MAX_COLUMNS-1) });
-                    next();
-                }
-            ];
-            
-            Stack.min = idx-1;
-            Stack.max = idx;
-            
-        } else if (idx>max && Env.MAX_COLUMNS===1){
-        } else if (idx<min){
-        }
+        }        
         
-        Env.panels.queue('spin', anim_queue).dequeue('spin');
+        return panel;
     };
     
     /**
