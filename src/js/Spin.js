@@ -43,50 +43,94 @@
 //------------------------------------------------------------------------------
 //-- Env (Private API) ---------------------------------------------------------
 //------------------------------------------------------------------------------
-
+    
+    /**
+     * @private
+     */
     var Env = {
         
+        /**
+         * Path to the directory containing Spin.js files
+         * @type    String
+         */
         basePath:           null,
         
+        /**
+         * Indicates if the environment has been initialized already
+         * @type    Boolean
+         */
         initialized:        null,
+        
+        /**
+         * Reference to the document body
+         * @type    jQuery
+         */
         body:               null,
+        
+        /**
+         * Reference to the panels stack
+         * @type    jQuery
+         */
         panels:             null,
         
-        packCss:            null,
-        unpackCss:          null,
-        shiftLeftCss:       null,
-        shiftRightCss:      null,
+        /**
+         * Single environment (one panel takes all the width)
+         * @type    Boolean
+         */
+        isSingle:           false,
+                
+        /**
+         * Dual environment (two panels; 1/2, 1/2)
+         * @type    Boolean
+         */
+        isDual:             false,
+        
+        /**
+         * Optimized environment (two panels; 1/3, 2/3)
+         * @type    Boolean
+         */
+        isOptimized:        false,
+        
+        panelZipped:        null,
+        panelUnzipped:      null,
+        panelAtLeft:        null,
+        panelAtRight:       null,
+        panelFullScreen:    null,
         
         configure: function (){
             var win = $(window).width(), //window width
-                packed,                  //packed width
-                unpacked;                //unpacked width
+                zipped,                  //zipped width
+                unzipped;                //unzipped width
+                
+            this.isSingle    = (win<640);
+            this.isDual      = (win>=640 && win<960);
+            this.isOptimized = (win>=960);
             
-            //one panel environment
-            if (win<640){
-                this.packCss       = { left: 0,        width: win      };    
-                this.unpackCss     = { left: 0,        width: win      };                
-                this.shiftLeftCss  = { left:-win,      width: win      };
-                this.shiftRightCss = { left: win,      width: win      };
-            
-            //two panels environment; same widths
-            } else if (win<960){
-                unpacked = Math.floor(win/2);
+            if (this.isSingle){                
+                this.panelZipped     = { left: 0,        width: win      };    
+                this.panelUnzipped   = { left: 0,        width: win      };                
+                this.panelAtLeft     = { left:-win,      width: win      };
+                this.panelAtRight    = { left: win,      width: win      };
+                this.panelFullScreen = { left: 0,        width: win      };
+                        
+            } else if (this.isDual){
+                unzipped = Math.floor(win/2);
                 
-                this.packCss       = { left: 0,        width: unpacked };    
-                this.unpackCss     = { left: unpacked, width: unpacked };                
-                this.shiftLeftCss  = { left:-unpacked, width: unpacked };
-                this.shiftRightCss = { left: win,      width: unpacked };
+                this.panelZipped     = { left: 0,        width: unzipped };    
+                this.panelUnzipped   = { left: unzipped, width: unzipped };                
+                this.panelAtLeft     = { left:-unzipped, width: unzipped };
+                this.panelAtRight    = { left: win,      width: unzipped };
+                this.panelFullScreen = { left: 0,        width: win      };
+                            
+            } else if (this.isOptimized) {
+                zipped   = Math.floor(win/3);
+                unzipped = Math.floor(win-zipped);
                 
-            //two panels environment; optimized widths            
-            } else {
-                packed   = Math.floor(win/3);
-                unpacked = Math.floor(win-packed);
-                
-                this.packCss       = { left: 0,        width: packed   };    
-                this.unpackCss     = { left: packed,   width: unpacked };                
-                this.shiftLeftCss  = { left:-unpacked, width: unpacked };
-                this.shiftRightCss = { left: win,      width: unpacked };
+                this.panelZipped     = { left: 0,        width: zipped   };    
+                this.panelUnzipped   = { left: zipped,   width: unzipped };                
+                this.panelAtLeft     = { left:-unzipped, width: unzipped };
+                this.panelAtRight    = { left: win,      width: unzipped };
+                this.panelFullScreen = { left: 0,        width: win      };          
             }            
         },
         
@@ -156,7 +200,6 @@
             //Sets environment variables
             Env.body       = $(document.body);
             Env.panels     = $('#spin-panels');
-            
             
             //Loads the first panel
             Env.loader(Env.body);
@@ -279,10 +322,7 @@
             });
         }
         
-    };//Env
-    
-    
-    
+    };//<--Env
             
 //------------------------------------------------------------------------------
 //-- Stack (Private API) -------------------------------------------------------
@@ -313,17 +353,16 @@
          * Panel id (autoincremented).
          * @type        Number
          */
-        next_id: 1,         
+        id: 1,         
         
         /**
          * Adds a panel both into the Stack and the DOM.
          *
          * @param       {jQuery} panel
-         * @param       {Object} properties
          * @returns     {Number} panel index
          */
         push: function (panel){  
-            var selector = '#' + panel.attr('id');            
+            var selector = '#' + panel.attr('id');   
             Env.panels.append(panel);
             Env.body.trigger('paneladd.spin', [panel]);                          
             return this.arr.push(selector) - 1;
@@ -385,34 +424,16 @@
         /**
          * Returns panel at given index.
          *
-         * @param       {Number} Stack index
+         * @param       {Number} idx     Stack index
+         * @param       {Number} [until] Stack index
          * @returns     {jQuery}
          */
-        panelAt: function (idx){
+        panelAt: function (idx, until){
+            if (until && until>idx){
+                return $(this.arr.slice(idx, until+1).join());
+            }
             return $(this.arr[idx]);
-        },            
-        
-        /**
-         * Returns true if index is within visible range.
-         *
-         * @param       {Number} idx Stack index
-         * @returns     {Boolean}
-         * @see         Stack#min
-         * @see         Stack#max
-         */
-        visible: function (idx){
-            return (this.min<=idx) && (idx<=this.max);
-        },        
-        
-        /**
-         * Returns id for a new panel.
-         *
-         * @returns     {String}
-         * @see         Stack#next_id
-         */
-        newId: function (){
-            return 'panel_' + this.next_id++;
-        },        
+        }        
     };
     
 //------------------------------------------------------------------------------
@@ -448,8 +469,7 @@
      */
     function Spin(html, title){
         var panel, 
-            panelId       = Stack.newId(),            
-            panelSelector = '#' + panelId,   
+            panelId       = 'panel_' + Stack.id++,
             panel_idx, 
             panel_pos,   
             script,
@@ -484,7 +504,7 @@
             
         //Base markup of a panel
         panel = $([
-            '<li class="spin-panel">',
+            '<li class="spin-panel" id="' + panelId + '">',
             '   <div class="spin-panel-hd">',
             '       <span class="spin-title">' + title + '</span>',
             '   </div>',
@@ -493,12 +513,9 @@
         ].join(''));
         
         if (!Stack.arr.length){//i.e. first panel        
-            panel.attr('id', panelId).css({
-                left:   0,
-                width:  $(window).width()
-            });
+            panel.css(Env.panelFullScreen);
         } else {
-            panel.attr('id', panelId).css(Env.shiftRightCss);
+            panel.css(Env.panelAtRight);
         }
         
         /*
@@ -527,9 +544,9 @@
                  * the panel that we just have created. 
                  */                
                 js.push([                    
-                    '(function (){',                        //<-- anonymous function       
-                        script.eq(i).text(),                //<-- reinjecting code
-                    '}).call($("' + panelSelector + '"));'  //<-- setting "this" to the panel
+                    '(function (){',                   //<-- anonymous function       
+                        script.eq(i).text(),           //<-- reinjecting code
+                    '}).call($("#' + panelId + '"));'  //<-- setting "this" to the panel
                 ].join(''));
             }
             
@@ -585,59 +602,56 @@
      * @since           1.0
      * @version         1.0
      * @param           {jQuery} panel
+     * @returns         {jQuery} panel
      */
-    Spin.expand = function (panel){
+    Spin.expand = function (panel){    
         var idx = Stack.indexOf(panel),
             min = Stack.min,
-            max = Stack.max,
-            selectors;
+            max = Stack.max;
             
-        
-        if (idx<=min){     
-            $(Stack.arr.slice(idx+1, min).join()).css({
-                left:   Env.WINDOW_WIDTH,
-                width:  Env.PANEL_WIDTH
-            });
             
+        if (Env.isSingle){                
             if (idx<min){
-                $(Stack.arr[min]).animate({ left: Env.WINDOW_WIDTH }, function (){
-                    $(this).css({ width: Env.PANEL_WIDTH });
-                });                
+                Stack.panelAt(idx+1, min).animate(Env.panelAtRight);
+                Stack.panelAt(idx).animate(Env.panelFullScreen);                
+                
+            } else if (idx>min){
+                Stack.panelAt(min, idx-1).animate(Env.panelAtLeft);
+                Stack.panelAt(idx).animate(Env.panelFullScreen);
+            }            
+            
+            Stack.min = idx;
+            Stack.max = idx;
+                        
+            return panel;
+        }
+                    
+        if (idx>max){             
+            if (max>0){           
+                Stack.panelAt(min, idx-2).animate(Env.panelAtLeft);            
             }
             
-            $(Stack.arr[max]).animate({ left: Env.WINDOW_WIDTH }, function (){
-                $(this).css({ width: Env.PANEL_WIDTH });
-            });
-            
-            if (idx===0 || Env.MAX_COLUMNS===1){                
-                $(Stack.arr[idx]).animate({
-                    left:   0,
-                    width:  Env.WINDOW_WIDTH
-                });   
-                
-                Stack.min = idx;
-                Stack.max = idx;             
-                                
-            } else {
-                $(Stack.arr[idx]).animate({
-                    left:   Env.PANEL_WIDTH,
-                    width:  Env.PANEL_WIDTH * (Env.MAX_COLUMNS-1)
-                });
-
-                $(Stack.arr[idx-1]).animate({
-                    left:   0,
-                    width:  Env.PANEL_WIDTH
-                });                
-                
-                Stack.min = idx-1;
-                Stack.max = idx;
-            }                                                  
-        } else if (max<idx){            
-            $(Stack.arr.slice(min, idx-1).join()).animate(Env.shiftLeftCss);            
-            $(Stack.arr[idx-1]).animate(Env.packCss);
-            $(Stack.arr[idx]).animate(Env.unpackCss);            
-            Stack.min = min<max || idx>0? idx-1 : idx;
+            Stack.panelAt(idx-1).animate(Env.panelZipped);
+            Stack.panelAt(idx).animate(Env.panelUnzipped);  
+                      
+            Stack.min = idx-1;
             Stack.max = idx;            
+                    
+        } else if (idx>0 && idx<=min){            
+            Stack.panelAt(idx+1, max).animate(Env.panelAtRight);
+            Stack.panelAt(idx).animate(Env.panelUnzipped);
+            Stack.panelAt(idx-1).animate(Env.panelZipped);
+            
+            Stack.min = idx-1;
+            Stack.max = idx;
+        
+        //going straight to the home panel
+        } else if (idx===0 && idx<max){
+            Stack.panelAt(1, max).animate(Env.panelAtRight);
+            Stack.panelAt(0).animate(Env.panelFullScreen);
+            
+            Stack.min = 0;
+            Stack.max = 0;
         }        
         
         return panel;
@@ -843,9 +857,7 @@
     };    
     
     Env.initBasePath();
-    Env.loadCss();
-    
-    $(Env.initialize);
+    Env.loadCss();        
     
     /**
      * Throws an Error and displays its message into a panel.
@@ -870,7 +882,7 @@
      */
     $.extend({spin: Spin});
     
-    
+    $(Env.initialize);
     
     //jQuery is awesome!!!
 }(jQuery));
