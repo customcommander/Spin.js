@@ -4,12 +4,11 @@
         <link rel="stylesheet" type="text/css" href="manual.css"/>
 		<link rel="stylesheet" type="text/css" href="../addons/breadcrumb/breadcrumb.css" />
 		<link rel="stylesheet" type="text/css" href="../addons/items/items.css" />
-        <script type="text/javascript" src="../src/js/jquery-1.6.1.min.js"></script>
-        <script type="text/javascript" src="../src/js/Spin.js"></script>
+        <script type="text/javascript" src="../src/js/jquery-1.6.1.min.js"></script>        
 		<script type="text/javascript" src="../addons/breadcrumb/breadcrumb.js"></script>
 		<script type="text/javascript" src="../addons/items/items.js"></script>
-        <script type="text/javascript">
-        
+		<script type="text/javascript" src="../src/js/Spin.js"></script>
+        <script type="text/javascript">        
             $.spin.loader(function (elt){
                 var panel = elt.data('panel');
             
@@ -24,8 +23,7 @@
                 }
                 
                 $.spin(panel.clone().html(), elt.panelTitle());
-            });
-            
+            });            
         </script>
         <title>Spin.js Manual</title>
     </head>
