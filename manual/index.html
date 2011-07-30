@@ -9,7 +9,7 @@
 		<script type="text/javascript" src="../addons/items/items.js"></script>
 		<script type="text/javascript" src="../src/js/Spin.js"></script>
         <script type="text/javascript">        
-            $.spin.loader(function (elt){
+            $.spin.configure(function (elt){
                 var panel = elt.data('panel');
             
                 if (!panel || $.type(panel)!='string'){
