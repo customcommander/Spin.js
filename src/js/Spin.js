@@ -91,6 +91,21 @@
          */
         isOptimized:        false,
         
+        /**
+         * @type    Boolean
+         */
+        wasSingle: false,
+        
+        /**
+         * @type    Boolean
+         */
+        wasDual: false,
+        
+        /**
+         * @type    Boolean
+         */
+        wasOptimized: false,
+        
         panelZipped:        null,
         panelUnzipped:      null,
         panelAtLeft:        null,
@@ -102,9 +117,14 @@
                 zipped,                  //zipped width
                 unzipped;                //unzipped width
                 
-            this.isSingle    = (win<640);
-            this.isDual      = (win>=640 && win<960);
-            this.isOptimized = (win>=960);
+
+            this.wasSingle    = this.isSingle;
+            this.wasDual      = this.isDual;
+            this.wasOptimized = this.wasOptimized;
+
+            this.isSingle     = (win<640);
+            this.isDual       = (win>=640 && win<960);
+            this.isOptimized  = (win>=960);
             
             if (this.isSingle){                
                 this.panelZipped     = { left: 0,        width: win      };    
@@ -210,7 +230,9 @@
              *
              */        
             $(window).resize(function (){
-                console.log('to implement');
+                Env.configure();
+                Env.resize();
+                console.log('resizing');
             });
             
             /*
@@ -320,6 +342,13 @@
                     Env.error(xhr.status + ' ' + error);
                 }
             });
+        },
+        
+        resize: function (){
+            if (Stack.min===0 && Stack.max===0){
+                Stack.panelAt(0).css(this.panelFullScreen);
+                Stack.panelAt(1, Stack.last).css(this.panelAtRight);
+            }
         }
         
     };//<--Env
@@ -335,23 +364,33 @@
      */
     var Stack = {
 
+        /**
+         * Panels ids
+         * @type    String[]
+         */
         arr: [],
         
         /**
          * Start of visible range.
-         * @type        Number
+         * @type    Number
          */
         min: 0,
         
         /**
          * End of visible range.
-         * @type        Number
+         * @type    Number
          */
         max: 0,   
         
         /**
+         * Last index
+         * @type    Number
+         */
+        last: 0,
+        
+        /**
          * Panel id (autoincremented).
-         * @type        Number
+         * @type    Number
          */
         id: 1,         
         
@@ -362,10 +401,10 @@
          * @returns     {Number} panel index
          */
         push: function (panel){  
-            var selector = '#' + panel.attr('id');   
+            this.last = this.arr.push('#'+panel.attr('id')) - 1; 
             Env.panels.append(panel);
             Env.body.trigger('paneladd.spin', [panel]);                          
-            return this.arr.push(selector) - 1;
+            return this.last;
         },
         
         /**
