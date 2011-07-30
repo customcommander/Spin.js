@@ -53,19 +53,17 @@
          * Path to the directory containing Spin.js files
          * @type    String
          */
-        basePath: null,                
+        basePath:       null,                
         
-        /**
-         * Reference to the document body.
+        /**#@+
          * @type    jQuery
          */
-        body: null,
+        /**Reference to the document body*/
+        body:           null,
         
-        /**
-         * Reference to the panels stack
-         * @type    jQuery
-         */
-        panels: null,
+        /**Reference to the panels stack*/
+        panels:         null,
+        /**#@-*/
         
         /**#@+
          * @type    Boolean
@@ -94,72 +92,60 @@
         
         /**#@+
          * @type    Object  CSS key/value pairs
-         */
-        /**
-         *
-         */
-        panelZipped:        null,
+         */        
+        /**CSS applied to the panel sitting at Stack.min index*/
+        minCss:         null,
         
-        /**
-         *
-         */
-        panelUnzipped:      null,
+        /**CSS applied to the panel sitting at Stack.max index*/
+        maxCss:         null,
         
-        /**
-         *
-         */
-        panelAtLeft:        null,
+        /**CSS applied to panels that must be hidden at left*/
+        hideLeftCss:    null,
         
-        /**
-         *
-         */
-        panelAtRight:       null,
+        /**CSS applied to panels that must be hidden at right*/
+        hideRightCss:   null,
         
-        /**
-         * 
-         */
-        panelFullScreen:    null,
+        /**CSS applied to panels that must be shown at full width*/
+        fullCss:        null,
         /**#@-*/
         
         configure: function (){
-            var win = $(window).width(), //window width
-                zipped,                  //zipped width
-                unzipped;                //unzipped width
-                
+            var winWidth = $(window).width(), //window width
+                minWidth,                     //panel width at min index
+                maxWidth;                     //panel width at max index                
 
             this.wasSingle    = this.isSingle;
+            this.isSingle     = (winWidth<640);            
+            
             this.wasDual      = this.isDual;
+            this.isDual       = (winWidth>=640 && winWidth<960);
+            
             this.wasOptimized = this.wasOptimized;
-
-            this.isSingle     = (win<640);
-            this.isDual       = (win>=640 && win<960);
-            this.isOptimized  = (win>=960);
+            this.isOptimized  = (winWidth>=960);
             
             if (this.isSingle){                
-                this.panelZipped     = { left: 0,        width: win      };    
-                this.panelUnzipped   = { left: 0,        width: win      };                
-                this.panelAtLeft     = { left:-win,      width: win      };
-                this.panelAtRight    = { left: win,      width: win      };
-                this.panelFullScreen = { left: 0,        width: win      };
+                this.hideLeftCss  = { left:-winWidth, width: winWidth };
+                this.hideRightCss = { left: winWidth, width: winWidth };
+                this.fullCss      = { left: 0,        width: winWidth };
                         
             } else if (this.isDual){
-                unzipped = Math.floor(win/2);
+                maxWidth = Math.floor(winWidth/2);
                 
-                this.panelZipped     = { left: 0,        width: unzipped };    
-                this.panelUnzipped   = { left: unzipped, width: unzipped };                
-                this.panelAtLeft     = { left:-unzipped, width: unzipped };
-                this.panelAtRight    = { left: win,      width: unzipped };
-                this.panelFullScreen = { left: 0,        width: win      };
+                this.minCss       = { left: 0,        width: maxWidth };    
+                this.maxCss       = { left: maxWidth, width: maxWidth };                
+                this.hideLeftCss  = { left:-maxWidth, width: maxWidth };
+                this.hideRightCss = { left: winWidth, width: maxWidth };
+                this.fullCss      = { left: 0,        width: winWidth };
                             
             } else if (this.isOptimized) {
-                zipped   = Math.floor(win/3);
-                unzipped = Math.floor(win-zipped);
+                minWidth = Math.floor(winWidth/3);
+                maxWidth = Math.floor(winWidth-minWidth);
                 
-                this.panelZipped     = { left: 0,        width: zipped   };    
-                this.panelUnzipped   = { left: zipped,   width: unzipped };                
-                this.panelAtLeft     = { left:-unzipped, width: unzipped };
-                this.panelAtRight    = { left: win,      width: unzipped };
-                this.panelFullScreen = { left: 0,        width: win      };          
+                this.minCss       = { left: 0,        width: minWidth };    
+                this.maxCss       = { left: minWidth, width: maxWidth };                
+                this.hideLeftCss  = { left:-maxWidth, width: maxWidth };
+                this.hideRightCss = { left: winWidth, width: maxWidth };
+                this.fullCss      = { left: 0,        width: winWidth };          
             }            
         },
         
@@ -235,13 +221,10 @@
             
             //From here until the end, we defines global events handlers
             
-            /*
-             *
-             */        
+
             $(window).resize(function (){
                 Env.configure();
                 Env.resize();
-                console.log('resizing');
             });
             
             /*
@@ -353,11 +336,43 @@
             });
         },
         
+        /**
+         * Resizes the environment
+         *
+         * @author      customcommander
+         * @since       1.0
+         * @version     1.0
+         */
         resize: function (){
-            if (Stack.min===0 && Stack.max===0){
-                Stack.panelAt(0).css(this.panelFullScreen);
-                Stack.panelAt(1, Stack.last).css(this.panelAtRight);
+            var min = Stack.min,
+                max = Stack.max;
+                    
+            if (min===0 && max===0){
+                Stack.panel(0  ).css(this.fullCss);
+                Stack.panel([1]).css(this.hideRightCss);
+                
+            } else if (this.isSingle){
+                if (!this.wasSingle){                                
+                    min = max;
+                }
+                
+                Stack.panel([0, max]).css(this.hideLeftCss);
+                Stack.panel(max     ).css(this.fullCss);
+                Stack.panel([max+1] ).css(this.hideRightCss);
+                
+            } else {
+                if (this.wasSingle){
+                    min = max-1;
+                }
+                
+                Stack.panel([0,min]).css(this.hideLeftCss);
+                Stack.panel(min    ).css(this.minCss);
+                Stack.panel(max    ).css(this.maxCss);
+                Stack.panel([max+1]).css(this.hideRightCss);                
             }
+            
+            Stack.min = min;
+            Stack.max = max;
         }
         
     };//<--Env
@@ -374,7 +389,7 @@
     var Stack = {
 
         /**
-         * Panels ids
+         * Panels selectors (id selector)
          * @type    String[]
          */
         arr: [],
@@ -481,7 +496,17 @@
                 return $(this.arr.slice(idx, until+1).join());
             }
             return $(this.arr[idx]);
-        }        
+        },
+        
+        panel: function (idx){
+            var sel;
+            if ($.isArray(idx)){
+                sel = this.arr.slice.apply(this.arr, idx).join();
+            } else {
+                sel = this.arr[idx];
+            }
+            return $(sel);
+        }    
     };
     
 //------------------------------------------------------------------------------
@@ -561,9 +586,9 @@
         ].join(''));
         
         if (!Stack.arr.length){//i.e. first panel        
-            panel.css(Env.panelFullScreen);
+            panel.css(Env.fullCss);
         } else {
-            panel.css(Env.panelAtRight);
+            panel.css(Env.hideRightCss);
         }
         
         /*
@@ -631,7 +656,7 @@
      * @version     1.0
      * @param   {Function} fn function in charge of loading your panels     
      */
-    Spin.loader = function (fn){
+    Spin.configure = function (fn){
         if (!Env.initialized){
             if (!$.isFunction(fn)){
                 Env.error('missing or invalid loader');
@@ -655,48 +680,45 @@
     Spin.expand = function (panel){    
         var idx = Stack.indexOf(panel),
             min = Stack.min,
-            max = Stack.max;
-            
+            max = Stack.max;            
             
         if (Env.isSingle){                
-            if (idx<min){
-                Stack.panelAt(idx+1, min).animate(Env.panelAtRight);
-                Stack.panelAt(idx).animate(Env.panelFullScreen);                
-                
-            } else if (idx>min){
-                Stack.panelAt(min, idx-1).animate(Env.panelAtLeft);
-                Stack.panelAt(idx).animate(Env.panelFullScreen);
-            }            
-            
-            Stack.min = idx;
-            Stack.max = idx;
+            if (idx<max){
+                Stack.panel([idx+1, max+1]).animate(Env.hideRightCss);
+            } else if (idx>max){
+                Stack.panel([max, idx]).animate(Env.hideLeftCss);
+            }   
                         
+            Stack.panel(idx).animate(Env.fullCss);                      
+            Stack.min = idx;
+            Stack.max = idx;                        
+            
             return panel;
         }
                     
-        if (idx>max){             
-            if (max>0){           
-                Stack.panelAt(min, idx-2).animate(Env.panelAtLeft);            
+        if (idx>max){
+            if (idx>1){
+                Stack.panel([min, idx-1]).animate(Env.hideLeftCss);                        
             }
             
-            Stack.panelAt(idx-1).animate(Env.panelZipped);
-            Stack.panelAt(idx).animate(Env.panelUnzipped);  
+            Stack.panel(idx-1).animate(Env.minCss);
+            Stack.panel(idx  ).animate(Env.maxCss);  
                       
             Stack.min = idx-1;
             Stack.max = idx;            
                     
-        } else if (idx>0 && idx<=min){            
-            Stack.panelAt(idx+1, max).animate(Env.panelAtRight);
-            Stack.panelAt(idx).animate(Env.panelUnzipped);
-            Stack.panelAt(idx-1).animate(Env.panelZipped);
+        } else if (idx>0 && idx<=min){     
+            Stack.panel([idx+1, max+1]).animate(Env.hideRightCss);
+            Stack.panel(idx-1         ).animate(Env.minCss);
+            Stack.panel(idx           ).animate(Env.maxCss);            
             
             Stack.min = idx-1;
             Stack.max = idx;
         
         //going straight to the home panel
         } else if (idx===0 && idx<max){
-            Stack.panelAt(1, max).animate(Env.panelAtRight);
-            Stack.panelAt(0).animate(Env.panelFullScreen);
+            Stack.panel([1]).animate(Env.hideRightCss);
+            Stack.panel(0  ).animate(Env.fullCss);
             
             Stack.min = 0;
             Stack.max = 0;
