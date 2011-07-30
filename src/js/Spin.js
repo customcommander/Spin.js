@@ -2,7 +2,7 @@
  * Spin.js 1.0
  * http://spinjs.com
  * 
- * Copyright 2011, Julien Gonzalez.
+ * Copyright 2011, Julien Gonzalez
  *
  * Includes jQuery JavaScript Library v1.6.1
  * http://jquery.com/
@@ -53,64 +53,73 @@
          * Path to the directory containing Spin.js files
          * @type    String
          */
-        basePath:           null,
+        basePath: null,                
         
         /**
-         * Indicates if the environment has been initialized already
-         * @type    Boolean
-         */
-        initialized:        null,
-        
-        /**
-         * Reference to the document body
+         * Reference to the document body.
          * @type    jQuery
          */
-        body:               null,
+        body: null,
         
         /**
          * Reference to the panels stack
          * @type    jQuery
          */
-        panels:             null,
+        panels: null,
         
-        /**
-         * Single environment (one panel takes all the width)
+        /**#@+
          * @type    Boolean
-         */
-        isSingle:           false,
+         */        
+        /**True if all initialization stuffs (like binding events) have been done already*/
+        initialized:    false,
+        
+        /**Single environment: one panel takes all the width*/
+        isSingle:       false,
                 
-        /**
-         * Dual environment (two panels; 1/2, 1/2)
-         * @type    Boolean
-         */
-        isDual:             false,
+        /**Dual environment: two panels of same width*/
+        isDual:         false,
         
-        /**
-         * Optimized environment (two panels; 1/3, 2/3)
-         * @type    Boolean
-         */
-        isOptimized:        false,
+        /**Optimized environment: two panels. 1/3 width and 2/3 width*/
+        isOptimized:    false,
         
-        /**
-         * @type    Boolean
-         */
-        wasSingle: false,
+        /**True if environment was 'Single' before resizing*/
+        wasSingle:      false,
         
-        /**
-         * @type    Boolean
-         */
-        wasDual: false,
+        /**True if environment was 'Dual' before resizing*/
+        wasDual:        false,
         
-        /**
-         * @type    Boolean
-         */
-        wasOptimized: false,
+        /**True if environment was 'Optimized' before resizing*/
+        wasOptimized:   false,
+        /**#@-*/
         
+        /**#@+
+         * @type    Object  CSS key/value pairs
+         */
+        /**
+         *
+         */
         panelZipped:        null,
+        
+        /**
+         *
+         */
         panelUnzipped:      null,
+        
+        /**
+         *
+         */
         panelAtLeft:        null,
+        
+        /**
+         *
+         */
         panelAtRight:       null,
+        
+        /**
+         * 
+         */
         panelFullScreen:    null,
+        /**#@-*/
         
         configure: function (){
             var win = $(window).width(), //window width
