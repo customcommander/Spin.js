@@ -2,7 +2,7 @@ $(function (){
 
     var body, 
         breadcrumb,
-        lastItem;
+        lastCrumb;
 
     $(document.body).append([
         '<div id="spin-menubar">',
@@ -13,33 +13,32 @@ $(function (){
     body       = $(document.body);
     breadcrumb = $('#spin-breadcrumb');
     
-    body.bind('paneladd.spin', function (e, panel){
-                
-        if (lastItem){
-            lastItem.removeClass('spin-last');
+    body.bind('paneladd.spin', function (e, panel){                
+        if (lastCrumb){
+            lastCrumb.removeClass('spin-last');
         }
         
-        lastItem = $([
-            '<li class="spin-breadcrumb-item spin-last" id="' + panel.attr('id') + '_ref">',
-                panel.panelTitle(),
-            '</li>'
-        ].join(''));
+        lastCrumb = $('<li/>', {
+            'class':    'spin-breadcrumb-item spin-last',
+            'id':       panel.attr('id') + '-ref',
+            'text':     panel.panelTitle()
+        });        
         
-        breadcrumb.append(lastItem);
+        breadcrumb.append(lastCrumb);
     });
     
     body.bind('panelremove.spin', function (e, panel){
-        $('#' + panel.attr('id') + '_ref').remove();
+        var crumbSel = '#' + panel.attr('id') + '-ref';        
+        lastCrumb = $(crumbSel).prev().addClass('spin-last');
+        $(crumbSel).remove();
     });
     
     body.bind('titlechange.spin', function (e, panel){
-        $('#' + panel.attr('id') + '_ref').text(panel.panelTitle());
+        $('#' + panel.attr('id') + '-ref').text(panel.panelTitle());
     });
     
     breadcrumb.delegate('li.spin-breadcrumb-item', 'click', function (e){
-        var id = $(this).attr('id').slice(0, -4); //removes "_ref" at end of string
-//        $.spin.moveTo($('#' + id));
-        $.spin.expand($('#' + id));
+        var sel = '#' + $(this).attr('id').split('-')[0];
+        $.spin.expand($(sel));
     });
-
 });
