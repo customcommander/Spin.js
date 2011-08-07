@@ -74,7 +74,6 @@
      * If at any given time the browser window becomes greater than 960px,
      * the environment is put on "Optimized Mode".
      *
-     *
      * @concept
      * @name Optimized Mode Environment
      */
