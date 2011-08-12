@@ -69,15 +69,7 @@
      * @concept
      * @name Dual Mode Environment
      */
-     
-    /**
-     * If at any given time the browser window becomes greater than 960px,
-     * the environment is put on "Optimized Mode".
-     *
-     * @concept
-     * @name Optimized Mode Environment
-     */
-      
+           
     /**
      * @spin
      * @name Env
@@ -117,19 +109,13 @@
         isSingle:       false,
                 
         /**True if environment is in Dual mode*/
-        isDual:         false,
-        
-        /**True if environment is in Optimized mode*/
-        isOptimized:    false,
+        isDual:         false,        
         
         /**True if environment was 'Single' before resizing*/
         wasSingle:      false,
         
         /**True if environment was 'Dual' before resizing*/
-        wasDual:        false,
-        
-        /**True if environment was 'Optimized' before resizing*/
-        wasOptimized:   false,
+        wasDual:        false,        
         /**#@-*/
         
         /**#@+
@@ -160,27 +146,16 @@
             
             this.wasSingle    = this.isSingle;
             this.wasDual      = this.isDual;
-            this.wasOptimized = this.wasOptimized;
 
-            this.isSingle     = (winWidth<640);                                    
-            this.isDual       = (winWidth>=640 && winWidth<960);
-            this.isOptimized  = (winWidth>=960);
+            this.isSingle     = (winWidth<960);                                    
+            this.isDual       = (winWidth>=960);
             
             if (this.isSingle){                
                 this.hideLeftCss  = { left:-winWidth, width: winWidth };
                 this.hideRightCss = { left: winWidth, width: winWidth };
                 this.fullCss      = { left: 0,        width: winWidth };
                         
-            } else if (this.isDual){
-                maxWidth = Math.floor(winWidth/2);
-                
-                this.minCss       = { left: 0,        width: maxWidth };    
-                this.maxCss       = { left: maxWidth, width: maxWidth };                
-                this.hideLeftCss  = { left:-maxWidth, width: maxWidth };
-                this.hideRightCss = { left: winWidth, width: maxWidth };
-                this.fullCss      = { left: 0,        width: winWidth };
-                            
-            } else if (this.isOptimized) {
+            } else {
                 minWidth = Math.floor(winWidth/3);
                 maxWidth = Math.floor(winWidth-minWidth);
                 
@@ -266,7 +241,7 @@
             
 
             $(window).resize(function (){
-                if (Env.winWidth!=$(window).width){
+                if (Env.winWidth!=$(window).width()){
                     Env.configure();
                     Env.resize();
                 }
@@ -401,12 +376,15 @@
         resize: function (){
             var min = Stack.min,
                 max = Stack.max;
-                    
+            
+            //if the only visible panel is the home panel
             if (min===0 && max===0){
-                Stack.panel(0  ).css(this.fullCss);
+                Stack.panel(0).css(this.fullCss);
                 Stack.panel([1]).css(this.hideRightCss);
-                
-            } else if (this.isSingle){
+            
+            } else if (this.isSingle){            
+                //if the environment was Dual, the visible range boundaries
+                //must be updated
                 if (!this.wasSingle){                                
                     min = max;
                 }
@@ -416,6 +394,8 @@
                 Stack.panel([max+1] ).css(this.hideRightCss);
                 
             } else {
+                //if the environment was Single, the visible range boundaries
+                //must be updated
                 if (this.wasSingle){
                     min = max-1;
                 }
