@@ -282,23 +282,7 @@
                     Spin.expand(Stack.panel(idx+1));                
                 }
                 
-            });  
-            
-            $(document).keypress(function (e){
-                var kc = e.keyCode;
-                
-                if (!$(e.target).is('html')){
-                    return;
-                }
-                
-                //left arrow key
-                if (kc===37){
-                    Spin.previous();
-                //right arrow key
-                } else if (kc===39){
-                    Spin.next();
-                }
-            });
+            });                          
             
             Env.initialized = true;
         },
@@ -523,19 +507,6 @@
     /**
      * Creates and appends a panel.
      *
-     * @example
-     * //Creates a panel with no content and no title
-     * $.spin();
-     *
-     * @example
-     * //Creates from HTML string
-     * $.spin('&lt;p&gt;Hello World&lt;/p&gt;', 'Hello');
-     *
-     * @example
-     * //Creates from jQuery object
-     * var html = $('&lt;p&gt;Hello World&lt;/p&gt;');
-     * $.spin(html, 'Hello');
-     *
      * @spin
      * @name $.spin
      * @exports Spin as $.spin
@@ -555,7 +526,7 @@
             i,      //control var 
             n,      //control var
             js,
-            expand = false;               
+            expand = false;                           
             
         /*
          * If the html parameter is given it must be either a string
