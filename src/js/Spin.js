@@ -44,6 +44,7 @@
  * @author              customcommander
  * @since               1.0.0
  */
+//Comment anonymous function when running unit tests!!!
 (function ($){    
     
 //------------------------------------------------------------------------------
@@ -177,6 +178,7 @@
          * @throws          {Error}
          */
         error: function (msg){
+            //Comment call to Spin when running unit tests!!!
             Spin('<h2>' + msg + '</h2>', 'Error!').addClass('error');
             throw new Error(msg);
         },
@@ -626,7 +628,6 @@
     }
     
     /**
-     * 
      * @name        $.spin.configure
      * @function
      * @since       1.0
@@ -639,7 +640,9 @@
                 Env.error('missing or invalid loader');
             }
             Env.loader = fn;
+            return true;
         }
+        Env.error('you cannot configure after initialization');
     };      
         
     /**
@@ -940,4 +943,5 @@
     $(Env.initialize);
     
     //jQuery is awesome!!!
+//Comment anonymous function when running unit tests!!!
 }(jQuery));

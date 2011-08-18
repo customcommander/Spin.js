@@ -1,0 +1,33 @@
+<script type="text/javascript">
+
+    var panel = this;
+
+    module('Stack.indexOf()');
+    
+    test('Torture Tests', function (){
+        
+        var invalid_args = [
+            null,
+            undefined,
+            false,
+            true,
+            [],
+            {},
+            NaN,
+            Infinity,
+            -Infinity,
+            0,
+            1,
+            -1,
+            function(){}            
+        ];
+        
+        var i=0, n=invalid_args.length;    
+        
+        for (; i<n; i++){
+            raises(function(){ Stack.indexOf( invalid_args[i] ); }, 
+                'throw if arg is not valid');
+        }                
+    });
+    
+</script>

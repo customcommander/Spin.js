@@ -3,7 +3,7 @@ $(function (){
     var body, 
         breadcrumb,
         lastCrumb;
-
+        
     $(document.body).append([
         '<div id="spin-menubar">',
         '   <ol id="spin-breadcrumb"/>',
