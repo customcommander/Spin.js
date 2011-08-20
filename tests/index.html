@@ -17,6 +17,9 @@
 		        overflow-y: auto;
 		        z-index:200;
 		    }
+		    .block {
+		        margin: 2em;
+		    }
 		</style>
 		
         <script type="text/javascript" src="../src/js/jquery-1.6.1.min.js"></script>        
@@ -24,8 +27,8 @@
 		<script type="text/javascript" src="../addons/breadcrumb/breadcrumb.js"></script>
 		<script type="text/javascript" src="../addons/items/items.js"></script>
 		<script type="text/javascript" src="../src/js/Spin.js"></script>
-        <script type="text/javascript">   
-        
+        <script type="text/javascript">               
+            
             module('Init');         
             
             test('Torturing the default loader', function (){            
@@ -95,15 +98,7 @@
                 ok($.spin.configure(Env.loader), 'arg is a function');
                 
                 $.holdReady(false);                               
-            });            
-            
-            module('After Init');
-            
-            test('$.spin.configure', function(){
-                function dummyfn(){}                
-                raises(function(){ $.spin.configure( dummyfn )},
-                    'throw if trying to configure after init');
-            });
+            });                        
             
             
         </script>

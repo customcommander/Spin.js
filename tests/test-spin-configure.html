@@ -1,0 +1,19 @@
+<div class="block">
+    <h2>$.spin.configure</h2>
+    <p>
+        The function is designed to be called before the environment is initialized.
+        Any call after initialization shoudl raise an error.
+    </p>
+</div>
+<script type="text/javascript">
+    module('$.spin.configure');
+    
+    test('cannot configure after init', function (){
+    
+        function dummyLoaderFn(){}
+        
+        raises(function(){
+            $.spin.configure( dummyLoaderFn );
+        });
+    });
+</script>

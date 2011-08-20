@@ -45,7 +45,7 @@
  * @since               1.0.0
  */
 //Comment anonymous function when running unit tests!!!
-(function ($){    
+//(function ($){    
     
 //------------------------------------------------------------------------------
 //-- Env (Private API) ---------------------------------------------------------
@@ -179,7 +179,7 @@
          */
         error: function (msg){
             //Comment call to Spin when running unit tests!!!
-            Spin('<h2>' + msg + '</h2>', 'Error!').addClass('error');
+            //Spin('<h2>' + msg + '</h2>', 'Error!').addClass('error');
             throw new Error(msg);
         },
         
@@ -521,14 +521,18 @@
      * @param           {String}        [title] Title of the panel
      * @returns         {jQuery} The panel that has been created
      */
-    function Spin(html, title){
+    function Spin(html, title, expand){
         var panel, 
             panelId       = 'panel_' + Stack.id++,
             script,
             i,      //control var 
             n,      //control var
-            js,
-            expand = false;                           
+            js;
+        
+        //if not given or not a boolean
+        if ($.type(expand)!=='boolean'){
+            expand = true;
+        }
             
         /*
          * If the html parameter is given it must be either a string
@@ -944,4 +948,4 @@
     
     //jQuery is awesome!!!
 //Comment anonymous function when running unit tests!!!
-}(jQuery));
+//}(jQuery));
