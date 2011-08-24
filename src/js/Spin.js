@@ -343,8 +343,8 @@
             
             $.ajax({
                 url: url,                              
-                success: function (html, status, xhr){            
-                    Spin(html, elt.panelTitle());                    
+                success: function (response, status, xhr){            
+                    Spin({ html: response, title: elt.panelTitle() });
                 },
                 error: function (xhr, status, error){                
                     Env.error(xhr.status + ' ' + error);
@@ -501,10 +501,12 @@
             return $(sel);
         }    
     };
-    
+
+
 //------------------------------------------------------------------------------
 //-- Spin (Public API) ---------------------------------------------------------
 //------------------------------------------------------------------------------
+
             
     /**
      * Creates and appends a panel.
@@ -516,53 +518,58 @@
      * @public
      * @author          customcommander
      * @since           1.0
-     * @version         1.0     
-     * @param           {String|jQuery} [html]  Body of the panel. Either a HTML string or a jQuery object.
-     * @param           {String}        [title] Title of the panel
-     * @returns         {jQuery} The panel that has been created
+     * @version		1.0
+	 * @param		{String|jQuery|Object} conf
+     * @returns		{jQuery}
      */
-    function Spin(html, title, expand){
+	function Spin(conf){
         var panel, 
-            panelId       = 'panel_' + Stack.id++,
             script,
             i,      //control var 
             n,      //control var
-            js;
-        
-        //if not given or not a boolean
-        if ($.type(expand)!=='boolean'){
-            expand = true;
-        }
-            
-        /*
-         * If the html parameter is given it must be either a string
-         * or a jQuery object.
-         */
-        if (html && $.type(html)!='string' &&  !(html instanceof jQuery)){
-            Env.error('String or jQuery object expected');
-        }
-        
-        /*
-         * Converts the html parameter to a jQuery object if it was not
-         * already.
-         */
-        if (!(html instanceof jQuery)){
-            html = $(html);
-        }
-        
-        /*
-         * If the title parameter was not given, we set it to an empty string.
-         * Otherwise the string 'undefined' will be displayed.
-         */
-        if (title===undefined){
-            title = '';
-        }
+            js;		
+		
+		//---Sets and validates the conf object--------------------------------
+		
+		// In its simplest usage Spin allows conf to be either a string or
+		// a jQuery object so that the developer can write: $.spin('<p>hi</p>')
+		// instead of: $.spin({html: '<p>hi</p>'}) if he/she doesn't care about the
+		// other properties.
+		if ( $.type(conf)==='string' || (conf instanceof jQuery) ){
+			conf = { html: conf };			
+		
+		// If conf is neither a string nor a jQuery object nor a plain object
+		// we replace it with an empty object.
+		} else if ( !$.isPlainObject(conf) ){
+			conf = {};
+		}
+		
+		// Spin takes care of this.
+		conf.id = 'panel_' + Stack.id++;
+		
+		// Validating html property
+		if (!conf.hasOwnProperty('html') || 
+			($.type(conf.html)!=='string' && !(conf.html instanceof jQuery)) ){
+			conf.html = $();
+		} else if (!(conf.html instanceof jQuery)){
+			conf.html = $(conf.html);
+		}
+		
+		// Validating title property
+		if (!conf.hasOwnProperty('title') || $.type(conf.title)!=='string'){
+			conf.title = '';
+		}
+		
+		// Validating expand property
+		if (!conf.hasOwnProperty('expand') || $.type(conf.expand)!=='boolean'){
+			conf.expand = true;
+		}		
             
         //Base markup of a panel
         panel = $([
-            '<li class="spin-panel" id="' + panelId + '">',
+            '<li class="spin-panel" id="' + conf.id + '">',
             '   <div class="spin-panel-hd">',
-            '       <span class="spin-title">' + title + '</span>',
+            '       <span class="spin-title">' + conf.title + '</span>',
             '   </div>',
             '   <div class="spin-panel-bd"/>',
             '</li>'
@@ -576,7 +583,7 @@
             Stack.max = Stack.min+1;
         } else {
             panel.css(Env.hideRightCss);
-            expand = true;
+            conf.expand = true;
         }
         
         /*
@@ -584,13 +591,13 @@
          * For reason explained below these nodes must be added to the DOM
          * separately.
          */
-        panel.find('div.spin-panel-bd').append(html.filter(':not(script)'));                        
+        panel.find('div.spin-panel-bd').append(conf.html.filter(':not(script)'));                        
        
         //Adds the panel to the DOM
         Stack.push(panel);                
         
         //Gets all <script/> nodes from the original html.
-        script = html.filter('script');
+        script = conf.html.filter('script');
         
         if (script.length){
             
@@ -606,7 +613,7 @@
                 js.push([                    
                     '(function (){',                   //<-- anonymous function       
                         script.eq(i).text(),           //<-- reinjecting code
-                    '}).call($("#' + panelId + '"));'  //<-- setting "this" to the panel
+                    '}).call($("#' + conf.id + '"));'  //<-- setting "this" to the panel
                 ].join(''));
             }
             
@@ -628,7 +635,7 @@
             ].join(''));
         }
         
-        return expand? Spin.expand(panel) : panel;
+        return conf.expand? Spin.expand(panel) : panel;
     }
     
     /**
@@ -948,4 +955,4 @@
     
     //jQuery is awesome!!!
 //Comment anonymous function when running unit tests!!!
-//}(jQuery));
+// }(jQuery));
