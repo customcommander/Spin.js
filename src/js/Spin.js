@@ -535,14 +535,14 @@
         // a jQuery object so that the developer can write: $.spin('<p>hi</p>')
         // instead of: $.spin({html: '<p>hi</p>'}) if he/she doesn't care about the
         // other properties.
-		if ( $.type(conf)==='string' || (conf instanceof jQuery) ){
-			conf = { html: conf };          
+        if ( $.type(conf)==='string' || (conf instanceof jQuery) ){
+            conf = { html: conf };          
 
-		// If conf is neither a string nor a jQuery object nor a plain object
-		// we replace it with an empty object.
-		} else if ( !$.isPlainObject(conf) ){
-			conf = {};
-		}
+        // If conf is neither a string nor a jQuery object nor a plain object
+        // we replace it with an empty object.
+        } else if ( !$.isPlainObject(conf) ){
+            conf = {};
+        }
         
         // Spin takes care of this.
         conf.id = 'panel_' + Stack.id++;
