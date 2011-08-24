@@ -518,52 +518,52 @@
      * @public
      * @author          customcommander
      * @since           1.0
-     * @version		1.0
-	 * @param		{String|jQuery|Object} conf
-     * @returns		{jQuery}
+     * @version     1.0
+     * @param       {String|jQuery|Object} conf
+     * @returns     {jQuery}
      */
-	function Spin(conf){
+    function Spin(conf){
         var panel, 
             script,
             i,      //control var 
             n,      //control var
-            js;		
-		
-		//---Sets and validates the conf object--------------------------------
-		
-		// In its simplest usage Spin allows conf to be either a string or
-		// a jQuery object so that the developer can write: $.spin('<p>hi</p>')
-		// instead of: $.spin({html: '<p>hi</p>'}) if he/she doesn't care about the
-		// other properties.
+            js;     
+        
+        //---Sets and validates the conf object--------------------------------
+        
+        // In its simplest usage Spin allows conf to be either a string or
+        // a jQuery object so that the developer can write: $.spin('<p>hi</p>')
+        // instead of: $.spin({html: '<p>hi</p>'}) if he/she doesn't care about the
+        // other properties.
 		if ( $.type(conf)==='string' || (conf instanceof jQuery) ){
-			conf = { html: conf };			
-		
+			conf = { html: conf };          
+
 		// If conf is neither a string nor a jQuery object nor a plain object
 		// we replace it with an empty object.
 		} else if ( !$.isPlainObject(conf) ){
 			conf = {};
 		}
-		
-		// Spin takes care of this.
-		conf.id = 'panel_' + Stack.id++;
-		
-		// Validating html property
-		if (!conf.hasOwnProperty('html') || 
-			($.type(conf.html)!=='string' && !(conf.html instanceof jQuery)) ){
-			conf.html = $();
-		} else if (!(conf.html instanceof jQuery)){
-			conf.html = $(conf.html);
-		}
-		
-		// Validating title property
-		if (!conf.hasOwnProperty('title') || $.type(conf.title)!=='string'){
-			conf.title = '';
-		}
-		
-		// Validating expand property
-		if (!conf.hasOwnProperty('expand') || $.type(conf.expand)!=='boolean'){
-			conf.expand = true;
-		}		
+        
+        // Spin takes care of this.
+        conf.id = 'panel_' + Stack.id++;
+        
+        // Validating html property
+        if (!conf.hasOwnProperty('html') || 
+            ($.type(conf.html)!=='string' && !(conf.html instanceof jQuery)) ){
+            conf.html = $();
+        } else if (!(conf.html instanceof jQuery)){
+            conf.html = $(conf.html);
+        }
+        
+        // Validating title property
+        if (!conf.hasOwnProperty('title') || $.type(conf.title)!=='string'){
+            conf.title = '';
+        }
+        
+        // Validating expand property
+        if (!conf.hasOwnProperty('expand') || $.type(conf.expand)!=='boolean'){
+            conf.expand = true;
+        }       
             
         //Base markup of a panel
         panel = $([
