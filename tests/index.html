@@ -30,11 +30,13 @@
         <script type="text/javascript" src="EnvTests.js"></script>
         <script type="text/javascript" src="SpinTests.js"></script>
         <script type="text/javascript">     
-            spin_configure_test();
-            spin_configure_after_init_test();           
-            env_default_loader_test();
-            $(env_basic_test);
-            $(window).resize(env_basic_test);            
+			if (window.hasOwnProperty('Env') && window.hasOwnProperty('Stack')){
+				spin_configure_test();
+	            spin_configure_after_init_test();           
+	            env_default_loader_test();
+	            $(env_basic_test);
+	            $(window).resize(env_basic_test);            	            
+			}
         </script>
     </head>
     <body data-url="index-tests.html" data-title="Home">
