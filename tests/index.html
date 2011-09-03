@@ -4,37 +4,37 @@
         
         <title>Spin.js QUnit Tests</title>
         
-        <link rel="stylesheet" type="text/css" href="qunit/qunit-git.css"/>		
-		<link rel="stylesheet" type="text/css" href="../addons/breadcrumb/breadcrumb.css" />
-		<link rel="stylesheet" type="text/css" href="../addons/items/items.css" />
-		
-		<style type="text/css">
-		    #qunit-console{
-		        position: absolute;
-		        top: 0;
-		        right: 0;
-		        bottom: 0;
-		        overflow-y: auto;
-		        z-index:200;
-		    }
-		    .block {
-		        margin: 2em;
-		    }
-		</style>
-		
+        <link rel="stylesheet" type="text/css" href="qunit/qunit-git.css"/>     
+        <link rel="stylesheet" type="text/css" href="../addons/breadcrumb/breadcrumb.css" />
+        <link rel="stylesheet" type="text/css" href="../addons/items/items.css" />
+        
+        <style type="text/css">
+            #qunit-console{
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                overflow-y: auto;
+                z-index:200;
+            }
+            .block {
+                margin: 2em;
+            }
+        </style>
+        
         <script type="text/javascript" src="../src/js/jquery-1.6.1.min.js"></script>        
         <script type="text/javascript" src="qunit/qunit-git.js"></script>
-		<script type="text/javascript" src="../addons/breadcrumb/breadcrumb.js"></script>
-		<script type="text/javascript" src="../addons/items/items.js"></script>
-		<script type="text/javascript" src="../src/js/Spin.js"></script>
-		<script type="text/javascript" src="EnvTests.js"></script>
-		<script type="text/javascript" src="SpinTests.js"></script>
+        <script type="text/javascript" src="../addons/breadcrumb/breadcrumb.js"></script>
+        <script type="text/javascript" src="../addons/items/items.js"></script>
+        <script type="text/javascript" src="../src/js/Spin.js"></script>
+        <script type="text/javascript" src="EnvTests.js"></script>
+        <script type="text/javascript" src="SpinTests.js"></script>
         <script type="text/javascript">     
-			spin_configure_test();
-			spin_configure_after_init_test();			
-			env_default_loader_test();
-			$(env_basic_test);
-			$(window).resize(env_basic_test);            
+            spin_configure_test();
+            spin_configure_after_init_test();           
+            env_default_loader_test();
+            $(env_basic_test);
+            $(window).resize(env_basic_test);            
         </script>
     </head>
     <body data-url="index-tests.html" data-title="Home">
