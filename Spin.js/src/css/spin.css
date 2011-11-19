@@ -1,0 +1,200 @@
+/*!
+ * Spin.js 1.0
+ * http://spinjs.com
+ * 
+ * Copyright 2011, Julien Gonzalez
+ *
+ * This file is part of Spin.js.
+ *
+ * Spin.js is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Spin.js is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Spin.js.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+Base Markup
+--------------------------------------------------------------------------------
+<body>
+    <div id="spin">
+        <!-- // -->
+    </div>
+</body>
+*/
+body,
+#spin {
+    overflow: hidden; /* to avoid a horizontal scroll when we append panels */
+}
+
+#spin {
+    position:   absolute;
+    top:        0em;
+    right:      0em;
+    bottom:     0em;
+    left:       0em;    
+}
+
+/*
+Collection of panels
+--------------------------------------------------------------------------------
+<body>
+    <div id="spin">
+        <ol id="spin-panels">
+            <!-- // -->
+        </ol>
+    </div>
+</body>
+
+@author     customcommander
+@since      1.0
+@version    1.0
+*/
+#spin-panels {        
+    position: absolute;
+    top:        0em;
+    right:      0em;
+    bottom:     0em;
+    left:       0em;    
+    width:      100%;    
+    margin:     0em;
+    padding:    0em;
+}
+
+/*
+Panel Markup
+--------------------------------------------------------------------------------
+<li class="spin-panel">
+    
+    <!-- Panel Header -->
+    <div class="spin-panel-hd>
+        <span class="spin-title">Panel Title</span>
+    </div>
+    
+    <!-- Panel Body -->
+    <div class="spin-panel-bd">
+        <!-- This is where user content is placed -->
+    </div>
+</li>
+
+@author     customcommander
+@since      1.0
+@version    1.0
+@see        #spin-panels
+
+>>>
+*/
+
+.spin-panel,
+.spin-panel-hd,
+.spin-panel-bd{
+    position:absolute;
+}     
+
+/*Panel*/    
+.spin-panel {
+    top:0em;
+    bottom: 0em;
+    list-style-type: none;
+    -moz-box-sizing:border-box;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    border-right:1px solid black;
+    z-index: 0;
+    background-color: white;
+
+}
+
+/*Panel Header*/
+.spin-panel-hd {    
+    top:0px;
+    width:100%;
+    height:2.5em;
+    background-color: whitesmoke;
+    text-align: center;
+    background: -moz-linear-gradient(center top , #B2B2B2, #838383) repeat scroll 0 0 #838383;    
+    background: -webkit-gradient(linear, left top, left bottom,from(#b2b2b2),to(#838383)) repeat scroll 0 0 #838383;
+}
+
+.spin-panel-hd .spin-title {
+    font-weight: bold;
+    color: white;
+    font-size: 1.3em;
+    text-shadow: 0 1px 0 black;
+    padding-top: 0.3em;
+    -moz-box-sizing:border-box;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    display: inline-block;
+}
+
+/*Panel Body*/
+.spin-panel-bd {
+    top:        2.5em;
+    right:      0em;                
+    bottom:     0em;
+    left:       0em;
+    overflow-y:auto;
+}
+
+/*
+<<<
+*/
+
+#spin-nav-controls {
+    position:   absolute;
+    top:        0em;
+    left:       0em;
+    height:     2.5em;
+    width:      100%;
+    z-index:    100;
+}
+
+#spin-nav-prev,
+#spin-nav-next {
+    display:            none;    
+    position:           absolute;
+    top:                0em;
+    z-index:            100;    
+    cursor:             pointer;    
+    width:              2.5em;   
+    height:             2.5em;
+    background-repeat:  no-repeat;
+}
+
+#spin-nav-prev {
+    left: 0.5em;
+    background-image: url('ctrl-prev.png');
+}
+
+#spin-nav-next {
+    right: 0.5em;
+    background-image: url('ctrl-next.png');
+}
+
+/*
+Error Panel
+--------------------------------------------------------------------------------
+@author     customcommander
+@since      1.0
+@version    1.0
+*/
+.spin-panel.error h2 {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    margin-left: -45%;
+    text-align: center;
+    border: 1px solid red;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    width: 90%;    
+    padding: 10px 0px;
+}

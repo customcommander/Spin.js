@@ -1,0 +1,75 @@
+/*!
+ * Spin.js 1.0
+ * http://spinjs.com
+ * 
+ * Copyright 2011, Julien Gonzalez
+ *
+ * This file is part of Spin.js.
+ *
+ * Spin.js is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Spin.js is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Spin.js.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+/*******************************************************************************
+ ** Menubar & Breadcrumb                                                       *
+ ******************************************************************************/
+
+/*We need to make room for the menubar so we push down #spin-panels a little bit...*/
+#spin {
+    top: 2.5em!important;
+}
+
+#spin-menubar {
+    position: absolute;
+    z-index: 100;
+    top: 0em;
+    left: 0em;
+    right: 0em;
+    width: 100%;
+    height: 2.5em;
+    background-color: red;      
+    background: -moz-linear-gradient(center top , #1a171b, #3d3c3f) repeat scroll 0 0 #3d3c3f;
+    background: -webkit-gradient(linear, left top, left bottom,from(#1a171b),to(#3d3c3f)) repeat scroll 0 0 #3d3c3f; 
+    -webkit-box-sizing: border-box;
+}
+
+#spin-breadcrumb {
+    list-style-type: none outside none;
+    height: 2.5em;
+    margin: 0px;
+    padding: 0px;
+}
+
+.spin-breadcrumb-item {
+    background-image: url('breadcrumb-item.png');
+    background-repeat: no-repeat;
+    background-position: center right;
+    display: block;
+    float: left;
+    height: 2.5em;
+    margin: 0px;
+    padding-top: 0.625em;
+    padding-right: 1.25em;
+    padding-bottom: 0em;
+    padding-left: 1em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;    
+    cursor: pointer;
+    color: white;
+}
+
+.spin-breadcrumb-item.spin-last {
+    background-image: url('breadcrumb-lastitem.png');    
+}
