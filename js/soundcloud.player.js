@@ -6,6 +6,181 @@
 // 
 
  (function($) {
+	function SoundSpinPlayer($elem){
+		this.element = $elem;
+		var self = this;
+
+		this.element.addClass('soundspin-player');
+
+		this.controls      = $('<div class="soundspin-controls"/>').appendTo(this.element);
+		this.avatar        = $('<div class="avatar"><div class="control play">&gt;</div><img/></div>').appendTo(this.controls);
+		this.animContainer = $('<div class="progress-bar-container"></div>').appendTo(this.avatar);
+
+		this.next  = $('<div class="control next">&gt;&gt;</div>').appendTo(this.controls);
+		this.clear = $('<div class="clear control">Clear</div>').appendTo(this.controls).
+			click(function(){
+				self.playlist.empty();
+			});
+
+		this.info 		= $('<div id="info" class="nav"/>').appendTo(this.controls)
+								.data('panelType', 'songwriterDetails');
+		this.author 	= $('<p id="author"/>').appendTo(this.info);
+		this.title 		= $('<p id="title"/>').appendTo(this.info);
+		this.duration 	= $('<p id="duration"/>').appendTo(this.info);
+
+		var trackToPlay = this.options.tracks.shift();
+
+		this.playlist = $('<ol class="play-list spin-items"/>').appendTo(this.element),
+		$.each(self.options.tracks,function(ind,track){
+			self.playlist.append(
+				Items.navigable({
+					title: 	'<strong>' + track.user.username + '</strong> ' + track.title
+				}).data({
+					panelType: 'songwriterDetails',
+					track: track,
+					user: track.user
+				}).attr('id',track.id)
+			);
+		});
+		
+		this.avatar.click(function(evt){
+			evt.preventDefault();
+			if(self.playing){
+				self._pause();
+			}else{
+				self._play();
+			}
+		});
+		this.next.click(function(evt){
+			evt.preventDefault();
+			self._next();
+		});
+
+		this._loadTrack(trackToPlay,trackToPlay.user);
+
+		this.player.bind($.jPlayer.event.ended,function(evt){
+			console.log('ended');
+			self._next();
+		});
+
+		this.player.bind($.jPlayer.event.timeupdate,function(evt){
+			// console.log('progress');
+			self._updateProgressBar(evt.jPlayer.status.currentTime , evt.jPlayer.status.duration);
+		});
+
+		this.player.bind($.jPlayer.event.error,function(evt){
+			console.log('error',evt.jPlayer.error);
+			self._next();
+		});
+	};
+
+	$.merge(SoundSpinPlayer,
+		addTrack:function(track, user){
+			this.playlist.append(Items.navigable({
+				title: 	'<strong>' + user.username + '</strong> ' + track.title
+			}).data({
+				panelType: 'songwriterDetails',
+				user: user,
+				track: track,
+				title: user.username
+			}).attr('id',track.id));
+		},
+		
+		hasTrack:function(track){
+			return this.playlist.find('#'+track.id).size() > 0;
+		},
+
+		_next:function(){
+			// this._stop();
+			var item = this.playlist.children().first();
+			if(!item.size()){
+				return;
+			}
+
+			this.player.jPlayer('stop');
+			this._stopProgressBar();
+			this._resetProgressBar();
+
+            this._loadTrack(item.data('track'), item.data('user')); // trigger a scPlayerReady event
+			item.remove();
+		},
+		_play:function(track){
+			this.player.jPlayer('play');
+			this.playing = true;
+			this.avatar.find('.play').text('||');
+			this.avatar.addClass('playing');
+			// this._beginProgressBar();// this.player.getDuration());
+		},
+		_pause:function(track){
+			this.player.jPlayer('pause');
+			this.playing = false;
+			this.avatar.find('.play').text('>');
+			this.avatar.removeClass('playing');
+			this._stopProgressBar();
+		},
+		_stop:function(track){
+			this.player.jPlayer('stop');
+			this.playing = false;
+			this.avatar.find('.play').text('>');
+			this.avatar.removeClass('playing');
+			this._stopProgressBar();
+			this._resetProgressBar();
+		},
+		
+		_loadTrack:function(track){
+			console.log('load track',track);
+            this.player.jPlayer("setMedia", {"mp3" : track.stream_url + '?client_id=' + this.options.client_id} ); // load(track, this.options.client_id)
+			this._resetProgressBar();
+			// this.player.jPlayer("load");
+			this._play();
+            this.avatar.find('img').attr('src', track.user.avatar_url);
+
+			this.info.data('user', track.user);
+			this.title.text(track.title);
+			this.author.text(track.user.username);
+			this.info.removeClass('loaded');
+
+			var sec = Math.floor(track.duration / 1000);
+			this.duration.text(this._zeroFill(Math.floor(sec / 60)) + ':' + this._zeroFill(sec % 60));
+		},
+		
+		/* progress bar functions */
+		_updateProgressBar:function(current, duration){
+			var newAngle = 360 * current / duration - 45;
+			for (;this.animateAngle < newAngle; this.animateAngle++) {
+				
+				$('<div class="bar"><div class="bar-visible"/></div>').appendTo(this.animContainer).rotate(this.animateAngle);
+			};
+		},
+		_stopProgressBar:function(duration){
+			clearTimeout(this.animTimer);
+		},
+		_resetProgressBar:function(duration){
+			this.animContainer.empty();
+			this.animateAngle = -45;
+		},
+
+
+
+
+		_zeroFill:function(num,count)
+		{
+			count = count || 2;
+	    	var numZeropad = num + '';
+	    	while(numZeropad.length < count) {
+				numZeropad = "0" + numZeropad;
+			}
+			return numZeropad;
+		}
+	});
+	
+	
+	
+	
+	
+
+
+	
 	$.widget("ui.soundSpinPlayer", {
 		getter: [],
     	options: {
