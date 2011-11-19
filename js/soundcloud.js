@@ -1,6 +1,18 @@
 var MainController;
 
 (function() {
+	var client_id = 'u9MitXmAQmMLJPiKtFHiQ',
+		client_secret = 'zBC6Xii6C8isUG0nKH6MxUA7yv7XHuameNrQdHTk',
+		code,
+		$player,
+		this_application_url = 'http://www.officity.com/apps-dev/jonathan/soundcloud/';
+		connect_url = 'https://soundcloud.com/connect?client_id=' + client_id + '&response_type=token&redirect_uri='+this_application_url;
+
+	SC.initialize({
+      client_id: client_id,
+      redirect_uri: "http://j-san.github.com/SoundSpin/",
+    });
+	
 	$(function(){
 		$(document.body).delegate('img.resizable','click',function(){
 			if(this.src.indexOf('default_avatar_large.png')>=0){
@@ -9,17 +21,10 @@ var MainController;
 			var $body = $('<div class="body panel-image-view"/>');
 			$body.append('<img src="' + this.src.replace(/large\.(\w{3})/,'crop.$1') + '" />');
 			$.spin.removeAfter($(this).closest('.panel'));
-			console.log($body);
 			var $panel = $.spin($body, 'img');
 		});
 	});
 
-	var client_id = 'u9MitXmAQmMLJPiKtFHiQ',
-		client_secret = 'zBC6Xii6C8isUG0nKH6MxUA7yv7XHuameNrQdHTk',
-		code,
-		$player,
-		this_application_url = 'http://www.officity.com/apps-dev/jonathan/soundcloud/';
-		connect_url = 'https://soundcloud.com/connect?client_id=' + client_id + '&response_type=token&redirect_uri='+this_application_url;
 
 	MainController = function($elt){
 		var panelType = $elt.data('panelType');
