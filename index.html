@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>Soundcloud</title>
+		<title>SoundSpin</title>
 		<meta name="apple-mobile-web-app-capable" content="yes"/>
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -12,20 +12,17 @@
 		<link rel="stylesheet" type="text/css" href="Spin.js/addons/items/items.css" />
 		<link rel="stylesheet" type="text/css" href="css/soundcloud.css" />
 
-		<script src="http://connect.soundcloud.com/sdk.js" type="text/JavaScript"></script>
+		<script src="http://connect.soundcloud.com/sdk.js" type="text/JavaScript"> </script>
 
-		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.js">&#160;</script>
-		<script type="text/javascript" src="jquery/jquery-ui-1.8.11.custom.min.js">&#160;</script>
-		<script type="text/javascript" src="jquery/jquery.folderPreview.js">&#160;</script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.js"> </script>
 
-		<script type="text/javascript" src="Spin.js/addons/breadcrumb/breadcrumb.js"></script>
-		<script type="text/javascript" src="Spin.js/addons/items/items.js"></script>
-		<script type="text/javascript" src="Spin.js/src/js/Spin.js">&#160;</script>
+		<script type="text/javascript" src="Spin.js/addons/breadcrumb/breadcrumb.js"> </script>
+		<script type="text/javascript" src="Spin.js/addons/items/items.js"> </script>
+		<script type="text/javascript" src="Spin.js/src/js/Spin.js"> </script>
 
-		<script type="text/javascript" src="jPlayer/jquery.jplayer.min.js"></script>
 
-		<script type="text/javascript" src="js/soundcloud.js">&#160;</script>
-		<script type="text/javascript" src="js/soundcloud.player.js"></script>
+		<script type="text/javascript" src="js/soundcloud.js"> </script>
+		<script type="text/javascript" src="js/soundcloud.player.js"> </script>
 		<script type="text/javascript">
             $.spin.configure(MainController);
 		</script>
@@ -44,5 +41,27 @@
 
 		</script>
 	</head>
-	<body/>
+	<body>
+		<div id="templates" style="display:none;">
+			<div class="soundspin-player">
+				<div class="soundspin-controls">
+					<div class="avatar">
+						<div class="control play">&gt;</div>
+						<img src=""/>
+						<div class="progress-bar-container">
+						</div>
+					</div>
+					<div class="control next">&gt;&gt;</div>
+					<div class="clear control">Clear</div>
+					<div id="info" class="nav">
+						<p id="author">Alesso</p>
+						<p id="title">Titanium (Alesso Remix) *PREVIEW*</p>
+						<p id="duration">02:24</p>
+					</div>
+				</div>
+				<ol class="play-list spin-items">
+				</ol>
+			</div>
+		</div>
+	</body>
 </html>
