@@ -1,4 +1,4 @@
-var MainController;
+
 
 (function() {
 	var client_id = 'u9MitXmAQmMLJPiKtFHiQ',
@@ -6,14 +6,14 @@ var MainController;
 		code,
 		$player,
 		player,
-		this_application_url = 'http://www.officity.com/apps-dev/jonathan/soundcloud/';
-		connect_url = 'https://soundcloud.com/connect?client_id=' + client_id + '&response_type=token&redirect_uri='+this_application_url;
+		this_application_url = 'http://j-san.github.com/SoundSpin/';
 
 	SC.initialize({
       client_id: client_id,
-      redirect_uri: "http://j-san.github.com/SoundSpin/",
+      redirect_uri: this_application_url,
     });
-	
+
+
 	$(function(){
 		$(document.body).delegate('img.resizable','click',function(){
 			if(this.src.indexOf('default_avatar_large.png')>=0){
@@ -27,7 +27,7 @@ var MainController;
 	});
 
 
-	MainController = function($elt){
+	window.MainController = function($elt){
 		var panelType = $elt.data('panelType');
 		var title = $elt.data('title') || $elt.text() || $elt.attr('title');
 		var $body;
@@ -84,9 +84,9 @@ var MainController;
 
 
 		// get some sample tracks
-		SC.get('/tracks',{},function(data){
+		SC.get('/tracks',{limit:10},function(data){
 			$player = $('<div/>');
-			player = new SoundSpinPlayer($player,data);
+			player = new SoundSpinPlayer($player,{tracks:data});
 			$player.appendTo($body)
 		});
 		
@@ -114,11 +114,11 @@ var MainController;
 							.data('track',track)
 							.click(function(){
 								if(!$track.hasClass('disabled')){
-									$player.soundSpinPlayer('addTrack',$track.data('track'),user);
+									player.addTrack($track.data('track'),user);
 									$track.addClass('disabled');
 								}
 							}).appendTo($set);
-					if($player.soundSpinPlayer('hasTrack',track)){
+					if(player.hasTrack(track)){
 						$track.addClass('disabled');
 					}
 				});
@@ -126,85 +126,84 @@ var MainController;
 		});
 
 		SC.get('/users/' + user.id, {}, function(data){
-				console.log('user' , data);
-				$block.removeClass('loading');
-				$block.append('<a href="' + user.permalink_url + '" target="_blank">Voir sur Soundcloud</a>');
-				$block.append('<h1>' + (data.full_name || data.username) + '</h1>');
-				$block.append('<img class="resizable songwriter-avatar" src="' + user.avatar_url + '" />');
-				if(data.description){
-					$block.append('<p>' + data.description + '</p>');
-				}
-				$('<li class="spin-item nav">' + data.public_favorites_count + ' Favorites</li>').appendTo($blockNav);
-				$('<li class="spin-item nav">' + data.followings_count + ' Followings</li>')
-						.data({
-							panelType: 'followings',
-							user: user
-						})
-						.appendTo($blockNav);
+			console.log('user' , data);
+			$block.removeClass('loading');
+			$block.append('<a href="' + user.permalink_url + '" target="_blank">Voir sur Soundcloud</a>');
+			$block.append('<h1>' + (data.full_name || data.username) + '</h1>');
+			$block.append('<img class="resizable songwriter-avatar" src="' + user.avatar_url + '" />');
+			if(data.description){
+				$block.append('<p>' + data.description + '</p>');
+			}
+			$('<li class="spin-item nav">' + data.public_favorites_count + ' Favorites</li>').appendTo($blockNav);
+			$('<li class="spin-item nav">' + data.followings_count + ' Followings</li>')
+					.data({
+						panelType: 'followings',
+						user: user
+					})
+					.appendTo($blockNav);
 
-				var $info = $('<div class="songwriter-info"/>').appendTo($block);
+			var $info = $('<div class="songwriter-info"/>').appendTo($block);
 
-				if(data.discogs_name){
-					$info.append('<p>Dicogs <strong>' + data.discogs_name + '</strong></p>');
-				}
-				if(data.myspace_name){
-					$info.append('<p>Myspace <strong>' + data.myspace_name + '</strong></p>');
-				}
-				if(data.website){
-					$info.append('<p><a href="' + data.website + '">' + (data.website_title || data.website) + '</a></p>');
-				}
-				if(data.country){
-					$info.append('<p>Country <strong>' + data.country + '</strong></p>');
-				}
-				if(data.city){
-					$info.append('<p>City <strong>' + data.city + '</strong></p>');
-				}
-				if(code){
-					$follow = $('<button>...</button>').appendTo($info).attr('disabled',true);
+			if(data.discogs_name){
+				$info.append('<p>Dicogs <strong>' + data.discogs_name + '</strong></p>');
+			}
+			if(data.myspace_name){
+				$info.append('<p>Myspace <strong>' + data.myspace_name + '</strong></p>');
+			}
+			if(data.website){
+				$info.append('<p><a href="' + data.website + '">' + (data.website_title || data.website) + '</a></p>');
+			}
+			if(data.country){
+				$info.append('<p>Country <strong>' + data.country + '</strong></p>');
+			}
+			if(data.city){
+				$info.append('<p>City <strong>' + data.city + '</strong></p>');
+			}
+			if(code){
+				$follow = $('<button>...</button>').appendTo($info).attr('disabled',true);
 
-					$follow.click(function(){
-							$follow.attr('disabled',true);
-							var url = 'https://api.soundcloud.com/me/followings/' + user.id + '.json?oauth_token=' + code;
-							$.ajax({
-								url			: url,
-								type		: $follow.data('follow') ? 'DELETE':'PUT',
-								dataType	: 'text',
-								success		: function(data){
-									$follow.removeAttr('disabled');
-									$follow.text($follow.data('follow') ? 'Follow' : 'Unfollow');
-									$follow.data('follow',!$follow.data('follow'));
-									console.log(data);
-								}
-							});
+				$follow.click(function(){
+						$follow.attr('disabled',true);
+						var url = 'https://api.soundcloud.com/me/followings/' + user.id + '.json?oauth_token=' + code;
+						$.ajax({
+							url			: url,
+							type		: $follow.data('follow') ? 'DELETE':'PUT',
+							dataType	: 'text',
+							success		: function(data){
+								$follow.removeAttr('disabled');
+								$follow.text($follow.data('follow') ? 'Follow' : 'Unfollow');
+								$follow.data('follow',!$follow.data('follow'));
+								console.log(data);
+							}
 						});
+					});
 
-					url = 'https://api.soundcloud.com/me/followings/' + user.id + '.json?oauth_token=' + code;
-					$.ajax({
-						url			: url,
-						type		: 'GET',
-						dataType	: 'text',
-						success		: function(data,textStatus){
-							// console.log(textStatus);
-							// return;
+				url = 'https://api.soundcloud.com/me/followings/' + user.id + '.json?oauth_token=' + code;
+				$.ajax({
+					url			: url,
+					type		: 'GET',
+					dataType	: 'text',
+					success		: function(data,textStatus){
+						// console.log(textStatus);
+						// return;
+						$follow.data('follow',true);
+						$follow.removeAttr('disabled');
+						$follow.text('Unfollow');
+					},
+					error		: function(jqXHR,textStatus,error){
+						// console.log(textStatus,error,jqXHR);
+						if(jqXHR.status==404){
+							$follow.data('follow',false);
+							$follow.removeAttr('disabled');
+							$follow.text('Follow');
+						}else{
 							$follow.data('follow',true);
 							$follow.removeAttr('disabled');
 							$follow.text('Unfollow');
-						},
-						error		: function(jqXHR,textStatus,error){
-							// console.log(textStatus,error,jqXHR);
-							if(jqXHR.status==404){
-								$follow.data('follow',false);
-								$follow.removeAttr('disabled');
-								$follow.text('Follow');
-							}else{
-								$follow.data('follow',true);
-								$follow.removeAttr('disabled');
-								$follow.text('Unfollow');
-							}
 						}
-					});
-					
-				}
+					}
+				});
+				
 			}
 		});
 
