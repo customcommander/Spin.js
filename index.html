@@ -8,7 +8,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<!-- <link rel="icon" type="image/png" href="images/kaiten-boxed-favicon.png" sizes="16x16"> -->
 
-		<link rel="stylesheet" type="text/css" href="Spin.js/addons/breadcrumb/breadcrumb.css" />
+		<!--<link rel="stylesheet" type="text/css" href="Spin.js/addons/breadcrumb/breadcrumb.css" /> -->
 		<link rel="stylesheet" type="text/css" href="Spin.js/addons/items/items.css" />
 		<link rel="stylesheet" type="text/css" href="css/soundcloud.css" />
 
@@ -16,7 +16,7 @@
 
 		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.js"> </script>
 
-		<script type="text/javascript" src="Spin.js/addons/breadcrumb/breadcrumb.js"> </script>
+		<!--<script type="text/javascript" src="Spin.js/addons/breadcrumb/breadcrumb.js"> </script>-->
 		<script type="text/javascript" src="Spin.js/addons/items/items.js"> </script>
 		<script type="text/javascript" src="Spin.js/src/js/Spin.js"> </script>
 
@@ -41,27 +41,26 @@
 
 		</script>
 	</head>
-	<body>
-		<div id="templates" style="display:none;">
-			<div class="soundspin-player">
-				<div class="soundspin-controls">
-					<div class="avatar">
-						<div class="control play">&gt;</div>
-						<img src=""/>
-						<div class="progress-bar-container">
-						</div>
+	<body/>
+	<script id="SoundSpinPlayerBody" type="text/html">
+		<div id="soundspin-container">
+			<div id="player">
+				<div id="indicator">
+					<div id="control-play" class="control">&gt;</div>
+					<div id="avatar">
+						<img/>
 					</div>
-					<div class="control next">&gt;&gt;</div>
-					<div class="clear control">Clear</div>
-					<div id="info" class="nav">
-						<p id="author">Alesso</p>
-						<p id="title">Titanium (Alesso Remix) *PREVIEW*</p>
-						<p id="duration">02:24</p>
-					</div>
+					<div id="progress-bar"/>
 				</div>
-				<ol class="play-list spin-items">
-				</ol>
+				<div id="control-next" class="control">&gt;&gt;</div>
+				<div id="control-clear" class="control">Clear</div>
+				<div id="info" class="nav spin-item">
+					<p id="author"/>
+					<p id="title"/>
+					<p id="duration"/>
+				</div>
 			</div>
+			<ol class="play-list spin-items"/>
 		</div>
-	</body>
+	</script>
 </html>

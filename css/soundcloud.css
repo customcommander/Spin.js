@@ -4,60 +4,106 @@
 	height:			300px;
 }
 
+/* theme */
+.spin-item.nav.mouseover,
+.soundspin-player #info:hover{
+/** webkit ********************************************************************/
+    background-image: -webkit-gradient(linear, left top, left bottom,from(#feae31),to(#efe457));
+    -webkit-background-origin: border;
+    -webkit-background-origin: border-box;
+/** gecko *********************************************************************/
+    background-image: -moz-linear-gradient(center top , #feae31, #efe457);
+    -moz-background-origin: border;
+/** no vendor prefix **********************************************************/
+    background-origin: border-box;
+/** shared ********************************************************************/
+    background-repeat: repeat;    
+    background-attachment: scroll; 
+    background-position: 0 0;
+}
+
+.spin-item.nav.loaded,
+.soundspin-player #info.loaded {
+	color: white;
+    background-image: -moz-linear-gradient(center top , #b9305a, #5f1538);
+    background-image: -webkit-gradient(linear, left top, left bottom,from(#b9305a),to(#5f1538));
+    background-position: 0 0;
+    -webkit-background-origin: border-box;
+    -moz-background-origin: border;
+    background-origin: border-box;
+}
+
 
 /* SoundCloud songs player */
 .soundspin-controls{
     position: 		relative;
 	width:			100%;
 	height: 		150px;
-	border-bottom: 	#999 solid 1px;
 	border-top: 	#999 solid 1px;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	user-select: none;
-/*	background-color: black;*/
+	background-color: #feae31;/*aubergine*/
 }
-
 .soundspin-controls .control{
+/*
 	background-color:	black;
 	background-clip:	padding-box;
-    position:		absolute;
 	color:			white;
 	font-weight:	bold;
 	text-align:		center;
 	vertical-align:	middle;
 	text-decoration:none;
 	border: 		3px solid red;
+*/
+    position:		absolute;
 	cursor:			pointer;
 	z-index: 10;
 }
 
-.soundspin-player .avatar{
+.soundspin-player .indicator{
     position:		absolute;
 	line-height: 	0;
-    left:			20px;
+    left:			24px;
     top:			16px;
 	cursor:			pointer;
-	border:			 				2px solid black;
-	-webkit-border-radius: 			9px;
-	-webkit-border-top-left-radius:	0;
-	-moz-border-radius: 			9px;
-	-moz-border-radius-topleft: 	0;
-	border-radius: 					9px;
-	border-top-left-radius: 		0;
 }
-.soundspin-player div.avatar .play{
-	display:		none;
-	top:			-12px;
-    left:			-12px;
-	width:			20px;
-	height:			20px;
-	line-height:	20px;
-	-webkit-border-radius: 	15px;
-	-moz-border-radius: 	15px;
-	border-radius: 			15px;
+.soundspin-player div.indicator .play{
+	/*display:		none;*/
+	background-image:url(../img/play.png);
+	top: -12px;
+    left: -16px;
+	width: 32px;
+	height: 32px;
 }
 
+.soundspin-player div.indicator.playing .play{
+	background-image:url(../img/pause.png);
+}
+
+.soundspin-player #avatar{
+	position: relative;
+	min-height: 100px; 
+	min-width: 100px;
+	z-index: 5;
+	overflow: hidden;
+	border: 2px solid black;
+	-webkit-border-radius: 9px;
+	-webkit-border-top-left-radius: 0;
+	-moz-border-radius: 9px;
+	-moz-border-radius-topleft: 0;
+	border-radius: 9px;
+	border-top-left-radius: 0;
+}
+
+.soundspin-player #avatar img{
+	-webkit-border-radius: 7px;
+	-webkit-border-top-left-radius: 0;
+	-moz-border-radius: 7px;
+	-moz-border-radius-topleft: 0;
+	border-radius: 7px;
+	border-top-left-radius: 0;
+}
 .soundspin-player .clear{
     position: absolute;
 	right: 65px;
@@ -71,35 +117,12 @@
 	border-radius:         12px;
 }
 
-.soundspin-player .control.next{
-	bottom:		15px;
-    right:		18px;
-	width:		40px;
-	height:		40px;
-	line-height:40px;
-	font-size: 	25px;
-	border: 	5px solid red;
-	cursor:		pointer;
-	-webkit-border-radius: 	40px;
-	-moz-border-radius: 	40px;
-	border-radius: 			40px;
-}
-
-.soundspin-player div.avatar:hover .play,
-.soundspin-player div.avatar.playing .play{
-	display:		block;
-}
-.soundspin-player .avatar img{
-	position: relative;
-	min-height: 100px; 
-	min-width: 100px;
-	z-index: 5;
-	-webkit-border-radius: 7px;
-	-webkit-border-top-left-radius: 0;
-	-moz-border-radius: 7px;
-	-moz-border-radius-topleft: 0;
-	border-radius: 7px;
-	border-top-left-radius: 0;
+.soundspin-player .next{
+	background-image:url(../img/ff.png);
+	bottom: 15px;
+    right: 14px;
+	width: 50px;
+	height: 50px;
 }
 
 .quick-nav{
@@ -124,9 +147,8 @@
 
 
 /* progress bar */
-.soundspin-player .avatar .progress-bar-container{
-/*	background-color:white;*/
-	z-index:-1;
+.soundspin-player .indicator .progress-bar-container{
+	background-color:white;
 	position: absolute;
     left: -6px;
     top: -6px;
@@ -136,14 +158,17 @@
 	overflow: hidden;
 	border: 2px solid black;
 	-webkit-border-radius: 14px;
+	-webkit-border-top-left-radius: 0;
 	-moz-border-radius: 14px;
+	-moz-border-top-left-radius: 0;
 	border-radius: 14px;
+	border-top-left-radius: 0;
 }
-.soundspin-player .avatar:hover .progress-bar-container,
-.soundspin-player .avatar.playing .progress-bar-container{
+.soundspin-player .indicator:hover .progress-bar-container,
+.soundspin-player .indicator.playing .progress-bar-container{
 	display: block;
 }
-.soundspin-player .avatar .progress-bar-container .bar{
+.soundspin-player .indicator .progress-bar-container .bar{
 	position: absolute; 
 	height: 67%; 
 	width: 2px;
@@ -156,13 +181,16 @@
 .soundspin-player #info{
     position: absolute;
     left: 140px;
-    top: 12px;
+    top: 10px;
 	right: 10px;
 	padding: 5px;
 	cursor: pointer;
 	font-size: 1.3em;
-	min-height: 100px;
+	min-height: 116px;
 	background-color:white;
+	height:auto;
+	line-height: initial;
+	background-image: none;
 
 	-webkit-border-radius: 	8px;
 	-moz-border-radius: 	8px;
@@ -173,11 +201,15 @@
 	-webkit-box-shadow:		10px 10px 70px #888;
 }
 
-.soundspin-player #info p{
+.soundspin-player #info::before {
+	background-image:none;
+}
+
+.soundspin-player #info p {
 	margin-bottom:6px;
 }
 
-.soundspin-player #author{
+.soundspin-player #author {
     font-weight:	bold;
 	color: 			red;
 	font-size: 		1.6em;
@@ -227,7 +259,7 @@
 }
 
 .songwriter-avatar{
-	margin-top: 16px;
+	margin: 0 16px 16px 0;
 	float:left;
 	-webkit-border-radius: 			9px;
 	-webkit-border-top-left-radius:	0;
@@ -237,6 +269,9 @@
 	border-top-left-radius: 		0;
 }
 
+.songwriter-description::first-letter{
+	font-size: 3em;
+}
 .songs{
 	clear:both;
 }
@@ -280,37 +315,74 @@ form.search input
   width:98%;
 }
 
-/* Spin.js style overwrite */
 p{
 	margin-bottom:0.4em;
 }
 
+
+/* Spin.js style overwrite */
 .block-content{
 	padding:10px;
 }
 
-.item{
-    height:2.1em;
-	line-height:2.1em;
-	vertical-align:middle;
+.spin-item{
+	line-height: 2.1em;
+	vertical-align: middle;
 	padding: 0 0.5em 0 0.8em;
-	white-space:nowrap;
-	overflow:hidden;
+}
+
+.spin-item:not(spin-icon){
+	padding-left: 28px;
 }
 
 .nav{
 	cursor:pointer;
 }
+.spin-item {
+	overflow:hidden;
+}
+.spin-item.nav {
+ 	background-image:none;
+}
+
+.spin-item::before {
+	content:" ";
+	position:absolute;
+	top:0;
+	right:7px;
+	width: 10px;
+	height: 100%;
+	background: url('../Spin.js/addons/items/item-arrow-black.png') no-repeat center right;
+}
+.spin-left, .spin-right {
+	position: initial;
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
 
 #k-nav {
     height:2.1em;
 }
-.panel{
+
+.spin-panel {
 	border-right: 1px solid #999;
 }
-.panel-hd{
+
+.spin-panel-hd {
+	background: -webkit-gradient(linear, left top, left bottom,from(#b9305a),to(#5f1538)) repeat scroll 0 0 #5f1538 !important;
+	background: -moz-linear-gradient(center top , #b9305a, #5f1538) repeat scroll 0 0 #5f1538 !important;
+}
+/*
+. {
+ 
+top: 0px;
+width: 100%;
+height: 2.5em;
+text-align: center;
 	font-size:1.3em;
-    height:1.6em; /* height : 2.1em but font-size change for 1.3em => height => 2.1 / 1.3em */
+    height:1.6em; height : 2.1em but font-size change for 1.3em => height => 2.1 / 1.3em 
 	line-height:1.6em;
 	vertical-align:middle;
 	white-space:nowrap;
@@ -319,6 +391,4 @@ p{
     background: -moz-linear-gradient(center top , #999, #222) repeat scroll 0 0 #222;    
     background: -webkit-gradient(linear, left top, left bottom,from(#999),to(#222)) repeat scroll 0 0 #222;
 }
-.panel-bd{
-   top:2.1em;
-}
+*/

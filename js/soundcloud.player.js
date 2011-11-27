@@ -18,19 +18,19 @@
 		this.element.addClass('soundspin-player');
 
 		this.controls      = $('<div class="soundspin-controls"/>').appendTo(this.element);
-		this.avatar        = $('<div class="avatar"><div class="control play">&gt;</div><img/></div>').appendTo(this.controls);
+		this.avatar        = $('<div class="indicator"><div class="control play"></div><div id="avatar"><img/></div></div>').appendTo(this.controls);
 		this.animContainer = $('<div class="progress-bar-container"></div>').appendTo(this.avatar);
 
 
-		this.info 		= $('<div id="info" class="nav"/>').appendTo(this.controls)
+		this.info 		= $('<div id="info" class="spin-item nav"/>').appendTo(this.controls)
 								.data('panelType', 'songwriterDetails');
 		this.author 	= $('<p id="author"/>').appendTo(this.info);
 		this.title 		= $('<p id="title"/>').appendTo(this.info);
 		this.duration 	= $('<p id="duration"/>').appendTo(this.info);
 
-		this.next  = $('<div class="control next">&gt;&gt;</div>').appendTo(this.info);
-		this.clear = $('<div class="clear control">Clear</div>').appendTo(this.info).
-			click(function(evt){
+		this.next  = $('<div class="control next"></div>').appendTo(this.info);
+		this.clear = $('<div class="clear control">C</div>').appendTo(this.info)
+			.click(function(evt){
 				evt.preventDefault();
 				evt.stopPropagation();
 				self.playlist.empty();
@@ -103,7 +103,6 @@
 	SoundSpinPlayer.prototype._play=function(track){
 		this.player.play();
 		this.playing = true;
-		this.avatar.find('.play').text('||');
 		this.avatar.addClass('playing');
 
 		var self = this;
@@ -113,14 +112,12 @@
 	SoundSpinPlayer.prototype._pause=function(track){
 		this.player.pause();
 		this.playing = false;
-		this.avatar.find('.play').text('>');
 		this.avatar.removeClass('playing');
 		this._stopProgressBar();
 	},
 	SoundSpinPlayer.prototype._stop=function(track){
 		this.player.stop();
 		this.playing = false;
-		this.avatar.find('.play').text('>');
 		this.avatar.removeClass('playing');
 		this._stopProgressBar();
 		this._resetProgressBar();

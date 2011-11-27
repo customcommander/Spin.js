@@ -65,7 +65,12 @@
 		
 		if(!code){
 			$connect = $('<button>connect</button>').click(function(){
-				SC.connect();
+				SC.connect({
+					redirect_uri: this_application_url,
+			      	connect: function(){
+						console.log('hey');
+					}
+				});
 			});
 			$block.append($connect);
 		}else{
@@ -99,7 +104,7 @@
 		 	$block = $('<div class="block-content loading"/>').appendTo($body),
 			$songs = $('<div class="loading songs"/>').appendTo($body);
 
-		SC.get('/users/' + user.id, {}, function(data){
+		SC.get('/users/' + user.id + '/playlists', {}, function(data){
 			console.log('playlists',data);
 			$songs.removeClass('loading');
 			$.each(data, function(ind,playlist){
@@ -132,7 +137,7 @@
 			$block.append('<h1>' + (data.full_name || data.username) + '</h1>');
 			$block.append('<img class="resizable songwriter-avatar" src="' + user.avatar_url + '" />');
 			if(data.description){
-				$block.append('<p>' + data.description + '</p>');
+				$block.append('<p class="songwriter-description">' + data.description + '</p>');
 			}
 			$('<li class="spin-item nav">' + data.public_favorites_count + ' Favorites</li>').appendTo($blockNav);
 			$('<li class="spin-item nav">' + data.followings_count + ' Followings</li>')
