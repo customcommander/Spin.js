@@ -4,7 +4,7 @@
 	height:			300px;
 }
 
-/* theme */
+/* Spin.js theme */
 .spin-item.nav.mouseover,
 .soundspin-player #info:hover{
 /** webkit ********************************************************************/
@@ -25,14 +25,20 @@
 .spin-item.nav.loaded,
 .soundspin-player #info.loaded {
 	color: white;
-    background-image: -moz-linear-gradient(center top , #b9305a, #5f1538);
-    background-image: -webkit-gradient(linear, left top, left bottom,from(#b9305a),to(#5f1538));
+    background-image: -moz-linear-gradient(center top , #a10627, #591426);
+    background-image: -webkit-gradient(linear, left top, left bottom,from(#a10627),to(#591426));
     background-position: 0 0;
     -webkit-background-origin: border-box;
     -moz-background-origin: border;
     background-origin: border-box;
 }
 
+.spin-panel-hd {
+	background: -webkit-gradient(linear, left top, left bottom,from(#a10627),to(#591426)) repeat scroll 0 0 #591426 !important;
+	background: -moz-linear-gradient(center top , #a10627, #591426) repeat scroll 0 0 #591426 !important;
+}
+
+/* end Spin.js theme */
 
 /* SoundCloud songs player */
 .soundspin-controls{
@@ -216,50 +222,15 @@
 	text-shadow:	black 2px 2px 1.5px;
 }
 
-.album .artwork{
-	margin-top: 16px;
-	float:		right;
-	-webkit-border-radius: 			9px;
-	-webkit-border-top-left-radius:	0;
-	-moz-border-radius: 			9px;
-	-moz-border-radius-topleft: 	0;
-	border-radius: 					9px;
-	border-top-left-radius: 		0;
-}
-.album .trackset{
-	
-}
-
-.trackset .disabled, .trackset .disabled.mouseover{
-	color: 		#888;
-/** webkit ********************************************************************/
-    background-image: -webkit-gradient(linear, left top, left bottom,from(#efefef),to(white));
-    -webkit-background-origin: border;
-    -webkit-background-origin: border-box;
-/** gecko *********************************************************************/
-    background-image: -moz-linear-gradient(center top , #EFEFEF, white);
-    -moz-background-origin: border;
-/** no vendor prefix **********************************************************/
-    background-origin: border-box;
-/** shared ********************************************************************/
-    background-repeat: repeat;    
-    background-attachment: scroll; 
-    background-position: 0 0;
-}
-
-.album{
-	clear:			both;
-	padding-top:	10px;
-}
 
 /* song writter info panel */
 .songwriter-info{
-	margin-left:	120px;
-	margin-top:		16px;
 }
 
 .songwriter-avatar{
 	margin: 0 16px 16px 0;
+	min-height:300px;
+	min-width:300px;
 	float:left;
 	-webkit-border-radius: 			9px;
 	-webkit-border-top-left-radius:	0;
@@ -272,10 +243,51 @@
 .songwriter-description::first-letter{
 	font-size: 3em;
 }
+
+
 .songs{
-	clear:both;
+	clear: both;
+	text-align: center;
+	padding: 5px;
 }
 
+.album{
+	display: inline-block;
+	padding: 5px;
+}
+
+.album .artwork{
+	min-height:100px;
+	min-width:100px;
+	-webkit-border-radius: 			9px;
+	-webkit-border-top-left-radius:	0;
+	-moz-border-radius: 			9px;
+	-moz-border-radius-topleft: 	0;
+	border-radius: 					9px;
+	border-top-left-radius: 		0;
+}
+.album .trackset{
+	
+}
+/*
+.trackset .disabled, .trackset .disabled.mouseover{
+	color: 		#888;
+/** webkit ******************************************************************** /
+    background-image: -webkit-gradient(linear, left top, left bottom,from(#efefef),to(white));
+    -webkit-background-origin: border;
+    -webkit-background-origin: border-box;
+/** gecko ********************************************************************* / 
+
+    background-image: -moz-linear-gradient(center top , #EFEFEF, white);
+    -moz-background-origin: border;
+/** no vendor prefix ********************************************************** /
+    background-origin: border-box;
+/** shared ******************************************************************** /
+    background-repeat: repeat;    
+    background-attachment: scroll; 
+    background-position: 0 0;
+}
+*/
 .toggle-button{
 	background:		#888;
 	color:			white;
@@ -370,10 +382,6 @@ p{
 	border-right: 1px solid #999;
 }
 
-.spin-panel-hd {
-	background: -webkit-gradient(linear, left top, left bottom,from(#b9305a),to(#5f1538)) repeat scroll 0 0 #5f1538 !important;
-	background: -moz-linear-gradient(center top , #b9305a, #5f1538) repeat scroll 0 0 #5f1538 !important;
-}
 /*
 . {
  

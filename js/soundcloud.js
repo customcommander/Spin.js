@@ -10,7 +10,7 @@
 
 	SC.initialize({
       client_id: client_id,
-      redirect_uri: this_application_url,
+      redirect_uri: this_application_url + 'callback.html',
     });
 
 
@@ -31,7 +31,7 @@
 		var panelType = $elt.data('panelType');
 		var title = $elt.data('title') || $elt.text() || $elt.attr('title');
 		var $body;
-		
+		console.log(panelType);
 		if(!$player){
 			$body = Home();
 			title = 'Home';
@@ -41,6 +41,8 @@
 			$body = songwriterSearch();
 		}else if(panelType == 'followings'){
 			$body = songwriterFollowings($elt.data('user'));
+		}else if(panelType == 'allTracks'){
+			$body = allTracks($elt.data('user'));
 		}else{
 			$.error('no panel specified');
 		}
@@ -63,17 +65,7 @@
 		$('<div class="nav spin-item see-more"></div>').appendTo($block)
 				.data({panelType: 'songwriterSearch'});
 		
-		if(!code){
-			$connect = $('<button>connect</button>').click(function(){
-				SC.connect({
-					redirect_uri: this_application_url,
-			      	connect: function(){
-						console.log('hey');
-					}
-				});
-			});
-			$block.append($connect);
-		}else{
+		function loadFollowings(){
 			SC.get('/me/followings',{},function(data){
 				console.log('followings',data);
 				$.each(data, function(ind,author){
@@ -84,7 +76,19 @@
 							})
 							.prependTo($block);
 				});
-			});	
+			});
+		}
+		
+		if(!SC.isConnected()){
+			$connect = $('<button>connect</button>').click(function(){
+				SC.connect(function(){
+					console.log('hey');
+					loadFollowings();
+				});
+			});
+			$block.append($connect);
+		}else{
+			loadFollowings();
 		}
 
 
@@ -108,12 +112,16 @@
 			console.log('playlists',data);
 			$songs.removeClass('loading');
 			$.each(data, function(ind,playlist){
-				var $album = $('<div class="album"/>').appendTo($songs);
+				var $album = $('<div class="nav album"/>').data('panelType',"albumDetails").appendTo($songs);
+				var $artwrork = $('<img class="artwork" />').appendTo($album);
+				$artwork.data('album',playlist);
 				if(playlist.artwork_url){
-					$('<img class="resizable artwork" src="' + playlist.artwork_url + '" />').appendTo($album);
+					 $artwork.prop('src',playlist.artwork_url);
+				}else{
+					$artwork.prop('src','img/default_album.png');
 				}
-				$('<h2>' + playlist.title + ' (' + playlist.type + ')</h2>').appendTo($album);
-	 			$set = $('<ol class="spin-items trackset"/>').appendTo($album);
+				$('<p>' + playlist.title + '</p>').appendTo($album);
+	 			/*$set = $('<ol class="spin-items trackset"/>').appendTo($album);
 				$.each(playlist.tracks, function(ind,track){
 					var $track = Items.clickable({title:track.title})
 							.data('track',track)
@@ -126,8 +134,11 @@
 					if(player.hasTrack(track)){
 						$track.addClass('disabled');
 					}
-				});
+				});*/
 			});
+			var $album = $('<div class="nav album"/>').data('panelType',"allTracks").data('user',user).appendTo($songs);
+			$('<img class="artwork" src="img/default_album.png" />').appendTo($album);
+			$('<p>All</p>').appendTo($album);
 		});
 
 		SC.get('/users/' + user.id, {}, function(data){
@@ -135,7 +146,7 @@
 			$block.removeClass('loading');
 			$block.append('<a href="' + user.permalink_url + '" target="_blank">Voir sur Soundcloud</a>');
 			$block.append('<h1>' + (data.full_name || data.username) + '</h1>');
-			$block.append('<img class="resizable songwriter-avatar" src="' + user.avatar_url + '" />');
+			$block.append('<img class="resizable songwriter-avatar" src="' + user.avatar_url.replace('large','t300x300') + '" />');
 			if(data.description){
 				$block.append('<p class="songwriter-description">' + data.description + '</p>');
 			}
@@ -164,7 +175,7 @@
 			if(data.city){
 				$info.append('<p>City <strong>' + data.city + '</strong></p>');
 			}
-			if(code){
+			if(SC.isConnected()){
 				$follow = $('<button>...</button>').appendTo($info).attr('disabled',true);
 
 				$follow.click(function(){
@@ -215,6 +226,30 @@
 		return $body;
 	};
 
+	var allTracks = function(user){
+		var $body  = $('<div class="body"/>'),
+			$songs = $('<div class="loading songs"/>').appendTo($body);
+
+		$songs.removeClass('loading');
+		SC.get('/users/' + user.id + '/tracks', {}, function(data){
+			$set = $('<ol class="spin-items trackset"/>').appendTo($songs);
+			$.each(data, function(ind,track){
+				var $track = Items.clickable({title:track.title})
+						.data('track',track)
+						.click(function(){
+							if(!$track.hasClass('disabled')){
+								player.addTrack($track.data('track'),user);
+								$track.addClass('disabled');
+							}
+						}).appendTo($set);
+				if(player.hasTrack(track)){
+					$track.addClass('disabled');
+				}
+			});
+		});
+
+		return $body;
+	};
 
 	var songwriterSearch = function(){
 		var url = 'https://api.soundcloud.com/users.json?client_id=' + client_id + '&limit=50&order=hotness&callback=?';
