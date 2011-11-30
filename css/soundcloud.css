@@ -232,11 +232,11 @@
 	min-height:300px;
 	min-width:300px;
 	float:left;
-	-webkit-border-radius: 			9px;
+	-webkit-border-radius: 			25px;
 	-webkit-border-top-left-radius:	0;
-	-moz-border-radius: 			9px;
+	-moz-border-radius: 			25px;
 	-moz-border-radius-topleft: 	0;
-	border-radius: 					9px;
+	border-radius: 					25px;
 	border-top-left-radius: 		0;
 }
 
@@ -253,13 +253,15 @@
 
 .album{
 	display: inline-block;
+	max-width: 120px;
 	padding: 5px;
+	vertical-align: top;
 }
 
 .album .artwork{
 	min-height:100px;
 	min-width:100px;
-	-webkit-border-radius: 			9px;
+	-webkit-border-radius: 			5px;
 	-webkit-border-top-left-radius:	0;
 	-moz-border-radius: 			9px;
 	-moz-border-radius-topleft: 	0;
@@ -327,7 +329,23 @@ form.search input
   width:98%;
 }
 
-p{
+.results {
+	text-align:center;
+	line-height:0;
+	margin-top:15px;
+}
+
+.results img {
+	margin:5px;
+	-webkit-border-radius: 			9px;
+	-webkit-border-top-left-radius:	0;
+	-moz-border-radius: 			9px;
+	-moz-border-radius-topleft: 	0;
+	border-radius: 					9px;
+	border-top-left-radius: 		0;
+}
+
+p {
 	margin-bottom:0.4em;
 }
 

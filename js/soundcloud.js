@@ -2,8 +2,6 @@
 
 (function() {
 	var client_id = 'u9MitXmAQmMLJPiKtFHiQ',
-		client_secret = 'zBC6Xii6C8isUG0nKH6MxUA7yv7XHuameNrQdHTk',
-		code,
 		$player,
 		player,
 		this_application_url = 'http://j-san.github.com/SoundSpin/';
@@ -43,6 +41,9 @@
 			$body = songwriterFollowings($elt.data('user'));
 		}else if(panelType == 'allTracks'){
 			$body = allTracks($elt.data('user'));
+		}else if(panelType == 'albumDetails'){
+			$body = albumDetails($elt.data('album'));
+			
 		}else{
 			$.error('no panel specified');
 		}
@@ -52,22 +53,20 @@
 	var Home = function(){
 		var self = this;
 
-		if(!code){
-			var match = /access_token=(\w*)/g.exec(window.location.href);
-			if(match && match[1]){
-				code = match[1];
-			}
-		}
 		var $body = $('<div class="body"/>');
 
 		var $block = $('<div class="quick-nav"/>');
 		$body.prepend($block);
-		$('<div class="nav spin-item see-more"></div>').appendTo($block)
+		$('<div class="nav spin-item see-more" title="Search artists"></div>').appendTo($block)
 				.data({panelType: 'songwriterSearch'});
 		
+		var $connect;
 		function loadFollowings(){
 			SC.get('/me/followings',{},function(data){
 				console.log('followings',data);
+				if($connect){
+					$connect.remove();
+				}
 				$.each(data, function(ind,author){
 					$('<img class="nav" title="' + author.username + '" src="' + author.avatar_url.replace(/large\.(\w{3})/,'badge.$1') + '"/>')
 							.data({
@@ -82,7 +81,6 @@
 		if(!SC.isConnected()){
 			$connect = $('<button>connect</button>').click(function(){
 				SC.connect(function(){
-					console.log('hey');
 					loadFollowings();
 				});
 			});
@@ -107,39 +105,6 @@
 	 		$blockNav = $('<ol class="spin-items" style="float:right; width:30%;"/>').appendTo($body),
 		 	$block = $('<div class="block-content loading"/>').appendTo($body),
 			$songs = $('<div class="loading songs"/>').appendTo($body);
-
-		SC.get('/users/' + user.id + '/playlists', {}, function(data){
-			console.log('playlists',data);
-			$songs.removeClass('loading');
-			$.each(data, function(ind,playlist){
-				var $album = $('<div class="nav album"/>').data('panelType',"albumDetails").appendTo($songs);
-				var $artwrork = $('<img class="artwork" />').appendTo($album);
-				$artwork.data('album',playlist);
-				if(playlist.artwork_url){
-					 $artwork.prop('src',playlist.artwork_url);
-				}else{
-					$artwork.prop('src','img/default_album.png');
-				}
-				$('<p>' + playlist.title + '</p>').appendTo($album);
-	 			/*$set = $('<ol class="spin-items trackset"/>').appendTo($album);
-				$.each(playlist.tracks, function(ind,track){
-					var $track = Items.clickable({title:track.title})
-							.data('track',track)
-							.click(function(){
-								if(!$track.hasClass('disabled')){
-									player.addTrack($track.data('track'),user);
-									$track.addClass('disabled');
-								}
-							}).appendTo($set);
-					if(player.hasTrack(track)){
-						$track.addClass('disabled');
-					}
-				});*/
-			});
-			var $album = $('<div class="nav album"/>').data('panelType',"allTracks").data('user',user).appendTo($songs);
-			$('<img class="artwork" src="img/default_album.png" />').appendTo($album);
-			$('<p>All</p>').appendTo($album);
-		});
 
 		SC.get('/users/' + user.id, {}, function(data){
 			console.log('user' , data);
@@ -176,62 +141,97 @@
 				$info.append('<p>City <strong>' + data.city + '</strong></p>');
 			}
 			if(SC.isConnected()){
-				$follow = $('<button>...</button>').appendTo($info).attr('disabled',true);
+				$follow = $('<button>Follow</button>')
+						.data('follow',false)
+						.attr('disabled',true)
+						.appendTo($info);
 
 				$follow.click(function(){
-						$follow.attr('disabled',true);
-						var url = 'https://api.soundcloud.com/me/followings/' + user.id + '.json?oauth_token=' + code;
-						$.ajax({
-							url			: url,
-							type		: $follow.data('follow') ? 'DELETE':'PUT',
-							dataType	: 'text',
-							success		: function(data){
-								$follow.removeAttr('disabled');
-								$follow.text($follow.data('follow') ? 'Follow' : 'Unfollow');
-								$follow.data('follow',!$follow.data('follow'));
-								console.log(data);
-							}
-						});
-					});
-
-				url = 'https://api.soundcloud.com/me/followings/' + user.id + '.json?oauth_token=' + code;
-				$.ajax({
-					url			: url,
-					type		: 'GET',
-					dataType	: 'text',
-					success		: function(data,textStatus){
-						// console.log(textStatus);
-						// return;
-						$follow.data('follow',true);
-						$follow.removeAttr('disabled');
-						$follow.text('Unfollow');
-					},
-					error		: function(jqXHR,textStatus,error){
-						// console.log(textStatus,error,jqXHR);
-						if(jqXHR.status==404){
-							$follow.data('follow',false);
+					$follow.attr('disabled',true);
+					if($follow.data('follow')){
+						SC.delete('/me/followings/' + user.id, function(data){
 							$follow.removeAttr('disabled');
 							$follow.text('Follow');
-						}else{
-							$follow.data('follow',true);
+							$follow.data('follow',false);
+						});
+					} else {
+						SC.put('/me/followings/' + user.id, function(data){
 							$follow.removeAttr('disabled');
 							$follow.text('Unfollow');
-						}
+							$follow.data('follow',true);
+						});
 					}
 				});
-				
+
+				SC.get('/me/followings/' + user.id, function(error){
+					$follow.removeAttr('disabled');
+					if(!error) {
+						$follow.data('follow',true);
+						$follow.text('Unfollow');
+					}
+				});
 			}
+		});
+
+		SC.get('/users/' + user.id + '/playlists', {}, function(data){
+			console.log('playlists',data);
+			$songs.removeClass('loading');
+			$.each(data, function(ind,playlist){
+				var $album = $('<div class="nav album"/>')
+						.data('panelType',"albumDetails")
+						.data('album',playlist)
+						.appendTo($songs);
+				var $artwork = $('<img class="artwork" />').appendTo($album);
+				$artwork.data('album',playlist);
+				if(playlist.artwork_url){
+					 $artwork.prop('src',playlist.artwork_url);
+				}else{
+					$artwork.prop('src','img/default_album.png');
+				}
+				$('<p>' + playlist.title + '</p>').appendTo($album);
+			});
+			var $album = $('<div class="nav album"/>').data('panelType',"allTracks").data('user',user).appendTo($songs);
+			$('<img class="artwork" src="img/default_album.png" />').appendTo($album);
+			$('<p>All</p>').appendTo($album);
 		});
 
 		return $body;
 	};
 
+	var albumDetails = function(album){
+		var $body  = $('<div class="body"/>'),
+	 		$block = $('<div class="block-content"/>').appendTo($body),
+			$songs = $('<div class="album-tracks"/>').appendTo($body);
+
+		if(album.artwork_url) {
+			$block.append('<img class="resizable album-artwork" src="' + album.artwork_url.replace('large','t300x300') + '" />');
+		}
+		if(album.description){
+			$block.append('<p class="album-description">' + album.description + '</p>');
+		}
+		$set = $('<ol class="spin-items trackset"/>').appendTo($songs);
+		$.each(album.tracks, function(ind,track){
+			var $track = Items.clickable({title:track.title})
+					.data('track',track)
+					.click(function(){
+						if(!$track.hasClass('disabled')){
+							player.addTrack($track.data('track'),user);
+							$track.addClass('disabled');
+						}
+					}).appendTo($set);
+			if(player.hasTrack(track)){
+				$track.addClass('disabled');
+			}
+		});
+		return $body;
+	}
+
 	var allTracks = function(user){
 		var $body  = $('<div class="body"/>'),
-			$songs = $('<div class="loading songs"/>').appendTo($body);
+			$songs = $('<div class="loading user-tracks"/>').appendTo($body);
 
-		$songs.removeClass('loading');
 		SC.get('/users/' + user.id + '/tracks', {}, function(data){
+			$songs.removeClass('loading');
 			$set = $('<ol class="spin-items trackset"/>').appendTo($songs);
 			$.each(data, function(ind,track){
 				var $track = Items.clickable({title:track.title})
@@ -252,14 +252,14 @@
 	};
 
 	var songwriterSearch = function(){
-		var url = 'https://api.soundcloud.com/users.json?client_id=' + client_id + '&limit=50&order=hotness&callback=?';
+		var url = '/users';
 
 		var $body  = $('<div class="body"/>'),
 			$filter = $('<div class="filter"/>').appendTo($body),
 			$search = $('<form class="search"><input/></form>').submit(function(evt){
 				evt.preventDefault();
 				var q=$(this).find('input').val();
-				songwriterSearchUpdateResults($block,'https://api.soundcloud.com/users.json?limit=50&q=' + q + '&oauth_token=' + code + '&callback=?')
+				songwriterSearchUpdateResults($block,'/users',{q:q})
 			}).appendTo($body),
 			$block = $('<div class="results"/>').appendTo($body);
 
@@ -268,9 +268,9 @@
 				$self = $(this);
 				$self.toggleClass('pressed');
 				if($self.hasClass('pressed')){
-					songwriterSearchUpdateResults($block,'https://api.soundcloud.com/me/followings.json?limit=50&oauth_token=' + code + '&callback=?')
+					songwriterSearchUpdateResults($block,'/me/followings')
 				}else{
-					songwriterSearchUpdateResults($block,'https://api.soundcloud.com/users.json?limit=50&oauth_token=' + code + '&callback=?')
+					songwriterSearchUpdateResults($block,'/users')
 				}
 			}).appendTo($filter);
 		$filter.append('<button class="toggle-button">Tag,</button>');
@@ -283,7 +283,7 @@
 	
 
 	var songwriterFollowings = function(user){
-		var url = 'https://api.soundcloud.com/users/' + user.id + '/followings.json?client_id=' + client_id + '&limit=50&oauth_token=' + code + '&callback=?';
+		var url = '/users/' + user.id + '/followings';
 
 		var $body  = $('<div class="body"/>'),
 			$filter = $('<div class="filter"/>').appendTo($body),
@@ -293,28 +293,23 @@
 		return $body;
 	};
 
-	var songwriterSearchUpdateResults = function($block,url){
+	var songwriterSearchUpdateResults = function($block,url,query){
 		$block.empty();
 		$block.addClass('loading');
 		if(this.xhr){
 			this.xhr.abort();
 		}
-		this.xhr = $.ajax({
-			url			: url,
-			type		: 'GET',
-			dataType	: 'json',
-			success		: function(data){
-				$block.removeClass('loading');
-				console.log('results',data);
-				$.each(data, function(ind,author){
-					$('<img class="nav" title="' + author.username + '" src="' + author.avatar_url + '"/>')
-							.data({
-								panelType: 'songwriterDetails',
-								user: author
-							})
-							.appendTo($block);
-				});
-			}
+		this.xhr = SC.get(url, query, function(data){
+			$block.removeClass('loading');
+			console.log('results',data);
+			$.each(data, function(ind,author){
+				$('<img class="nav" title="' + author.username + '" src="' + author.avatar_url + '"/>')
+						.data({
+							panelType: 'songwriterDetails',
+							user: author
+						})
+						.appendTo($block);
+			});
 		});	
 	}
 	
