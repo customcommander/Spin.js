@@ -22,7 +22,7 @@
 		this.animContainer = $('<div class="progress-bar-container"></div>').appendTo(this.avatar);
 
 
-		this.info 		= $('<div id="info" class="spin-item nav"/>').appendTo(this.controls)
+		this.info 		= $('<div id="info" class="spin-item nav no-arrow"/>').appendTo(this.controls)
 								.data('panelType', 'songwriterDetails');
 		this.author 	= $('<p id="author"/>').appendTo(this.info);
 		this.title 		= $('<p id="title"/>').appendTo(this.info);

@@ -207,10 +207,6 @@
 	-webkit-box-shadow:		10px 10px 70px #888;
 }
 
-.soundspin-player #info::before {
-	background-image:none;
-}
-
 .soundspin-player #info p {
 	margin-bottom:6px;
 }
@@ -227,23 +223,12 @@
 .songwriter-info{
 }
 
-.songwriter-avatar{
-	margin: 0 16px 16px 0;
-	min-height:300px;
-	min-width:300px;
-	float:left;
-	-webkit-border-radius: 			25px;
-	-webkit-border-top-left-radius:	0;
-	-moz-border-radius: 			25px;
-	-moz-border-radius-topleft: 	0;
-	border-radius: 					25px;
-	border-top-left-radius: 		0;
-}
-
-.songwriter-description::first-letter{
+.description::first-letter{
 	font-size: 3em;
 }
-
+.description{
+	line-height: 1em;
+}
 
 .songs{
 	clear: both;
@@ -258,7 +243,20 @@
 	vertical-align: top;
 }
 
-.album .artwork{
+.extended-artwork{
+	margin: 0 16px 16px 0;
+	min-height:300px;
+	min-width:300px;
+	float:left;
+	-webkit-border-radius: 			25px;
+	-webkit-border-top-left-radius:	0;
+	-moz-border-radius: 			25px;
+	-moz-border-radius-topleft: 	0;
+	border-radius: 					25px;
+	border-top-left-radius: 		0;
+}
+
+.artwork{
 	min-height:100px;
 	min-width:100px;
 	-webkit-border-radius: 			5px;
@@ -268,41 +266,30 @@
 	border-radius: 					9px;
 	border-top-left-radius: 		0;
 }
-.album .trackset{
-	
+
+.trackset{
+	clear: both;
 }
-/*
+
 .trackset .disabled, .trackset .disabled.mouseover{
 	color: 		#888;
-/** webkit ******************************************************************** /
     background-image: -webkit-gradient(linear, left top, left bottom,from(#efefef),to(white));
-    -webkit-background-origin: border;
-    -webkit-background-origin: border-box;
-/** gecko ********************************************************************* / 
-
     background-image: -moz-linear-gradient(center top , #EFEFEF, white);
-    -moz-background-origin: border;
-/** no vendor prefix ********************************************************** /
-    background-origin: border-box;
-/** shared ******************************************************************** /
-    background-repeat: repeat;    
-    background-attachment: scroll; 
-    background-position: 0 0;
 }
-*/
+
 .toggle-button{
-	background:		#888;
-	color:			white;
-	padding: 		3px 5px;
-	margin: 		5px 3px;
-	border:			none;
-	-webkit-border-radius: 			9px;
-	-moz-border-radius: 			9px;
-	border-radius: 					9px;
+	background: #888;
+	color: white;
+	padding: 3px 5px;
+	margin: 5px 3px;
+	border: none;
+	-webkit-border-radius: 9px;
+	-moz-border-radius: 9px;
+	border-radius: 9px;
 }
 
 .toggle-button.pressed{
-	background:		red;
+	background: red;
 }
 
 form.search
@@ -350,6 +337,8 @@ p {
 }
 
 
+
+
 /* Spin.js style overwrite */
 .block-content{
 	padding:10px;
@@ -375,7 +364,7 @@ p {
  	background-image:none;
 }
 
-.spin-item::before {
+.spin-item:not(.disabled):not(.no-arrow)::before {
 	content:" ";
 	position:absolute;
 	top:0;
