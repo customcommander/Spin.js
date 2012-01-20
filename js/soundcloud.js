@@ -30,6 +30,7 @@
 		var title = $elt.data('title') || $elt.text() || $elt.attr('title');
 		var $body;
 		console.log(panelType);
+		_gaq.push(['_trackEvent', 'panel', 'load', panelType]);
 		if(!$player){
 			$body = Home();
 			title = 'Home';
@@ -87,17 +88,32 @@
 				});
 			});
 			$block.append($connect);
+
+			// get some sample random tracks
+			SC.get('/tracks',{limit:10},function(data){
+				$player = $('<div/>');
+				player = new SoundSpinPlayer($player,{tracks:data});
+				$player.appendTo($body);
+			});
 		}else{
 			loadFollowings();
+			var showed = [];
+			SC.get('/me/activities',{},function(data) {
+				console.log(data.collection);
+				$player = $('<div/>');
+				player = new SoundSpinPlayer($player);
+				for(var i in data.collection){
+					var activity = data.collection[i];
+					if(activity.origin.track && showed.indexOf(activity.origin.track.id) < 0){
+						player.addTrack(activity.origin.track,activity.origin.user);
+						showed.push(activity.origin.track.id);
+					}
+				}
+				$player.appendTo($body);
+			});
 		}
 
 
-		// get some sample tracks
-		SC.get('/tracks',{limit:10},function(data){
-			$player = $('<div/>');
-			player = new SoundSpinPlayer($player,{tracks:data});
-			$player.appendTo($body)
-		});
 		
 		return $body;
 	};
@@ -216,6 +232,10 @@
 		if(album.description){
 			$block.append('<p class="description">' + album.description + '</p>');
 		}
+		$block.append('<button>Play all</button>').click(function(){	
+			player.addTracks(album.tracks);
+			$set.find('.spin-item').addClass('disabled');
+		});
 		$set = $('<ol class="spin-items trackset"/>').appendTo($songs);
 		$.each(album.tracks, function(ind,track){
 			var $track = Items.clickable({title:track.title})
@@ -423,6 +443,7 @@
 		navigable:function(options){
 			return $(
 			'<li class="spin-item nav" title="' + (options.title || '') + '">\
+				' + (options.icon? '<img src="' + options.icon + '" />': '') + '\
 				<span class="spin-left spin-title">' + (options.title || '') + '</span>\
 				<span class="spin-right">' + (options.info || '') + '</span>\
 			</li>');

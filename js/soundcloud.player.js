@@ -11,7 +11,7 @@
 	
 	window.SoundSpinPlayer = function($elem,options){
 		this.element = $elem;
-		this.options = options;
+		this.options = options || {};
 		var self = this;
 		
 
@@ -35,22 +35,19 @@
 				evt.stopPropagation();
 				self.playlist.empty();
 			});
-
-		var trackToPlay = this.options.tracks.shift();
-
-		this.playlist = $('<ol class="play-list spin-items"/>').appendTo(this.element),
-		$.each(self.options.tracks,function(ind,track){
-			self.playlist.append(
-				Items.navigable({
-					title: 	'<strong>' + track.user.username + '</strong> ' + track.title
-				}).data({
-					panelType: 'songwriterDetails',
-					track: track,
-					user: track.user
-				}).attr('id',track.id)
-			);
-		});
 		
+		this.playlist = $('<ol class="play-list spin-items"/>').appendTo(this.element);
+
+		if('tracks' in this.options)
+		{
+			var trackToPlay = this.options.tracks.shift();
+			this.addTracks(this.options.tracks);
+						
+			SC.whenStreamingReady(function(){
+				self._loadTrack(trackToPlay,trackToPlay.user);
+			});
+		}
+
 		this.avatar.click(function(evt){
 			evt.preventDefault();
 			if(self.playing){
@@ -64,14 +61,11 @@
 			evt.stopPropagation();
 			self._next();
 		});
-		
-		SC.whenStreamingReady(function(){
-			self._loadTrack(trackToPlay,trackToPlay.user);
-		});
 	};
 
 	SoundSpinPlayer.prototype.addTrack=function(track, user){
 		this.playlist.append(Items.navigable({
+			icon: 	track.artwork_url.replace(/large\.(\w{3})/,'small.$1'),
 			title: 	'<strong>' + user.username + '</strong> ' + track.title
 		}).data({
 			panelType: 'songwriterDetails',
@@ -80,6 +74,22 @@
 			title: user.username
 		}).attr('id',track.id));
 	},
+	
+	SoundSpinPlayer.prototype.addTracks=function(tracks){
+		var self = this;
+		$.each(tracks,function(ind,track){
+			self.playlist.append(
+				Items.navigable({
+					title: 	'<strong>' + track.user.username + '</strong> ' + track.title
+				}).data({
+					panelType: 'songwriterDetails',
+					track: track,
+					user: track.user
+				}).attr('id',track.id)
+			);
+		});
+	},
+	
 
 	SoundSpinPlayer.prototype.hasTrack=function(track){
 		return this.playlist.find('#'+track.id).size() > 0;
