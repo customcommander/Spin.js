@@ -65,14 +65,22 @@
 
 	SoundSpinPlayer.prototype.addTrack=function(track, user){
 		this.playlist.append(Items.navigable({
-			icon: 	track.artwork_url.replace(/large\.(\w{3})/,'small.$1'),
-			title: 	'<strong>' + user.username + '</strong> ' + track.title
+			icon: (track.artwork_url ? track.artwork_url.replace(/large\.(\w{3})/,'small.$1') : ''),
+			title: track.title,
+			info: track.user.username
 		}).data({
 			panelType: 'songwriterDetails',
 			user: user,
 			track: track,
 			title: user.username
 		}).attr('id',track.id));
+		
+		if(!this.player) {
+			var self = this;
+			SC.whenStreamingReady(function(){
+				self._loadTrack(track, user);
+			});
+		}
 	},
 	
 	SoundSpinPlayer.prototype.addTracks=function(tracks){
@@ -80,7 +88,9 @@
 		$.each(tracks,function(ind,track){
 			self.playlist.append(
 				Items.navigable({
-					title: 	'<strong>' + track.user.username + '</strong> ' + track.title
+					icon: (track.artwork_url ? track.artwork_url.replace(/large\.(\w{3})/,'small.$1') : ''),
+					title: track.title,
+					info: track.user.username
 				}).data({
 					panelType: 'songwriterDetails',
 					track: track,
@@ -144,15 +154,15 @@
 		this._resetProgressBar();
 
 		this._play();
-        this.avatar.find('img').attr('src', track.user.avatar_url);
+        this.avatar.find('img').attr('src', track.artwork_url || track.user.avatar_url);
 
 		this.info.data('user', track.user);
 		this.title.text(track.title);
 		this.author.text(track.user.username);
 		this.info.removeClass('loaded');
 
-		var sec = Math.floor(track.duration / 1000);
-		this.duration.text(this._zeroFill(Math.floor(sec / 60)) + ':' + this._zeroFill(sec % 60));
+		// var sec = Math.floor(track.duration / 1000);
+		// this.duration.text(this._zeroFill(Math.floor(sec / 60)) + ':' + this._zeroFill(sec % 60));
 	},
 
 	/* progress bar functions */

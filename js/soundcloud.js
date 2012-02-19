@@ -30,7 +30,7 @@
 		var title = $elt.data('title') || $elt.text() || $elt.attr('title');
 		var $body;
 		console.log(panelType);
-		_gaq.push(['_trackEvent', 'panel', 'load', panelType]);
+		_gaq.push(['_trackEvent', 'loadpanel', panelType, title]);
 		if(!$player){
 			$body = Home();
 			title = 'Home';
@@ -105,7 +105,11 @@
 				for(var i in data.collection){
 					var activity = data.collection[i];
 					if(activity.origin.track && showed.indexOf(activity.origin.track.id) < 0){
-						player.addTrack(activity.origin.track,activity.origin.user);
+						var track = activity.origin.track;
+						if(!track.user) {
+							track.user = activity.origin.user;
+						}
+						player.addTrack(track, track.user);
 						showed.push(activity.origin.track.id);
 					}
 				}
@@ -443,9 +447,9 @@
 		navigable:function(options){
 			return $(
 			'<li class="spin-item nav" title="' + (options.title || '') + '">\
-				' + (options.icon? '<img src="' + options.icon + '" />': '') + '\
-				<span class="spin-left spin-title">' + (options.title || '') + '</span>\
+				' + (options.icon? '<img class="spin-icon" src="' + options.icon + '" />': '') + '\
 				<span class="spin-right">' + (options.info || '') + '</span>\
+				' + (options.title || '') + '\
 			</li>');
 		},
 		clickable:function(options){

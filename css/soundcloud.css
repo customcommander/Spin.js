@@ -348,25 +348,32 @@ p {
 	padding:10px;
 }
 
-.spin-item{
-	line-height: 2.1em;
-	vertical-align: middle;
-	padding: 0 0.5em 0 0.8em;
-}
-
-.spin-item:not(spin-icon){
-	padding-left: 28px;
-}
-
 .nav{
 	cursor:pointer;
 }
-.spin-item {
-	overflow:hidden;
-}
+
 .spin-item.nav {
  	background-image:none;
 }
+
+.spin-item {
+	overflow:hidden;
+	min-height: 2.1em;
+	height:auto;
+	vertical-align: middle;
+	padding: .625em 0.5em 0 4px;
+}
+
+.spin-item .spin-left {
+	padding-left: 38px;
+	vertical-align: top;
+	padding-top: .625em;
+}
+
+.spin-item .spin-icon + .spin-left {
+	padding-left: 2px;
+}
+
 
 .spin-item:not(.disabled):not(.no-arrow)::before {
 	content:" ";
@@ -377,13 +384,33 @@ p {
 	height: 100%;
 	background: url('../Spin.js/addons/items/item-arrow-black.png') no-repeat center right;
 }
-.spin-left, .spin-right {
-	position: initial;
-	display: inline-block;
-	white-space: nowrap;
-	overflow: hidden;
+
+.spin-icon {
+	float: left;
+	padding: 4px;
+	margin-top: -.625em;
 }
 
+.spin-left {
+	position: initial;
+	display: inline-block;
+/*	white-space: nowrap;
+*/	overflow: hidden;
+	text-overflow: ellipsis;
+	padding-top: .625em;
+}
+
+.spin-right {
+	position: initial;
+	float:right;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding-right: 24px;
+	max-width: 30%;
+	font-weight:bold;
+	padding:0 24px .4em .8em;
+}
 
 #k-nav {
     height:2.1em;
