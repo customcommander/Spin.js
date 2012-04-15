@@ -2,13 +2,6 @@
 <html>
     <head>
 		<link rel="stylesheet" type="text/css" href="../addons/navigation/navigation.css" />
-<!--
-        <style>
-        nav a:not([href]) {
-            color:#CCC;
-        }
-        </style>
--->
 
         <script type="text/javascript" src="../src/js/jquery-1.6.1.min.js"></script>        
 		<script type="text/javascript" src="../addons/navigation/navigation.js"></script>
@@ -40,6 +33,22 @@
                 loader(window.location.hash);
             });
         </script>
+        <style>
+        code {
+            white-space: pre-wrap;
+            font-weight: bold;
+        }
+        .block {
+            margin: 1em;
+        }
+
+        /*
+        nav a:not([href]) {
+            color:#CCC;
+        }
+        */
+        </style>
+
         <title>Spin.js Navigation demo</title>
     </head>
     <body data-panel="home" data-title="Spin.js Navigation demo">
@@ -63,44 +72,43 @@
                     </a>
                 </nav>
                 <section class="block">
-                    <h1>TODO</h1>
+                    <h1>Notes</h1>
                     <ol>
-                        <li>Test browsers compatibility</li>
-                        <li>Polify gradients</li>
-                        <li>Wath about seo indexation ?</li>
+                        <li>Browsers compatibility ?</li>
+                        <li>What about seo indexation ?</li>
                     </ol>
                 </section>
             </article>
             <article id="html5">
                 <section class="block">
                     <h1>Html5 markup semantic and css base line</h1>
-                    <p>I suggest to use <strong>&lt;article&gt;</strong> tag as panels to see
+                    <p>I suggest to use <code>&lt;article&gt;</code> tag as panels to see
                     a panel as a widget  with own content.</p>
-                    <p><strong>&lt;nav&gt;</strong> is used for navigation items container but
+                    <p><code>&lt;nav&gt;</code> is used for navigation items container but
                     can contains also semantic items as dividers or titles under
-                    simple <strong>&lt;hearder&gt;</strong>, <strong>&lt;h1&gt;</strong> 
-                    or <strong>&lt;p&gt;</strong> tag.</p>
+                    simple <code>&lt;hearder&gt;</code>, <code>&lt;h1&gt;</code> 
+                    or <code>&lt;p&gt;</code> tag.</p>
                     <p>We need to apply IE <a href="http://code.google.com/p/html5shiv/">html5shiv</a></p>
-                    <pre>
+                    <code>
     &lt;!--[if lt IE 9]&gt;
         &lt;script src="//html5shiv.googlecode.com/svn/trunk/html5.js"&gt;&lt;/script&gt;
     &lt;![endif]--&gt;
-                    </pre>
+                    </code>
                 </section>
             </article>
             <article id="list-example">
                 <nav class="spin-list">
                     <header>
                         <h1>Just a navigation block example</h1>
-                        <p>This is a <strong>&lt;header&gt;</strong> element.</p>
-                        <p>It also worl with a <strong>&lt;hgroup&gt;</strong> element.</p>
+                        <p>This is a <code>&lt;header&gt;</code> element.</p>
+                        <p>It also worl with a <code>&lt;hgroup&gt;</code> element.</p>
                     </header>
                     <a href="#block">
                         <img src="https://www.google.com/images/icons/product/search-32.gif" />
                         Iconned navigation item
                     </a>
                     <p class="nav">
-                        <strong>&lt;p&gt;</strong> with <strong>class="nav"</strong> works also
+                        <code>&lt;p&gt;</code> with <code>class="nav"</code> works also
                     </p>
                     <a href="#home">
                         <h2>Structured block item</h2>
