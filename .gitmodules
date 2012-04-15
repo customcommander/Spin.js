@@ -1,0 +1,9 @@
+[submodule "lib/JTmpl"]
+	path = lib/JTmpl
+	url = git://github.com/j-san/JTmpl.git
+[submodule "lib/JPath"]
+	path = lib/JPath
+	url = git://github.com/j-san/JPath.git
+[submodule "lib/Spin.js"]
+	path = lib/Spin.js
+	url = https://github.com/j-san/Spin.js

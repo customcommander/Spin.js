@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>SoundSpin</title>
+		<meta name="apple-mobile-web-app-capable" content="yes"/>
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- <link rel="icon" type="image/png" href="images/kaiten-boxed-favicon.png" sizes="16x16"> -->
+
+		<link rel="stylesheet" type="text/css" href="Spin.js/addons/breadcrumb/breadcrumb.css" />
+		<link rel="stylesheet" type="text/css" href="Spin.js/addons/items/items.css" />
+		<link rel="stylesheet" type="text/css" href="css/soundcloud.css" />
+
+
+
+		<script src="http://connect.soundcloud.com/sdk.js" type="text/JavaScript"> </script>
+
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.js"> </script>
+
+		<script type="text/javascript" src="Spin.js/addons/breadcrumb/breadcrumb.js"> </script>
+		<script type="text/javascript" src="Spin.js/addons/items/items.js"> </script>
+		<script type="text/javascript" src="Spin.js/src/js/Spin.js"> </script>
+		<script type="text/javascript" src="lib/JPath/src/JPath.js"> </script>
+		<script type="text/javascript" src="lib/JTmpl/src/JTmpl.js"> </script>
+
+
+		<script type="text/javascript" src="js/soundcloud.js"> </script>
+		<script type="text/javascript" src="js/soundcloud.player.js"> </script>
+		<script type="text/javascript">
+            $.spin.configure(MainController);
+		</script>
+		
+		<script type="text/javascript">
+
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-27139182-1']);
+		  _gaq.push(['_trackPageview']);
+
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+
+		</script>
+	</head>
+	<body/>
+	<script id="SoundSpinPlayerBody" type="text/html">
+		<div id="soundspin-container">
+			<div id="player">
+				<div id="indicator">
+					<div id="control-play" class="control">&gt;</div>
+					<div id="avatar">
+						<img/>
+					</div>
+					<div id="progress-bar"/>
+				</div>
+				<div id="control-next" class="control">&gt;&gt;</div>
+				<div id="control-clear" class="control">Clear</div>
+				<div id="info" class="nav spin-item">
+					<p id="author"/>
+					<p id="title"/>
+					<p id="duration"/>
+				</div>
+			</div>
+			<ol class="play-list spin-items"/>
+		</div>
+	</script>
+</html>
