@@ -1,0 +1,62 @@
+
+.spin-list {
+    border-top: 1px solid #CCC;
+}
+
+.spin-list > * {
+    position:relative;
+    clear:both;
+    border-bottom: 1px solid #CCC;
+    padding: .5em 2px .5em 2px;
+}
+
+.spin-list * {
+    margin: 0;
+}
+
+.spin-list > header,
+.spin-list > hgroup,
+.spin-list > h1,
+.spin-list > h2,
+.spin-list > h3,
+.spin-list > h4,
+.spin-list > h5,
+.spin-list > h6 {
+    padding: 2.5em 2px 1.7em 1.2em;
+}
+
+
+.spin-list a, .spin-list .nav {
+    display: block;
+    text-decoration: none;
+    color: black;
+    outline:none;
+}
+
+.spin-list a[href]::after, .spin-list .nav::after, .spin-list .arrow {
+    content: ' ';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 8px;
+    height: 100%;
+    width: 20px;
+    
+    background: url(arrow.png) center right no-repeat;
+}
+
+.spin-list a[href]:focus, .spin-list a[href]:hover, .spin-list .nav:hover {
+    background-image: -webkit-gradient(linear, left top, left bottom,from(#efefef),to(#d6d6d6));
+    background-image: -moz-linear-gradient(center top , #EFEFEF, #D6D6D6);
+}
+
+.spin-list .spin-active, .spin-list .loaded {
+    background-image: -moz-linear-gradient(center top , #186AB9, #6AA4DC) !important;
+    background-image: -webkit-gradient(linear, left top, left bottom,from(#186ab9),to(#6aa4dc)) !important;
+}
+
+.spin-list img, .spin-list .icon {
+    vertical-align: middle;
+}
+
+
