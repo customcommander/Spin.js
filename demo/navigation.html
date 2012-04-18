@@ -12,7 +12,7 @@
         <script type="text/javascript">
             
             function loader(hash) {
-                panel = $(hash  || '#home');
+                panel = $(hash.replace('#!', '#')  || '#home');
                 
                 if (!panel.length){
                     $.error('Panel Not Found');
@@ -53,21 +53,21 @@
     </head>
     <body data-panel="home" data-title="Spin.js Navigation demo">
         <div id="main" style="display:none">
-            <article id="home">
+            <article id="home" title="Spin.js Navigation demo">
                 <nav class="spin-list">
-                    <a href="#list-example">
+                    <a href="#!list-example">
                         Demo list navigation
                     </a>
 
-                    <a href="#block-example">
+                    <a href="#!block-example">
                         Demo block
                     </a>
 
-                    <a href="#doc">
+                    <a href="#!doc">
                         Documentation
                     </a>
                 
-                    <a href="#html5">
+                    <a href="#!html5">
                         Html5 markup semantic and css base line
                     </a>
                 </nav>
@@ -75,11 +75,11 @@
                     <h1>Notes</h1>
                     <ol>
                         <li>Browsers compatibility ?</li>
-                        <li>What about seo indexation ?</li>
+                        <li><a href="https://developers.google.com/webmasters/ajax-crawling/docs/getting-started?hl=en-US">What about seo indexation ?</a></li>
                     </ol>
                 </section>
             </article>
-            <article id="html5">
+            <article id="html5" title="Html5 markup semantic and css base line">
                 <section class="block">
                     <h1>Html5 markup semantic and css base line</h1>
                     <p>I suggest to use <code>&lt;article&gt;</code> tag as panels to see
@@ -103,19 +103,19 @@
                         <p>This is a <code>&lt;header&gt;</code> element.</p>
                         <p>It also worl with a <code>&lt;hgroup&gt;</code> element.</p>
                     </header>
-                    <a href="#block">
+                    <a href="#!block">
                         <img src="https://www.google.com/images/icons/product/search-32.gif" />
                         Iconned navigation item
                     </a>
                     <p class="nav">
                         <code>&lt;p&gt;</code> with <code>class="nav"</code> works also
                     </p>
-                    <a href="#home">
+                    <a href="#!home">
                         <h2>Structured block item</h2>
                         <p>With content inside</p>
                     </a>
                 
-                    <a href="#home">
+                    <a href="#!home">
                         <p class="right" style="float: right; margin-right: 24px;">test</p>
                         Right alligned test
                     </a>
