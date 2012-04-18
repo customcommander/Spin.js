@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<link rel="stylesheet" type="text/css" href="../addons/navigation/navigation.css" />
+
+        <script type="text/javascript" src="../src/js/jquery-1.6.1.min.js"></script>        
+		<script type="text/javascript" src="../addons/navigation/navigation.js"></script>
+		<script type="text/javascript" src="../src/js/Spin.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <script type="text/javascript">
+            
+            function loader(hash) {
+                panel = $(hash.replace('#!', '#')  || '#home');
+                
+                if (!panel.length){
+                    $.error('Panel Not Found');
+                }
+                
+                $.spin(panel.clone(), panel.prop('title'));
+            }
+
+            $.spin.configure(function(elt) {
+                if(window.location.hash == '#home') {
+                    loader('#home');
+                } else {
+                    window.location.hash = 'home';
+                }
+            });
+            
+            $(window).bind('hashchange', function(elt) {
+                loader(window.location.hash);
+            });
+        </script>
+        <style>
+        code {
+            white-space: pre-wrap;
+            font-weight: bold;
+        }
+        .block {
+            margin: 1em;
+        }
+
+        /*
+        nav a:not([href]) {
+            color:#CCC;
+        }
+        */
+        </style>
+
+        <title>Spin.js Navigation demo</title>
+    </head>
+    <body data-panel="home" data-title="Spin.js Navigation demo">
+        <div id="main" style="display:none">
+            <article id="home" title="Spin.js Navigation demo">
+                <nav class="spin-list">
+                    <a href="#!list-example">
+                        Demo list navigation
+                    </a>
+
+                    <a href="#!block-example">
+                        Demo block
+                    </a>
+
+                    <a href="#!doc">
+                        Documentation
+                    </a>
+                
+                    <a href="#!html5">
+                        Html5 markup semantic and css base line
+                    </a>
+                </nav>
+                <section class="block">
+                    <h1>Notes</h1>
+                    <ol>
+                        <li>Browsers compatibility ?</li>
+                        <li><a href="https://developers.google.com/webmasters/ajax-crawling/docs/getting-started?hl=en-US">What about seo indexation ?</a></li>
+                    </ol>
+                </section>
+            </article>
+            <article id="html5" title="Html5 markup semantic and css base line">
+                <section class="block">
+                    <h1>Html5 markup semantic and css base line</h1>
+                    <p>I suggest to use <code>&lt;article&gt;</code> tag as panels to see
+                    a panel as a widget  with own content.</p>
+                    <p><code>&lt;nav&gt;</code> is used for navigation items container but
+                    can contains also semantic items as dividers or titles under
+                    simple <code>&lt;hearder&gt;</code>, <code>&lt;h1&gt;</code> 
+                    or <code>&lt;p&gt;</code> tag.</p>
+                    <p>We need to apply IE <a href="http://code.google.com/p/html5shiv/">html5shiv</a></p>
+                    <code>
+    &lt;!--[if lt IE 9]&gt;
+        &lt;script src="//html5shiv.googlecode.com/svn/trunk/html5.js"&gt;&lt;/script&gt;
+    &lt;![endif]--&gt;
+                    </code>
+                </section>
+            </article>
+            <article id="list-example">
+                <nav class="spin-list">
+                    <header>
+                        <h1>Just a navigation block example</h1>
+                        <p>This is a <code>&lt;header&gt;</code> element.</p>
+                        <p>It also worl with a <code>&lt;hgroup&gt;</code> element.</p>
+                    </header>
+                    <a href="#!block">
+                        <img src="https://www.google.com/images/icons/product/search-32.gif" />
+                        Iconned navigation item
+                    </a>
+                    <p class="nav">
+                        <code>&lt;p&gt;</code> with <code>class="nav"</code> works also
+                    </p>
+                    <a href="#!home">
+                        <h2>Structured block item</h2>
+                        <p>With content inside</p>
+                    </a>
+                
+                    <a href="#!home">
+                        <p class="right" style="float: right; margin-right: 24px;">test</p>
+                        Right alligned test
+                    </a>
+
+                    <a>
+                        <p>Void</p>
+                    </a>
+                </nav>
+            </article>
+            <article id="block-example">
+                <section class="block">
+                    <h1>Hello world</h1>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Vivamus eros mi, accumsan eget porta vel, rhoncus in odio. 
+                    Cras ac purus a metus commodo pellentesque. Sed a aliquam enim. 
+                    Integer leo nisl, molestie mollis laoreet in, vulputate sit amet velit. 
+                    Donec mollis aliquet elementum. Integer pellentesque suscipit libero 
+                    nec posuere. Suspendisse adipiscing fringilla purus vitae 
+                    vulputate. Vivamus elementum enim ac sem tempus ut mattis 
+                    odio elementum. Integer et dolor eu urna iaculis faucibus.
+                    </p>
+                </section>
+            </article>
+        </div><!--end of #demo-->
+    </body>
+</html>
