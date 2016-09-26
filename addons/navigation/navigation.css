@@ -1,0 +1,74 @@
+
+.spin-list {
+    border-top: 1px solid #CCC;
+}
+
+.spin-list > * {
+    position:relative;
+    clear:both;
+    border-bottom: 1px solid #CCC;
+    padding: .5em 2px .5em 2px;
+}
+
+.spin-list * {
+    margin: 0;
+}
+
+.spin-list > header,
+.spin-list > hgroup,
+.spin-list > h1,
+.spin-list > h2,
+.spin-list > h3,
+.spin-list > h4,
+.spin-list > h5,
+.spin-list > h6 {
+    padding: 2.5em 2px 1.7em 1.2em;
+}
+
+
+.spin-list a, .spin-list .nav {
+    display: block;
+    text-decoration: none;
+    color: black;
+    outline:none;
+}
+
+.spin-list a[href]::after, .spin-list .nav::after, .spin-list .arrow {
+    content: ' ';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 8px;
+    height: 100%;
+    width: 20px;
+    
+    background: url(arrow.png) center right no-repeat;
+}
+
+.spin-list a[href]:focus, .spin-list a[href]:hover, .spin-list .nav:hover {
+    background-color: #D6D6D6;
+  
+    background-image: -webkit-gradient(linear, left top, left bottom,from(#EFEFEF),to(#D6D6D6));
+    background-image: -webkit-linear-gradient(top, #EFEFEF, #D6D6D6);   
+    background-image:    -moz-linear-gradient(top, #EFEFEF, #D6D6D6);   
+    background-image:     -ms-linear-gradient(top, #EFEFEF, #D6D6D6);   
+    background-image:      -o-linear-gradient(top, #EFEFEF, #D6D6D6);   
+    background-image:         linear-gradient(to bottom, #EFEFEF, #D6D6D6);
+}
+
+.spin-list .spin-active, .spin-list .loaded {
+    background-color: #186AB9;
+  
+    background-image: -webkit-gradient(linear, left top, left bottom,from(#186AB9),to(#6AA4DC)) !important;
+    background-image: -webkit-linear-gradient(top, #186AB9, #6AA4DC) !important;
+    background-image:    -moz-linear-gradient(top, #186AB9, #6AA4DC) !important;
+    background-image:     -ms-linear-gradient(top, #186AB9, #6AA4DC) !important;
+    background-image:      -o-linear-gradient(top, #186AB9, #6AA4DC) !important;
+    background-image:         linear-gradient(to bottom, #186AB9, #6AA4DC) !important;
+}
+
+.spin-list img, .spin-list .icon {
+    vertical-align: middle;
+}
+
+
